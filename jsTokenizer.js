@@ -48,6 +48,7 @@ module.exports = function tokenizer(testCode) {
                 currentFirstLetter = currentCode[0],
                 currentLastLetter = currentCode[currentCode.length - 1];
 
+            //直接全部尝试一次似乎性能有些挫?先不管了...
             const mnum = currentCode.match(rnum),
                 mbool = currentCode.match(rbool),
                 mstring = currentCode.match(rstring),

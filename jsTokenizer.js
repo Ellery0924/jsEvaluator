@@ -17,28 +17,27 @@ const rnum = /\d+(\.\d+)?/,
 let lastIndex = 0, parsed = [];
 let lookahead = lastIndex + 1;
 
+function getToken(match, type) {
+    const cachedIndex = lastIndex,
+        token = match[0];
+    lastIndex += token.length;
+    lookahead = lastIndex + 1;
+    console.log({
+        token: token,
+        len: token.length,
+        type: type,
+        pos: cachedIndex
+    });
+    return {
+        token: token,
+        len: token.length,
+        type: type,
+        pos: cachedIndex
+    };
+}
+
 module.exports = function scan(testCode) {
-
     const codeLen = testCode.length;
-
-    function getToken(match, type) {
-        const cachedIndex = lastIndex,
-            token = match[0];
-        lastIndex += token.length;
-        lookahead = lastIndex + 1;
-        console.log({
-            token: token,
-            len: token.length,
-            type: type,
-            pos: cachedIndex
-        });
-        return {
-            token: token,
-            len: token.length,
-            type: type,
-            pos: cachedIndex
-        };
-    }
 
     while (lastIndex < codeLen && lookahead < codeLen) {
         while (lookahead <= codeLen) {

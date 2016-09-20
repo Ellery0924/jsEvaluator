@@ -1,3 +1,7 @@
+/**
+ * 词法分析器
+ * 只包含es5语法和常用操作符,~ << >>之类的就算了
+ */
 'use strict';
 const rnum = /\d+(\.\d+)?/,
     rbool = /true|false/,

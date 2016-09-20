@@ -36,7 +36,7 @@ function getToken(match, type) {
     };
 }
 
-module.exports = function scan(testCode) {
+module.exports = function tokenizer(testCode) {
     const codeLen = testCode.length;
 
     while (lastIndex < codeLen && lookahead < codeLen) {

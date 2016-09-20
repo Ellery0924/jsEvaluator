@@ -121,7 +121,7 @@ module.exports = function tokenizer(testCode) {
             //匹配操作符
             else if (moperator) {
                 const currentLetter = moperator[0];
-                //以下操作符可能是某个操作符的一部分
+                //以下操作符可能是某个更长的操作符的一部分
                 //因此遇到以下操作符直接向缓冲区追加一个字符进行匹配
                 if (currentLetter === '<'
                     || currentLetter === '>'

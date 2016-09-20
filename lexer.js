@@ -116,7 +116,7 @@ module.exports = function scan(testCode) {
                     || currentLetter === '-'
                     || currentLetter === '*'
                     || currentLetter === '/') {
-                    if (nextLetter.match(/=/)) {
+                    if (nextLetter === '=') {
                         lookahead++;
                         break;
                     }

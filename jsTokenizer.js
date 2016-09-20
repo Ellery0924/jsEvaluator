@@ -11,14 +11,13 @@ const rnum = /\d+(\.\d+)?/,
     rpunctuation = /\.|,|;|\(|\)|\{|\}|\[|\]/,
     roperator = /\+=|\-=|\*=|\/=|\+|\-|\*|\/|<=|>=|>|<|===|!==|!+|&&|\|\|/,
     rassign = /=/,
-    rspace = /\s/,
+    rspace = /[\s\n\r]/,
     rquotation = /['"]/;
 
 let lastIndex = 0, parsed = [];
 let lookahead = lastIndex + 1;
 
 module.exports = function scan(testCode) {
-    testCode = testCode.replace(/[\n\r]+/, '');
 
     const codeLen = testCode.length;
 

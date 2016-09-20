@@ -10,7 +10,13 @@ for (var i = 0; i <= 10; i++) {
     c += "aahaha\"";
 }
 
+while(true){
+    c++;
+}
+
 function nani(arg1, arg2) {
 
-    console.log([123!==123.22],true)
+    console.log([123 !== 123.22], true);
+    c = null;
+    c = undefined;
 }

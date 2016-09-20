@@ -9,7 +9,7 @@ const rnum = /\d+(\.\d+)?/,
     rkeyword = /if|while|for|var|else|function|null|undefined/,
     rid = /[a-zA-Z$_]([\w$_]+)?/,
     rpunctuation = /\.|,|;|\(|\)|\{|\}|\[|\]/,
-    roperator = /\+=|\-=|\*=|\/=|\+|\-|\*|\/|<=|>=|>|<|===|!==|!+|&&|\|\|/,
+    roperator = /\+\+|\-\-|\+=|\-=|\*=|\/=|\+|\-|\*|\/|<=|>=|>|<|===|!==|!+|&&|\|\|/,
     rassign = /=/,
     rspace = /[\s\n\r]/,
     rquotation = /['"]/;
@@ -116,6 +116,10 @@ module.exports = function scan(testCode) {
                     || currentLetter === '*'
                     || currentLetter === '/') {
                     if (nextLetter === '=') {
+                        lookahead++;
+                        break;
+                    }
+                    if (currentLetter === '+' || currentLetter === '-') {
                         lookahead++;
                         break;
                     }

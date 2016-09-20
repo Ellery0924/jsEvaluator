@@ -91,6 +91,7 @@ module.exports = function tokenizer(testCode) {
                 break;
             }
             //匹配关键字
+            //由于字符串的匹配优先进行,因此这里可以放心的匹配
             else if (mkeyword) {
                 parsed.push(getToken(mkeyword, 'keyword'));
                 break;

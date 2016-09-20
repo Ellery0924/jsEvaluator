@@ -8,7 +8,7 @@ const rnum = /\d+(\.\d+)?/,
     rstring = /(['"])([^'"]|\\\'|\\\")*\1/,
     rkeyword = /if|while|for|var|else|function|null|undefined/,
     rid = /[a-zA-Z$_]([\w$_]+)?/,
-    rpunctuation = /\.|,|;|\(|\)|\{|\}|\[|\]/,
+    rpunctuation = /\.|,|;|\(|\)|\{|\}|\[|\]|:/,
     roperator = /\+\+|\-\-|\+=|\-=|\*=|\/=|\+|\-|\*|\/|<=|>=|>|<|===|!==|!+|&&|\|\|/,
     rassign = /=/,
     rspace = /[\s\n\r]/,
@@ -41,7 +41,6 @@ module.exports = function scan(testCode) {
     }
 
     while (lastIndex < codeLen && lookahead < codeLen) {
-
         while (lookahead <= codeLen) {
             const currentCode = testCode.slice(lastIndex, lookahead);
             const nextLetter = testCode[lookahead],

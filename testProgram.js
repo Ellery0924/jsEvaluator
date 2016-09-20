@@ -10,7 +10,7 @@ for (var i = 0; i <= 10; i++) {
     c += "aahaha\"";
 }
 
-while(true){
+while (true) {
     c++;
 }
 
@@ -20,3 +20,5 @@ function nani(arg1, arg2) {
     c = null;
     c = undefined;
 }
+
+var a = {a: "2333", b: null};

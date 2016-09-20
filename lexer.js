@@ -1,10 +1,10 @@
 'use strict';
-const rnum = /\d(\.\d+)?/,
+const rnum = /\d+(\.\d+)?/,
     rbool = /true|false/,
     rstring = /(['"])([^'"]|\\\'|\\\")*\1/,
-    rkeyword = /if|while|for|var|else/,
-    rid = /[\w$_]([\w\d$_]+)?/,
-    rpunctuation = /,|;|\(|\)|\{|\}|\[|\]/,
+    rkeyword = /if|while|for|var|else|function/,
+    rid = /[a-zA-Z$_]([\w$_]+)?/,
+    rpunctuation = /\.|,|;|\(|\)|\{|\}|\[|\]/,
     roperator = /\+=|\-=|\*=|\/=|\+|\-|\*|\/|<=|>=|>|<|===|!==|!+|&&|\|\|/,
     rassign = /=/,
     rspace = /\s/,
@@ -20,18 +20,18 @@ module.exports = function scan(testCode) {
 
     function getToken(match, type) {
         const cachedIndex = lastIndex,
-            word = match[0];
-        lastIndex += word.length;
+            token = match[0];
+        lastIndex += token.length;
         lookahead = lastIndex + 1;
         console.log({
-            text: word,
-            len: word.length,
+            token: token,
+            len: token.length,
             type: type,
             pos: cachedIndex
         });
         return {
-            text: word,
-            len: word.length,
+            token: token,
+            len: token.length,
             type: type,
             pos: cachedIndex
         };
@@ -72,15 +72,7 @@ module.exports = function scan(testCode) {
                 }
             }
 
-            if (mnum) {
-                if (nextLetter.match(/[\.\d]/)) {
-                    lookahead++;
-                    break;
-                }
-                parsed.push(getToken(mnum, 'num'));
-                break;
-            }
-            else if (mbool) {
+            if (mbool) {
                 parsed.push(getToken(mbool, 'bool'));
                 break;
             }
@@ -98,6 +90,14 @@ module.exports = function scan(testCode) {
                     break;
                 }
                 parsed.push(getToken(mid, 'id'));
+                break;
+            }
+            else if (mnum) {
+                if (nextLetter.match(/[\.\d]/)) {
+                    lookahead++;
+                    break;
+                }
+                parsed.push(getToken(mnum, 'num'));
                 break;
             }
             else if (mpunctuation) {
@@ -122,6 +122,10 @@ module.exports = function scan(testCode) {
                         lookahead++;
                         break;
                     }
+                    if (nextLetter.match('=')) {
+                        lookahead++;
+                        break;
+                    }
                 }
                 parsed.push(getToken(moperator, 'operator'));
                 break;
@@ -135,7 +139,7 @@ module.exports = function scan(testCode) {
                 break;
             }
 
-            lookahead++;
+            throw new Error('syntax error at:' + currentCode);
         }
     }
 

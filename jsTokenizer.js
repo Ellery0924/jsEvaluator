@@ -6,7 +6,7 @@
 const rnum = /\d+(\.\d+)?/,
     rbool = /true|false/,
     rstring = /(['"])([^'"]|\\\'|\\\")*\1/,
-    rkeyword = /if|while|for|var|else|function/,
+    rkeyword = /if|while|for|var|else|function|null|undefined/,
     rid = /[a-zA-Z$_]([\w$_]+)?/,
     rpunctuation = /\.|,|;|\(|\)|\{|\}|\[|\]/,
     roperator = /\+=|\-=|\*=|\/=|\+|\-|\*|\/|<=|>=|>|<|===|!==|!+|&&|\|\|/,

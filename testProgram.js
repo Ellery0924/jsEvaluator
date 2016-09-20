@@ -19,6 +19,7 @@ function nani(arg1, arg2) {
     console.log([123 !== 123.22], true);
     c = null;
     c = undefined;
+    return !c
 }
 
 var a = {a: "2333", b: null};

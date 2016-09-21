@@ -71,7 +71,8 @@ module.exports = function tokenizer(testCode) {
             //如果结尾和开头不同为'或者",则报语法错误
             if (currentFirstLetter.match(rquotation)) {
                 if (currentCode.length === 1
-                    || currentCode.length > 1 && !currentLastLetter.match(/['"]/)) {
+                    || currentCode.length > 1 && !currentLastLetter.match(/['"]/
+                    || currentLastLetter.match(/['"]/) && currentCode[currentCode.length - 2] === '\\')) {
                     lookahead++;
                     break;
                 }

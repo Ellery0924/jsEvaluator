@@ -1,21 +1,24 @@
 /**
  * 词法分析器
  * 只包含es5语法和常用操作符,~ << >>之类的就算了
+ * 没用自动机实现可能有bug?先实现了再说...
  */
 'use strict';
+//不处理科学计数法的数字,太麻烦了
 const rnum = /\d+(\.\d+)?/,
-    rbool = /true|false/,
-    rstring = /(['"])([^'"]|\\\'|\\\")*\1/,
-    rkeyword = /if|while|for|var|else|function|null|undefined|return/,
+    rbool = /^(true|false)$/,
+    rstring = /(['"])(\\\'|\\\"|[^'"])*\1/,
+    rkeyword = /^(if|while|for|var|else|function|null|undefined|return|do)$/,
     rid = /[a-zA-Z$_]([\w$_]+)?/,
     rpunctuation = /\.|,|;|\(|\)|\{|\}|\[|\]|:/,
     roperator = /\+\+|\-\-|\+=|\-=|\*=|\/=|\+|\-|\*|\/|<=|>=|>|<|===|!==|!+|&&|\|\|/,
     rassign = /=/,
-    rspace = /[\s\n\r]/,
+    rspace = /[\s\n\r\t]/,
     rquotation = /['"]/;
 
 let lastIndex = 0, parsed = [];
 let lookahead = lastIndex + 1;
+let line = 1;
 
 function getToken(match, type) {
     const cachedIndex = lastIndex,
@@ -34,6 +37,10 @@ function getToken(match, type) {
         type: type,
         pos: cachedIndex
     };
+}
+
+function throwSyntaxError(currentCode, line, index) {
+    throw new Error('Syntax error at line ' + line + ', index:' + index + ', error code:' + currentCode);
 }
 
 module.exports = function tokenizer(testCode) {
@@ -59,6 +66,10 @@ module.exports = function tokenizer(testCode) {
                 massign = currentCode.match(rassign),
                 mspace = currentCode.match(rspace);
 
+            if (currentCode.match(/[\n\r]/)) {
+                line++;
+            }
+
             //如果是空格或者换行,直接跳到下一个字符
             if (mspace) {
                 lastIndex++;
@@ -71,30 +82,43 @@ module.exports = function tokenizer(testCode) {
             //如果结尾和开头不同为'或者",则报语法错误
             if (currentFirstLetter.match(rquotation)) {
                 if (currentCode.length === 1
-                    || currentCode.length > 1 && !currentLastLetter.match(/['"]/
-                    || currentLastLetter.match(/['"]/) && currentCode[currentCode.length - 2] === '\\')) {
+                    || currentCode.length > 1 && currentLastLetter !== currentFirstLetter
+                    || currentLastLetter === currentFirstLetter && currentCode[currentCode.length - 2] === '\\') {
+                    //如果匹配到空白符,则可以认定为非法字符串
+                    //我的天哪 字符串是怎么parse的啊
+                    if (nextLetter.match(rspace)) {
+                        throwSyntaxError(currentCode, line, lastIndex);
+                    }
                     lookahead++;
                     break;
                 }
                 else if (currentLastLetter !== currentFirstLetter) {
-                    throw new Error('syntax error: fail to match quotation at:' + currentCode);
+                    throwSyntaxError(currentCode, line, lastIndex);
                 }
             }
-
-            //匹配布尔值
-            if (mbool) {
-                parsed.push(getToken(mbool, 'bool'));
-                break;
-            }
             //匹配字符串
-            else if (mstring) {
+            if (mstring) {
                 parsed.push(getToken(mstring, 'string'));
                 break;
             }
             //匹配关键字
             //由于字符串的匹配优先进行,因此这里可以放心的匹配
             else if (mkeyword) {
+                if (nextLetter.match(/\w/)) {
+                    lookahead++;
+                    break;
+                }
                 parsed.push(getToken(mkeyword, 'keyword'));
+                break;
+            }
+            //匹配布尔值
+            else if (mbool) {
+                //如果后一个字符还是字母或者数字,说明不是true/false而是变量
+                if (nextLetter.match(/\w/)) {
+                    lookahead++;
+                    break;
+                }
+                parsed.push(getToken(mbool, 'bool'));
                 break;
             }
             //匹配标识符
@@ -111,6 +135,9 @@ module.exports = function tokenizer(testCode) {
                 if (nextLetter.match(/[\.\d]/)) {
                     lookahead++;
                     break;
+                }
+                if (nextLetter.match(/\w/)) {
+                    throwSyntaxError(currentCode, line);
                 }
                 parsed.push(getToken(mnum, 'num'));
                 break;
@@ -166,9 +193,8 @@ module.exports = function tokenizer(testCode) {
                 parsed.push(getToken(massign, 'assign'));
                 break;
             }
-
             //出现空匹配,报语法错误
-            throw new Error('syntax error at:' + currentCode);
+            throwSyntaxError(currentCode, line, lastIndex);
         }
     }
 

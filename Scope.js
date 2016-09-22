@@ -13,4 +13,8 @@ class Scope {
     setParent(parent) {
         this.parent = parent;
     }
+
+    getID(key) {
+        return this.env[key];
+    }
 }

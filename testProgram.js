@@ -1,16 +1,19 @@
 var a = 1
 var b = 2
 var c = 3.5;
+var anothertokenif;
+var trueffff
+var fffftrue;;;;;;
 
 if (!!(a + b >= c)) {
     c = a + b;
 }
 
 for (var i = 0; i <= 10; i++) {
-    c += "aahaha\"";
+    c += 'aahahawocaocao\"cao+++++;';
 }
 
-while (true) {
+while (1) {
     c++;
 }
 

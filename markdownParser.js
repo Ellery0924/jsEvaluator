@@ -29,17 +29,22 @@ function markdownParser(lineList, prev) {
 
         //收集这个section的所有子孙元素,push到tobeParsed数组中
         //next始终指向下一行
-        let next = cdr[0];
+        let next = cdr.shift();
         while (next) {
             //如果当前行没有匹配这个h的末尾并且不是最后一行,向tobeParsed推入一行,并且重置next指针
             if (next && !(next.type === 'head' && next.tag.length === lvl)) {
                 tobeParsed.push(next);
-                cdr = cdr.slice(1);
-                next = cdr[0];
+                next = cdr.shift();
             }
             else {
+                //这里的处理和```是不同的,因为#是不会成对出现的
                 break;
             }
+        }
+        //因为next=cdr.shift()处并没有判断下一行是不是刚好是下一个同级#的开始,因此一定会多shift一行
+        //这里在循环结束后给补回来,除非next是undefined
+        if (next) {
+            cdr.unshift(next);
         }
         //递归地解析tobeParsed,并且添加尾部关闭标签
         ret += markdownParser(tobeParsed, car) + "</div></section>"
@@ -75,7 +80,7 @@ function markdownParser(lineList, prev) {
     }
     //处理```
     else if (car.type === 'multilinecode') {
-        let next = cdr[0], ret = '<code>';
+        let next = cdr.shift(), ret = '<code>';
         //收集两个```之间的所有行,对于```之间的所有行,全部按照普通行处理,不做任何解析
         while (next) {
             if (next.type === 'multilinecode') {
@@ -83,10 +88,9 @@ function markdownParser(lineList, prev) {
                 break;
             }
             ret += next.content + '<br/>';
-            cdr = cdr.slice(1);
-            next = cdr[0];
+            next = cdr.shift();
         }
-        ret += markdownParser(cdr.slice(1), car);
+        ret += markdownParser(cdr, car);
         return ret;
     }
 }

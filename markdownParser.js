@@ -43,7 +43,7 @@ function markdownParser(lineList, prev) {
         }
         //递归地解析tobeParsed,并且添加尾部关闭标签
         ret += markdownParser(tobeParsed, car) + "</div></section>"
-            //递归地处理文档余下的部分
+            //递归地处理文档余下的部分,注意cdr已经不是原来的那个了,而是除去car,tobeParsed的部分,但是prev依然要传入car
             + markdownParser(cdr, car);
         return ret;
     }
@@ -93,7 +93,7 @@ function markdownParser(lineList, prev) {
 
 //markdown的tokenizer,只按行处理token,非常简单
 function markdownTokenizer(text) {
-    const lines = text.split(/[\r\n]+/);
+    const lines = text.split(/[\r\n]+/).map(lineText=>lineText.trim());
     return lines.map(line=> {
         const mhead = line.match(rhead),
             mli = line.match(rli),

@@ -6,7 +6,7 @@ const rhead = /^(\#+)\s+(.*)$/,
     rmultilinecode = /^```$/,
     rbold = /^\*\*\s+(.*)\s+\*\*$/;
 
-function parse(lineList, prev) {
+function markdownParser(lineList, prev) {
     let car = lineList[0],
         cdr = lineList.slice(1);
 
@@ -23,10 +23,11 @@ function parse(lineList, prev) {
                 "<div>",
             tobeParsed = [];
 
-        //开始收集这个section的所有子孙元素,push到tobeParsed数组中
+        //收集这个section的所有子孙元素,push到tobeParsed数组中
+        //next始终指向下一行
         let next = cdr[0];
         while (next) {
-            //如果当前行没有匹配这个h的末尾并且不是最后一行,向tobeParsed推入一行
+            //如果当前行没有匹配这个h的末尾并且不是最后一行,向tobeParsed推入一行,并且重置next指针
             if (next && !(next.type === 'head' && next.tag.length === lvl)) {
                 tobeParsed.push(next);
                 cdr = cdr.slice(1);
@@ -36,10 +37,10 @@ function parse(lineList, prev) {
                 break;
             }
         }
-        //解析tobeParsed,并且添加尾部关闭标签
-        ret += parse(tobeParsed, car) + "</div></section>"
-            //递归处理文档余下的部分
-            + parse(cdr, car);
+        //递归地解析tobeParsed,并且添加尾部关闭标签
+        ret += markdownParser(tobeParsed, car) + "</div></section>"
+            //递归地处理文档余下的部分
+            + markdownParser(cdr, car);
         return ret;
     }
     //处理li
@@ -54,19 +55,19 @@ function parse(lineList, prev) {
         if (!cdr[0] || cdr[0].type !== 'li') {
             ret += '</ul>';
         }
-        return ret + parse(cdr, car);
+        return ret + markdownParser(cdr, car);
     }
     //处理普通行
     else if (car.type === 'content') {
-        return car.content + "<br/>" + parse(cdr, car);
+        return car.content + "<br/>" + markdownParser(cdr, car);
     }
     //处理单行代码
     else if (car.type === 'singlelinecode') {
-        return "<code>" + car.content + "</code>" + parse(cdr, car);
+        return "<code>" + car.content + "</code>" + markdownParser(cdr, car);
     }
     //处理单行加粗
     else if (car.type === 'bold') {
-        return "<b>" + car.content + "</b>" + parse(cdr, car);
+        return "<b>" + car.content + "</b>" + markdownParser(cdr, car);
     }
     //处理多行代码
     else if (car.type === 'multilinecode') {
@@ -81,14 +82,15 @@ function parse(lineList, prev) {
             cdr = cdr.slice(1);
             next = cdr[0];
         }
-        ret += parse(cdr.slice(1), car);
+        ret += markdownParser(cdr.slice(1), car);
         return ret;
     }
 }
 
-module.exports = function markdownParser(text) {
+//markdown的tokenizer,只按行处理token,非常简单
+function markdownTokenizer(text) {
     const lines = text.split(/[\r\n]+/);
-    return parse(lines.map(line=> {
+    return lines.map(line=> {
         const mhead = line.match(rhead),
             mli = line.match(rli),
             mslcode = line.match(rsinglelinecode),
@@ -113,5 +115,9 @@ module.exports = function markdownParser(text) {
         else {
             return {type: 'content', content: line};
         }
-    }), null);
+    })
+}
+
+module.exports = function (text) {
+    return markdownParser(markdownTokenizer(text), null);
 };

@@ -6,10 +6,14 @@ const rhead = /^(\#+)\s+(.*)$/,
     rmultilinecode = /^```$/,
     rbold = /^\*\*\s+(.*)\s+\*\*$/;
 
+//递归下降的md解析器
 function markdownParser(lineList, prev) {
+    //car始终指向待处理列表的第一个元素
     let car = lineList[0],
+        //cdr是待处理列表的尾部,即除了第一个元素的其余部分
         cdr = lineList.slice(1);
 
+    //空列表直接返回'',递归的终止条件
     if (lineList.length === 0) {
         return '';
     }
@@ -43,7 +47,7 @@ function markdownParser(lineList, prev) {
             + markdownParser(cdr, car);
         return ret;
     }
-    //处理li
+    //处理-
     else if (car.type === 'li') {
         //li元素
         let ret = "<li>" + car.content + "</li>";
@@ -61,18 +65,18 @@ function markdownParser(lineList, prev) {
     else if (car.type === 'content') {
         return car.content + "<br/>" + markdownParser(cdr, car);
     }
-    //处理单行代码
+    //处理``
     else if (car.type === 'singlelinecode') {
         return "<code>" + car.content + "</code>" + markdownParser(cdr, car);
     }
-    //处理单行加粗
+    //处理**
     else if (car.type === 'bold') {
         return "<b>" + car.content + "</b>" + markdownParser(cdr, car);
     }
-    //处理多行代码
+    //处理```
     else if (car.type === 'multilinecode') {
         let next = cdr[0], ret = '<code>';
-        //对于```之间的所有行,全部按照普通行处理
+        //收集两个```之间的所有行,对于```之间的所有行,全部按照普通行处理,不做任何解析
         while (next) {
             if (next.type === 'multilinecode') {
                 ret += '</code>';

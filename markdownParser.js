@@ -41,8 +41,8 @@ function markdownParser(lineList, prev) {
                 break;
             }
         }
-        //因为next=cdr.shift()处并没有判断下一行是不是刚好是下一个同级#的开始,因此一定会多shift一行
-        //这里在循环结束后给补回来,除非next是undefined
+        //因为#并不会成对出现,因此循环结束时,最后一个被shift出来的元素一定是下一级#的头一行或者undefined
+        //所以这里在循环结束后补回多shift的一行
         if (next) {
             cdr.unshift(next);
         }

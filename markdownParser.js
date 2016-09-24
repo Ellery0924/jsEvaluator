@@ -1,5 +1,4 @@
 'use strict';
-
 const rhead = /^(\#+)\s+(.*)$/,
     rli = /^\-\s+(.*)$/,
     rsinglelinecode = /^``(.*)``$/,
@@ -123,7 +122,7 @@ function markdownTokenizer(text) {
         else {
             return {type: 'content', content: line};
         }
-    })
+    });
 }
 
 module.exports = function (text) {

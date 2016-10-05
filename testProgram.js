@@ -3,9 +3,10 @@ var b = 2
 var c = 3.5;
 var anothertokenif;
 var trueffff
-var fffftrue;;;;;;
+var fffftrue;
+;;;;;
 
-if (!!(a + b >= c)) {
+if (!!(a ? a : b)) {
     c = a + b;
 }
 

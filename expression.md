@@ -12,30 +12,63 @@ js表达式优先级
 3. || 或
 4. && 与
 5. === !== <= > < >= 比较运算(== != 已经被开除党籍)
-6. +-/* 四则运算
+6. +- 加减
+7. */ 乘除
 
 一元运算符
 7. ++ -- += += -= *= /= !+ - 自加/自减/自乘/自除/not/数字求反 (~|&等等全部无视)
 8. .
 
 表达式文法
-终结符: identifier(id) | string | number|  object | array | undefined | null | bool | e(空字符,艾塔打不出来,凑合用e) 以上所有运算符
+终结符: identifier(id) | string | number|  object | array | undefined | null | bool | e(空字符) | () |  以上所有运算符
 非终结符 Expr[n] n根据优先级从小到大递增 | Lval Lval' 左值文法 | Rval Rval' 右值文法 | Factor 基本类型/id
 
-//赋值运算符文法 左值=更高优先级级表达式
-Expr[0]->Lval=Rval
+Expr->Expr0|Expr1|Expr2
+
+//赋值运算符文法 左值=右值
+Expr0->Lval=Expr
 
 //左递归的左值文法
-Lval->Lval.id|Lval[string]|Lval[number]|Lval[id]|id
+Lval->Lval.id | Lval[string] | Lval[number] | Lval[id] | id
 
 //消除左递归的左值文法
 Lval->idLval'
-Lval'->.idLval'|[string]Lval'|[number]Lval'|[id]Lval'|e
+Lval'->.idLval' | [string]Lval' | [number]Lval' | [id]Lval' | (Lval') | e
 
-//右值文法,无左递归
-Rval->Factor|Expr[0-n]
+//三元操作符
+Expr1->Expr2?Expr1':Expr1'
+//三元操作符子表达式
+Expr1'->Expr1 | Expr2
 
-//咖啡喝完了 回家!
-Expr[1]->
-
-Factor->id|string|number|object|array|undefined|null|bool
+//二元操作符
+//或操作符
+Expr2->Expr3Expr2'
+Expr2'->e | ||Expr3Expr2'
+//与操作符
+Expr3->Expr4Expr3'
+Expr3'->e | &&Expr4Expr3'
+//比较操作
+Expr4->Expr5Expr4'
+Expr4'->e | >Expr5Expr4' | >=Expr5Expr4' | <Expr5Expr4' | <=Expr5Expr4' | ===Expr5Expr4' | !==Expr5Expr4'
+//加减法
+Expr5->Expr6Expr5'
+Expr5'->e | +Expr6Expr5' | -Expr6Expr5'
+//乘除法
+Expr6->FactorExpr6'
+Expr6'-> *FactorExpr6' | /FactorExpr6'
+//基本因子
+Factor->Lval | BasicTypes | (Expr) | Expr7
+//一元运算符
+Expr7->++Lval | --Lval | !Factor
+//基本数据类型
+BasicTypes->string | number | object | array | undefined | null | bool
+//对象
+object->{objContent}
+//对象内容
+objContent->key:Expr,objContent | key:Expr | e
+//键值
+key->id | string | number
+//数组
+array->[arrayContent]
+//数组内容
+arrayContent->Expr,arrayContent | Expr | e

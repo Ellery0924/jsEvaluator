@@ -11,14 +11,14 @@ if (!!(a ? a : b)) {
 }
 
 for (var i = 0; i <= 10; i++) {
-    c += 'aahahawocaocao\"cao+++++;';
+    c += 'aahaha\"+++++;';
 }
 
 while (1) {
     c++;
 }
 
-function nani(arg1, arg2) {
+function foo(arg1, arg2) {
 
     console.log([123 !== 123.22], true);
     c = null;

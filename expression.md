@@ -21,25 +21,19 @@ js表达式优先级
 
 表达式文法
 终结符: identifier(id) | string | number|  object | array | undefined | null | bool | e(空字符) | () |  以上所有运算符
-非终结符 Expr[n] n根据优先级从小到大递增 | Lval Lval' 左值文法 | Rval Rval' 右值文法 | Factor 基本类型/id
 
+//表达式文法入口
 Expr->Expr0|Expr1|Expr2
-
 //赋值运算符文法 左值=右值
-Expr0->Lval=Expr
-
+Expr0->Lval=Rval
+Rval->Expr
 //左递归的左值文法
 Lval->Lval.id | Lval[string] | Lval[number] | Lval[id] | id
-
 //消除左递归的左值文法
 Lval->idLval'
-Lval'->.idLval' | [string]Lval' | [number]Lval' | [id]Lval' | (Lval') | e
-
+Lval'->.idLval' | [string]Lval' | [number]Lval' | [id]Lval'| [bool]Lval' | e
 //三元操作符
-Expr1->Expr2?Expr1':Expr1'
-//三元操作符子表达式
-Expr1'->Expr1 | Expr2
-
+Expr1->Expr2?Expr1:Expr1 | Expr2
 //二元操作符
 //或操作符
 Expr2->Expr3Expr2'
@@ -57,11 +51,9 @@ Expr5'->e | +Expr6Expr5' | -Expr6Expr5'
 Expr6->FactorExpr6'
 Expr6'-> *FactorExpr6' | /FactorExpr6'
 //基本因子
-Factor->Lval | BasicTypes | (Expr) | Expr7
-//一元运算符
-Expr7->++Lval | --Lval | !Factor
-//基本数据类型
-BasicTypes->string | number | object | array | undefined | null | bool
+Factor->Lval | string | number | object | array | undefined | null | bool | (Expr) | Expr7 | !Factor
+Expr7->++Expr7'|--Expr7'
+Expr7'->(Lval)|Lval
 //对象
 object->{objContent}
 //对象内容

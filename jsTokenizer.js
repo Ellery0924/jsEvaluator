@@ -25,12 +25,15 @@ function getToken(match, type) {
         token = match[0];
     lastIndex += token.length;
     lookahead = lastIndex + 1;
-    console.log({
-        token: token,
-        len: token.length,
-        type: type,
-        pos: cachedIndex
-    });
+    if (token === 'null' || token === 'undefined') {
+        type = token;
+    }
+    //console.warn({
+    //    token: token,
+    //    len: token.length,
+    //    type: type,
+    //    pos: cachedIndex
+    //});
     return {
         token: token,
         len: token.length,
@@ -48,10 +51,10 @@ module.exports = function tokenizer(testCode) {
     //使用lastIndex和lookahead维护一个缓冲区
     //缓冲区的初始大小为1,即只保存一个字符
     //但是会有很多情况需要追加字符再进行匹配
-    while (lastIndex < codeLen && lookahead < codeLen) {
+    while (lastIndex < codeLen && lookahead <= codeLen) {
         while (lookahead <= codeLen) {
             const currentCode = testCode.slice(lastIndex, lookahead);
-            const nextLetter = testCode[lookahead],
+            const nextLetter = testCode[lookahead] == null ? '' : testCode[lookahead],
                 currentFirstLetter = currentCode[0],
                 currentLastLetter = currentCode[currentCode.length - 1];
 
@@ -139,7 +142,7 @@ module.exports = function tokenizer(testCode) {
                 if (nextLetter.match(/\w/)) {
                     throwSyntaxError(currentCode, line);
                 }
-                parsed.push(getToken(mnum, 'num'));
+                parsed.push(getToken(mnum, 'number'));
                 break;
             }
             //匹配标点符号
@@ -162,7 +165,7 @@ module.exports = function tokenizer(testCode) {
                         lookahead++;
                         break;
                     }
-                    if (currentLetter === '+' || currentLetter === '-') {
+                    if (nextLetter === '+' || nextLetter === '-') {
                         lookahead++;
                         break;
                     }

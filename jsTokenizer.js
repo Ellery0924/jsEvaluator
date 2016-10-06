@@ -5,7 +5,7 @@
  */
 'use strict';
 //不处理科学计数法的数字,太麻烦了
-const rnum = /\d+(\.\d+)?/,
+const rnum = /\-?\d+(\.\d+)?/,
     rbool = /^(true|false)$/,
     rstring = /(['"])(\\\'|\\\"|[^'"])*\1/,
     rkeyword = /^(if|while|for|var|else|function|null|undefined|return|do)$/,
@@ -28,12 +28,12 @@ function getToken(match, type) {
     if (token === 'null' || token === 'undefined') {
         type = token;
     }
-    //console.warn({
-    //    token: token,
-    //    len: token.length,
-    //    type: type,
-    //    pos: cachedIndex
-    //});
+    console.warn({
+        token: token,
+        len: token.length,
+        type: type,
+        pos: cachedIndex
+    });
     return {
         token: token,
         len: token.length,
@@ -54,8 +54,8 @@ module.exports = function tokenizer(testCode) {
     while (lastIndex < codeLen && lookahead <= codeLen) {
         while (lookahead <= codeLen) {
             const currentCode = testCode.slice(lastIndex, lookahead);
-            const nextLetter = testCode[lookahead] == null ? '' : testCode[lookahead],
-                currentFirstLetter = currentCode[0],
+            let nextLetter = testCode[lookahead] == null ? '' : testCode[lookahead];
+            const currentFirstLetter = currentCode[0],
                 currentLastLetter = currentCode[currentCode.length - 1];
 
             //直接全部尝试一次似乎性能有些挫?先不管了...
@@ -169,14 +169,13 @@ module.exports = function tokenizer(testCode) {
                         lookahead++;
                         break;
                     }
-                }
-                //处理!,!可能是!!(!!!,!!!!...)或者!==的一部分
-                if (currentLetter === '!') {
-                    //不停地追加!直至下一个不是!的字符
-                    if (nextLetter === '!') {
+                    if (currentLetter === '-' && nextLetter.match(/\d/)) {
                         lookahead++;
                         break;
                     }
+                }
+                //处理!
+                if (currentLetter === '!') {
                     //匹配!==
                     if (nextLetter === '=') {
                         lookahead++;

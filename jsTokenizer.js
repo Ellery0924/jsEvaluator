@@ -1,14 +1,13 @@
 /**
  * 词法分析器
  * 只包含es5语法和常用操作符,~ << >>之类的就算了
- * 没用自动机实现可能有bug?先实现了再说...
  */
 'use strict';
-//不处理科学计数法的数字,太麻烦了
+//不处理科学计数法的数字
 const rnum = /\-?\d+(\.\d+)?/,
     rbool = /^(true|false)$/,
     rstring = /(['"])(\\\'|\\\"|[^'"])*\1/,
-    rkeyword = /^(if|while|for|var|else|function|null|undefined|return|do)$/,
+    rkeyword = /^(if|while|for|var|else|function|null|undefined|return|do|break|continue)$/,
     rid = /[a-zA-Z$_]([\w$_]+)?/,
     rpunctuation = /\.|,|;|\(|\)|\{|\}|\[|\]/,
     roperator = /\+\+|\-\-|\+=|\-=|\*=|\/=|\+|\-|\*|\/|<=|>=|>|<|===|!==|!+|&&|\|\||\?|:/,
@@ -47,6 +46,7 @@ function throwSyntaxError(currentCode, line, index) {
 }
 
 module.exports = function tokenizer(testCode) {
+    console.log('tokenizer analyzing...');
     const codeLen = testCode.length;
     //使用lastIndex和lookahead维护一个缓冲区
     //缓冲区的初始大小为1,即只保存一个字符
@@ -170,8 +170,12 @@ module.exports = function tokenizer(testCode) {
                         break;
                     }
                     if (currentLetter === '-' && nextLetter.match(/\d/)) {
-                        lookahead++;
-                        break;
+                        const prevLetter = testCode[lastIndex - 1];
+                        //如果之前的字符是一个数字,字母或者反括号,那么说明不是负数而是减法
+                        if (prevLetter && !prevLetter.match(/[\d\w\)]/)) {
+                            lookahead++;
+                            break;
+                        }
                     }
                 }
                 //处理!

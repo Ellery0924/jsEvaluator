@@ -38,6 +38,7 @@ Expr1->Expr2?Expr1:Expr1 | Expr2
 //或操作符
 Expr2->Expr3Expr2'
 Expr2'->e | ||Expr3Expr2'
+Expr->Expr3||Expr2 | Expr3
 //与操作符
 Expr3->Expr4Expr3'
 Expr3'->e | &&Expr4Expr3'
@@ -52,7 +53,7 @@ Expr6->FactorExpr6'
 Expr6'-> *FactorExpr6' | /FactorExpr6'
 //基本因子
 Factor->Lval | string | number | object | array | undefined | null | bool | (Expr) | Expr7 | !Factor
-Expr7->++Expr7'|--Expr7'
+Expr7->++Expr7'|--Expr7'|+=Expr7'|-=Expr7'|*=Expr7'|/=Expr7'|Expr7'--|Expr7'++
 Expr7'->(Lval)|Lval
 //对象
 object->{objContent}

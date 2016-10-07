@@ -30,18 +30,22 @@ Rval->Expr
 //左递归的左值文法
 Lval->Lval.id | Lval[string] | Lval[number] | Lval[id] | id
 //消除左递归的左值文法
-Lval->idLval'
+Lval->idLval' | (Lval)
 Lval'->.idLval' | [string]Lval' | [number]Lval' | [id]Lval'| [bool]Lval' | e
 //三元操作符
 Expr1->Expr2?Expr1:Expr1 | Expr2
 //二元操作符
+//+=,-=
+Expr8-> Expr9 | Lval+=Expr9 | Lval-=Expr9
+//*=,/=
+Expr9->Lval*=Expr4 | Lval/=Expr4 | Expr4
 //或操作符
 Expr2->Expr3Expr2'
 Expr2'->e | ||Expr3Expr2'
 Expr->Expr3||Expr2 | Expr3
 //与操作符
-Expr3->Expr4Expr3'
-Expr3'->e | &&Expr4Expr3'
+Expr3->Expr8Expr3'
+Expr3'->e | &&Expr8Expr3'
 //比较操作
 Expr4->Expr5Expr4'
 Expr4'->e | >Expr5Expr4' | >=Expr5Expr4' | <Expr5Expr4' | <=Expr5Expr4' | ===Expr5Expr4' | !==Expr5Expr4'
@@ -53,7 +57,7 @@ Expr6->FactorExpr6'
 Expr6'-> *FactorExpr6' | /FactorExpr6'
 //基本因子
 Factor->Lval | string | number | object | array | undefined | null | bool | (Expr) | Expr7 | !Factor
-Expr7->++Expr7'|--Expr7'|+=Expr7'|-=Expr7'|*=Expr7'|/=Expr7'|Expr7'--|Expr7'++
+Expr7->++Expr7'|--Expr7' | Expr7'--| Expr7'++
 Expr7'->(Lval)|Lval
 //对象
 object->{objContent}

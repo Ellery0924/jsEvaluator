@@ -10,7 +10,7 @@ const rnum = /\-?\d+(\.\d+)?/,
     rkeyword = /^(if|while|for|var|else|function|null|undefined|return|do|break|continue)$/,
     rid = /[a-zA-Z$_]([\w$_]+)?/,
     rpunctuation = /\.|,|;|\(|\)|\{|\}|\[|\]/,
-    roperator = /\+\+|\-\-|\+=|\-=|\*=|\/=|\+|\-|\*|\/|<=|>=|>|<|===|!==|!+|&&|\|\||&|\||\?|:/,
+    roperator = /\+\+|\-\-|\+=|\-=|\*=|\/=|\+|\-|\*|\/|<=|>=|<<|>>|>|<|===|!==|==|!=|!|&&|\|\||&|\||\?|:|~/,
     rassign = /=/,
     rspace = /[\s\n\r\t]/,
     rquotation = /['"]/;
@@ -155,38 +155,40 @@ module.exports = function tokenizer(testCode) {
                 const currentLetter = moperator[0];
                 //以下操作符可能是某个更长的操作符的一部分
                 //因此遇到以下操作符直接向缓冲区追加一个字符进行匹配
-                if (currentLetter === '<'
-                    || currentLetter === '>'
-                    || currentLetter === '+'
+                if (currentLetter === '-' && nextLetter.match(/\d/)) {
+                    const prevLetter = testCode[lastIndex - 1];
+                    //如果之前的字符是一个数字,字母或者反括号,那么说明不是负数而是减法
+                    if (prevLetter && !prevLetter.match(/[\d\w\)]/)) {
+                        lookahead++;
+                        break;
+                    }
+                }
+                else if (currentLetter === '|' && nextLetter === '|' ||
+                    currentLetter === '&' && nextLetter === '&') {
+                    lookahead++;
+                    break;
+                }
+                else if (currentLetter === '<' && (nextLetter === '<' || nextLetter === '=')
+                    || currentLetter === '>' && (nextLetter === '>' || nextLetter === '=')) {
+                    lookahead++;
+                    break;
+                }
+                else if (currentLetter === '+' && nextLetter === '+'
+                    || currentLetter === '-' && nextLetter === '-') {
+                    lookahead++;
+                    break;
+                }
+                else if (currentLetter === '+'
                     || currentLetter === '-'
                     || currentLetter === '*'
-                    || currentLetter === '|'
-                    || currentLetter === '&'
                     || currentLetter === '/') {
                     if (nextLetter === '=') {
                         lookahead++;
                         break;
                     }
-                    if (nextLetter === '+' || nextLetter === '-') {
-                        lookahead++;
-                        break;
-                    }
-                    if (currentLetter === '-' && nextLetter.match(/\d/)) {
-                        const prevLetter = testCode[lastIndex - 1];
-                        //如果之前的字符是一个数字,字母或者反括号,那么说明不是负数而是减法
-                        if (prevLetter && !prevLetter.match(/[\d\w\)]/)) {
-                            lookahead++;
-                            break;
-                        }
-                    }
-                    if (currentLetter === '|' && nextLetter === '|' ||
-                        currentLetter === '&' && nextLetter === '&') {
-                        lookahead++;
-                        break;
-                    }
                 }
                 //处理!
-                if (currentLetter === '!') {
+                else if (currentLetter === '!') {
                     //匹配!==
                     if (nextLetter === '=') {
                         lookahead++;

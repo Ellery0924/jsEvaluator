@@ -46,7 +46,7 @@ module.exports = function evalJs(tokens) {
             if (m) {
                 toNextPos();
                 ast.append(new Node(currentToken.token, currentToken.type), parent);
-                return currentToken;
+                return true;
             }
             else {
                 if (optional) {
@@ -66,7 +66,7 @@ module.exports = function evalJs(tokens) {
             if (m) {
                 toNextPos();
                 ast.append(new Node(currentToken.token, currentToken.type), parent);
-                return currentToken;
+                return true;
             }
             else {
                 if (optional) {
@@ -78,7 +78,14 @@ module.exports = function evalJs(tokens) {
     }
 
     function findFirstKeyTerm(from) {
-        return tokens.slice(from).find(token=>token.token === '=' || token.token === '?') || {token: 'others'};
+        return tokens.slice(from).find(token=>
+                token.token === '='
+                || token.token === '?'
+                || token.token === '+='
+                || token.token === '-='
+                || token.token === '*='
+                || token.token === '/='
+            ) || {token: 'others'};
     }
 
     function Expr(node, from) {
@@ -87,13 +94,17 @@ module.exports = function evalJs(tokens) {
             const exprRoot = ast.append(new Node('EXPR', 'NON_TERM'), node);
             switch (keyTerm.token) {
                 case '=':
-                    return Expr0(exprRoot);
+                case '+=':
+                case '-=':
+                case '*=':
+                case '/=':
+                    Expr0(exprRoot);
                     break;
                 case '?':
-                    return Expr1(exprRoot);
+                    Expr1(exprRoot);
                     break;
                 default:
-                    return Expr2(exprRoot);
+                    Expr2(exprRoot);
             }
         }
     }
@@ -101,19 +112,26 @@ module.exports = function evalJs(tokens) {
     function Expr0(parent) {
         const node = ast.append(new Node('EXPR_0', 'NON_TERM'), parent);
         Lval(node);
-        matchToken(/=/, node);
-        return Rval(node, current);
+        matchToken(/\+=|\-=|\*=|\/=|=/, node);
+        Rval(node, current);
     }
 
     function Lval(parent) {
         const node = ast.append(new Node('LVAL', 'NON_TERM'), parent);
-        matchType(/id/, node);
-        LvalTail(node);
+        if (matchToken(/\(/, node, true)) {
+            matchType(/id/, node);
+            LvalTail(node);
+            matchToken(/\)/, node, true);
+        }
+        else {
+            matchType(/id/, node);
+            LvalTail(node);
+        }
     }
 
     function Rval(parent) {
         const node = ast.append(new Node('RVAL', 'NON_TERM'), parent);
-        return Expr(node, current);
+        Expr(node, current);
     }
 
     function LvalTail(parent) {
@@ -133,183 +151,126 @@ module.exports = function evalJs(tokens) {
 
     function Expr1(parent) {
         const node = ast.append(new Node('EXPR_1', 'NON_TERM'), parent);
-        const cond = Expr2(node);
+        Expr2(node);
         if (matchToken(/\?/, node, true)) {
-            const then = Expr1(node);
+            Expr1(node);
             matchToken(/:/, node);
-            const els = Expr1(node);
-
-            if (cond) {
-                return then;
-            }
-            return els;
+            Expr1(node);
         }
-
-        return cond;
     }
 
     function Expr2(parent) {
         const node = ast.append(new Node('EXPR_2', 'NON_TERM'), parent);
-        const first = Expr3(node);
-        if (matchToken(/\|\|/, node, true)) {
-            const rest = Expr2(node);
-            if (first) {
-                return first;
-            }
-            return rest;
-        }
+        Expr3(node);
+        Expr2Tail(node);
+    }
 
-        return first;
+    function Expr2Tail(parent) {
+        const node = new Node('EXPR_2_TAIL', 'NON_TERM');
+        if (matchToken(/\|\|/, node, true)) {
+            Expr3(node);
+            Expr2Tail(node);
+            ast.append(node, parent);
+        }
     }
 
     function Expr3(parent) {
         const node = ast.append(new Node('EXPR_3', 'NON_TERM'), parent);
-        const first = Expr4(node);
-        if (matchToken(/&&/, node, true)) {
-            const rest = Expr3(node);
-            if (first) {
-                if (rest) {
-                    return rest;
-                }
-            }
-            return first;
-        }
+        Expr4(node);
+        Expr3Tail(node);
+    }
 
-        return first;
+    function Expr3Tail(parent) {
+        const node = new Node('EXPR_3_TAIL', 'NON_TERM');
+        if (matchToken(/&&/, node, true)) {
+            Expr4(node);
+            Expr3Tail(node);
+            ast.append(node, parent);
+        }
     }
 
     function Expr4(parent) {
         const node = ast.append(new Node('EXPR_4', 'NON_TERM'), parent);
-        const first = Expr5(node);
-        const operatorToken = matchToken(/>|>=|<|<=|===|!==/, node, true);
-        if (operatorToken) {
-            const rest = Expr4(node);
-            const operator = operatorToken.token;
-            if (operator === '>') {
-                return first > rest;
-            }
-            else if (operator === '>=') {
-                return first >= rest;
-            }
-            else if (operator === '<') {
-                return first < rest;
-            }
-            else if (operator === '<=') {
-                return first <= rest;
-            }
-            else if (operator === '===') {
-                return first === rest;
-            }
-            else if (operator === '!==') {
-                return first !== rest;
-            }
-        }
+        Expr5(node);
+        Expr4Tail(node);
+    }
 
-        return first;
+    function Expr4Tail(parent) {
+        const node = new Node('EXPR_4_TAIL', 'NON_TERM');
+        if (matchToken(/>|>=|<|<=|===|!==/, node, true)) {
+            Expr5(node);
+            Expr4Tail(node);
+            ast.append(node, parent);
+        }
     }
 
     function Expr5(parent) {
         const node = ast.append(new Node('EXPR_5', 'NON_TERM'), parent);
-        const first = Expr6(node);
-        const operatorToken = matchToken(/\+|\-/, node, true);
+        Expr6(node);
+        Expr5Tail(node);
+    }
 
-        if (operatorToken) {
-            const rest = Expr5(node);
-            const operator = operatorToken.token;
-
-            if (operator === '+') {
-                return first + rest;
-            }
-            return first - rest;
+    function Expr5Tail(parent) {
+        const node = new Node('EXPR_5_TAIL', 'NON_TERM');
+        if (matchToken(/^(\+|\-)$/, node, true)) {
+            Expr6(node);
+            Expr5Tail(node);
+            ast.append(node, parent);
         }
-
-        return first;
     }
 
     function Expr6(parent) {
+        //console.log(parent);
         const node = ast.append(new Node('EXPR_6', 'NON_TERM'), parent);
-        const first = Factor(node);
-        const operatorToken = matchToken(/\*|\//, node, true);
+        Factor(node);
+        Expr6Tail(node);
+    }
 
-        if (operatorToken) {
-            const rest = Expr6(node);
-            const operator = operatorToken.token;
-
-            if (operator === '*') {
-                return first * rest;
-            }
-            return first / rest;
+    function Expr6Tail(parent) {
+        const node = new Node('EXPR_6_TAIL', 'NON_TERM');
+        if (matchToken(/^(\*|\/)$/, node, true)) {
+            Factor(node);
+            Expr6Tail(node);
+            ast.append(node, parent);
         }
-
-        return first;
     }
 
     function Factor(parent) {
-        if (current < tokens.length) {
-            const node = ast.append(new Node('FACTOR', 'NON_TERM'), parent);
-            const currentToken = tokens[current],
-                type = currentToken.type,
-                token = currentToken.token,
-                nextToken = lookAhead < tokens.length ? tokens[lookAhead].token : '';
+        const node = ast.append(new Node('FACTOR', 'NON_TERM'), parent);
+        const currentToken = tokens[current],
+            type = currentToken.type,
+            token = currentToken.token;
 
-            if (type.match(/string|number|bool|undefined|null/)) {
-                const valToken = matchType(/string|number|bool|undefined|null/, node);
-                const type = valToken.type, valStr = valToken.token;
-                if (type === 'string') {
-                    return valStr;
-                }
-                else if (type === 'number') {
-                    return Number(valStr);
-                }
-                else if (type === 'bool') {
-                    if (valStr === 'true') {
-                        return true;
-                    }
-                    return false;
-                }
-                else if (type === 'undefined') {
-                    return undefined;
-                }
-                else if (type === 'null') {
-                    return null;
-                }
-            }
-            else if (token.match(/\+\+|\-\-|\+=|-=|\*=|\/=/)
-                || type === 'id' && nextToken.match(/\+\+|\-\-/)) {
-                return Expr7(node);
-            }
-            else if (type.match(/id/)) {
-                return Lval(node);
-            }
-            else if (token.match(/!/)) {
-                matchToken(/!/, node);
-                return !Factor(node);
-            }
-            else if (token.match(/\{/)) {
-                return Obj(node);
-            }
-            else if (token.match(/\[/)) {
-                return Arr(node);
-            }
-            else if (token.match(/\(/)) {
-                matchToken(/\(/, node);
-                const val = Expr(node, current);
-                matchToken(/\)/, node);
-                return val;
-            }
+        if (type.match(/string|number|bool|undefined|null/)) {
+            matchType(/string|number|bool|undefined|null/, node);
+        }
+        else if (type.match(/id/)) {
+            Lval(node);
+        }
+        else if (token.match(/\+\+|\-\-/)) {
+            Expr7(node);
+        }
+        else if (token.match(/!/)) {
+            matchToken(/!/, node);
+            Factor(node);
+        }
+        else if (token.match(/\{/)) {
+            evalObject(node);
+        }
+        else if (token.match(/\[/)) {
+            evalArray(node);
+        }
+        else if (token.match(/\(/)) {
+            matchToken(/\(/, node);
+            Expr(node, current);
+            matchToken(/\)/, node);
         }
     }
 
     function Expr7(parent) {
         const node = ast.append(new Node('EXPR_7', 'NON_TERM'), parent);
-        const first = matchToken(/\-\-|\+\+/, node, true);
-        if (first) {
-            Expr7Tail(node);
-        }
-        else {
-            Expr7Tail(node);
-            matchToken(/\-\-|\+\+/, node);
-        }
+        matchToken(/\-\-|\+\+/, node);
+        Expr7Tail(node);
     }
 
     function Expr7Tail(parent) {
@@ -324,37 +285,37 @@ module.exports = function evalJs(tokens) {
         ast.append(node, parent);
     }
 
-    function Obj(parent) {
+    function evalObject(parent) {
         const node = ast.append(new Node('OBJECT', 'NON_TERM'), parent);
         matchToken(/\{/, node);
-        ObjContent(node);
+        evalObjectContent(node);
         matchToken(/\}/, node);
     }
 
-    function ObjContent(parent) {
+    function evalObjectContent(parent) {
         const node = new Node('OBJECT_CONTENT', 'NON_TERM');
         if (matchType(/id|string|number/, node, true)) {
             matchToken(/:/, node);
             Expr(node, current);
             ast.append(node, parent);
             if (matchToken(/\,/, node, true)) {
-                ObjContent(node);
+                evalObjectContent(node);
             }
         }
     }
 
-    function Arr(parent) {
+    function evalArray(parent) {
         const node = ast.append(new Node('ARRAY', 'NON_TERM'), parent);
         matchToken(/\[/, node, true);
-        ArrContent(node);
+        evalArrayContent(node);
         matchToken(/\]/, node, true);
     }
 
-    function ArrContent(parent) {
+    function evalArrayContent(parent) {
         const node = ast.append(new Node('ARRAY_CONTENT', 'NON_TERM'), parent);
         Expr(node, current);
         if (matchToken(/\,/, node, true)) {
-            ArrContent(node);
+            evalArrayContent(node);
         }
     }
 
@@ -381,15 +342,10 @@ module.exports = function evalJs(tokens) {
         if (node.parent) {
             delete node.parent;
         }
-        if (node.children.length === 0) {
-            delete node.children;
-        }
-        if (node.children) {
-            node.children.forEach(child=>clearAST(child));
-        }
+        node.children.forEach(child=>clearAST(child));
     }
 
-    console.log('eval result: ' + Expr(null, 0));
+    Expr(null, 0);
     flatAST(ast.root);
     clearAST(ast.root);
     return ast;

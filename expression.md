@@ -23,9 +23,9 @@ js表达式优先级
 终结符: identifier(id) | string | number|  object | array | undefined | null | bool | e(空字符) | () |  以上所有运算符
 
 //表达式文法入口
-Expr->Expr0|Expr1|Expr2
+Expr->Expr0 | Expr1 | Expr2
 //赋值运算符文法 左值=右值
-Expr0->Lval=Rval
+Expr0->Lval=Rval | Lval+=Rval | Lval-=Rval | Lval*=Rval | Lval/=Rval
 Rval->Expr
 //左递归的左值文法
 Lval->Lval.id | Lval[string] | Lval[number] | Lval[id] | id
@@ -35,10 +35,6 @@ Lval'->.idLval' | [string]Lval' | [number]Lval' | [id]Lval'| [bool]Lval' | e
 //三元操作符
 Expr1->Expr2?Expr1:Expr1 | Expr2
 //二元操作符
-//+=,-=
-Expr8-> Expr9 | Lval+=Expr9 | Lval-=Expr9
-//*=,/=
-Expr9->Lval*=Expr4 | Lval/=Expr4 | Expr4
 //或操作符
 Expr2->Expr3Expr2'
 Expr2'->e | ||Expr3Expr2'

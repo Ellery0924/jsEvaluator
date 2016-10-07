@@ -10,7 +10,7 @@ const rnum = /\-?\d+(\.\d+)?/,
     rkeyword = /^(if|while|for|var|else|function|null|undefined|return|do|break|continue)$/,
     rid = /[a-zA-Z$_]([\w$_]+)?/,
     rpunctuation = /\.|,|;|\(|\)|\{|\}|\[|\]/,
-    roperator = /\+\+|\-\-|\+=|\-=|\*=|\/=|\+|\-|\*|\/|<=|>=|>|<|===|!==|!+|&&|\|\||\?|:/,
+    roperator = /\+\+|\-\-|\+=|\-=|\*=|\/=|\+|\-|\*|\/|<=|>=|>|<|===|!==|!+|&&|\|\||&|\||\?|:/,
     rassign = /=/,
     rspace = /[\s\n\r\t]/,
     rquotation = /['"]/;
@@ -160,6 +160,8 @@ module.exports = function tokenizer(testCode) {
                     || currentLetter === '+'
                     || currentLetter === '-'
                     || currentLetter === '*'
+                    || currentLetter === '|'
+                    || currentLetter === '&'
                     || currentLetter === '/') {
                     if (nextLetter === '=') {
                         lookahead++;
@@ -176,6 +178,11 @@ module.exports = function tokenizer(testCode) {
                             lookahead++;
                             break;
                         }
+                    }
+                    if (currentLetter === '|' && nextLetter === '|' ||
+                        currentLetter === '&' && nextLetter === '&') {
+                        lookahead++;
+                        break;
                     }
                 }
                 //处理!

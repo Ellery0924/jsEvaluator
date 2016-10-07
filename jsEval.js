@@ -169,10 +169,10 @@ module.exports = function evalJs(tokens) {
             const rest = Expr3(node);
             if (first) {
                 if (rest) {
-                    return true;
+                    return rest;
                 }
             }
-            return false;
+            return first;
         }
 
         return first;

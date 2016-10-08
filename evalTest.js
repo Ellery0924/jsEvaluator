@@ -4,8 +4,8 @@
 'use strict';
 const fs = require('fs');
 const testCode = fs.readFileSync('./evalTestCode', 'utf8');
-const jsEval = require('./jsEval');
+const parse = require('./jsParse');
 const tokenizer = require('./jsTokenizer');
 
 console.log('evaluating javascript expression ' + testCode);
-fs.writeFileSync('./evalret.json', JSON.stringify(jsEval(tokenizer((testCode))), null, 4));
+fs.writeFileSync('./evalret.json', JSON.stringify(parse(tokenizer((testCode))), null, 4));

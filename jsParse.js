@@ -27,7 +27,7 @@ class Node {
     }
 }
 
-module.exports = function evalJs(tokens) {
+module.exports = function (tokens) {
     const ast = new AST();
 
     function error() {
@@ -111,40 +111,40 @@ module.exports = function evalJs(tokens) {
 
     function assign(parent) {
         const node = ast.append(new Node('ASSIGN', 'NON_TERM'), parent);
-        Lval(node);
+        lVal(node);
         matchToken(/\+=|\-=|\*=|\/=|=/, node);
-        Rval(node, current);
+        rVal(node, current);
     }
 
-    function Lval(parent) {
+    function lVal(parent) {
         const node = ast.append(new Node('LVAL', 'NON_TERM'), parent);
         if (matchToken(/\(/, node, true)) {
             matchType(/id/, node);
-            LvalRest(node);
+            lValRest(node);
             matchToken(/\)/, node, true);
         }
         else {
             matchType(/id/, node);
-            LvalRest(node);
+            lValRest(node);
         }
     }
 
-    function Rval(parent) {
+    function rVal(parent) {
         const node = ast.append(new Node('RVAL', 'NON_TERM'), parent);
         Expr(node, current);
     }
 
-    function LvalRest(parent) {
+    function lValRest(parent) {
         const node = new Node('LVAL_REST', 'NON_TERM');
         if (matchToken(/\./, node, true)) {
             matchType(/id/, node);
-            LvalRest(node);
+            lValRest(node);
             ast.append(node, parent);
         }
         else if (matchToken(/\[/, node, true)) {
             matchType(/string|number|id|bool/, node);
             matchToken(/\]/, node);
-            LvalRest(node);
+            lValRest(node);
             ast.append(node, parent);
         }
     }
@@ -220,22 +220,21 @@ module.exports = function evalJs(tokens) {
     }
 
     function multiOrDiv(parent) {
-        //console.log(parent);
         const node = ast.append(new Node('MULTI_DIV', 'NON_TERM'), parent);
-        Factor(node);
+        factor(node);
         multiOrDivRest(node);
     }
 
     function multiOrDivRest(parent) {
         const node = new Node('MULTI_DIV_REST', 'NON_TERM');
         if (matchToken(/^(\*|\/)$/, node, true)) {
-            Factor(node);
+            factor(node);
             multiOrDivRest(node);
             ast.append(node, parent);
         }
     }
 
-    function Factor(parent) {
+    function factor(parent) {
         const node = ast.append(new Node('FACTOR', 'NON_TERM'), parent);
         const currentToken = tokens[current],
             type = currentToken.type,
@@ -245,14 +244,14 @@ module.exports = function evalJs(tokens) {
             matchType(/string|number|bool|undefined|null/, node);
         }
         else if (type.match(/id/)) {
-            Lval(node);
+            lVal(node);
         }
         else if (token.match(/\+\+|\-\-/)) {
             selfPlusOrMinus(node);
         }
         else if (token.match(/!/)) {
             matchToken(/!/, node);
-            Factor(node);
+            factor(node);
         }
         else if (token.match(/\{/)) {
             object(node);
@@ -276,11 +275,11 @@ module.exports = function evalJs(tokens) {
     function selfPlusOrMinusRest(parent) {
         const node = new Node('SELF_PLUS_MINUS_REST', 'NON_TERM');
         if (matchToken(/\(/, node, true)) {
-            Lval(node);
+            lVal(node);
             matchToken(/\)/, node);
         }
         else {
-            Lval(node);
+            lVal(node);
         }
         ast.append(node, parent);
     }
@@ -342,11 +341,16 @@ module.exports = function evalJs(tokens) {
         if (node.parent) {
             delete node.parent;
         }
-        node.children.forEach(child=>clearAST(child));
+        if (node.children.length === 0) {
+            delete node.children;
+        }
+        else {
+            node.children.forEach(child=>clearAST(child));
+        }
     }
 
     Expr(null, 0);
     flattenAST(ast.root);
     clearAST(ast.root);
-    return ast;
+    return ast.root;
 };

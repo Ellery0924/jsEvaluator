@@ -85,10 +85,11 @@ module.exports = function (tokens) {
                 || token.token === '-='
                 || token.token === '*='
                 || token.token === '/='
+                || token.token === '%='
             ) || {token: 'others'};
     }
 
-    function Expr(node, from) {
+    function expr(node, from) {
         if (current < tokens.length) {
             const keyTerm = findFirstKeyTerm(from);
             const exprRoot = ast.append(new Node('EXPR', 'NON_TERM'), node);
@@ -98,6 +99,7 @@ module.exports = function (tokens) {
                 case '-=':
                 case '*=':
                 case '/=':
+                case '%=':
                     assign(exprRoot);
                     break;
                 case '?':
@@ -131,7 +133,7 @@ module.exports = function (tokens) {
 
     function rVal(parent) {
         const node = ast.append(new Node('RVAL', 'NON_TERM'), parent);
-        Expr(node, current);
+        expr(node, current);
     }
 
     function lValRest(parent) {
@@ -176,15 +178,40 @@ module.exports = function (tokens) {
 
     function and(parent) {
         const node = ast.append(new Node('AND', 'NON_TERM'), parent);
-        compare(node);
+        instanceOfAndIn(node);
         andRest(node);
     }
 
     function andRest(parent) {
         const node = new Node('AND_REST', 'NON_TERM');
         if (matchToken(/&&/, node, true)) {
-            compare(node);
+            instanceOfAndIn(node);
             andRest(node);
+            ast.append(node, parent);
+        }
+    }
+
+    function instanceOfAndIn(parent) {
+        const node = ast.append(new Node('INSTANCEOF_AND_IN', 'NON_TERM'), parent);
+        compare(node);
+        instanceOfAndInRest(node)
+    }
+
+    function instanceOfAndInRest(parent) {
+        const node = new Node('INSTANCEOF_AND_IN_REST', 'NON_TERM');
+        const token = matchToken(/instanceof|in/, node, true);
+        if (token) {
+            if (token.token === 'instanceof') {
+                lVal(node);
+            }
+            else {
+                if (tokens[current].token === '{') {
+                    object(node);
+                }
+                else {
+                    lVal(node);
+                }
+            }
             ast.append(node, parent);
         }
     }
@@ -197,7 +224,7 @@ module.exports = function (tokens) {
 
     function compareRest(parent) {
         const node = new Node('COMPARE_REST', 'NON_TERM');
-        if (matchToken(/>|>=|<|<=|===|!==/, node, true)) {
+        if (matchToken(/>|>=|<|<=|===|!==|!=|==/, node, true)) {
             plusOrMinus(node);
             compareRest(node);
             ast.append(node, parent);
@@ -243,8 +270,11 @@ module.exports = function (tokens) {
         if (type.match(/string|number|bool|undefined|null/)) {
             matchType(/string|number|bool|undefined|null/, node);
         }
-        else if (type.match(/id/)) {
+        else if (type.match(/id|\(/)) {
             lVal(node);
+            if (matchToken(/\+\+|\-\-/, node, true)) {
+                node.token = 'SELF_PLUS_MINUS_BACKWARDS';
+            }
         }
         else if (token.match(/\+\+|\-\-/)) {
             selfPlusOrMinus(node);
@@ -261,8 +291,31 @@ module.exports = function (tokens) {
         }
         else if (token.match(/\(/)) {
             matchToken(/\(/, node);
-            Expr(node, current);
+            expr(node, current);
             matchToken(/\)/, node);
+            if (matchToken(/\+\+|\-\-/, node, true)) {
+                node.token = 'SELF_PLUS_MINUS_BACKWARDS';
+            }
+        }
+        else if (token.match(/\-/)) {
+            matchToken(/\-/, node);
+            factor(node);
+        }
+        else if (token.match(/void/)) {
+            matchToken(/void/, node);
+            factor(node);
+        }
+        else if (token.match(/delete/)) {
+            matchToken(/delete/, node);
+            lVal(node);
+        }
+        else if (token.match(/typeof/)) {
+            matchToken(/typeof/, node);
+            factor(node);
+        }
+        else if (token.match(/~/)) {
+            matchToken(/~/, node);
+            factor(node);
         }
     }
 
@@ -295,7 +348,7 @@ module.exports = function (tokens) {
         const node = new Node('OBJECT_CONTENT', 'NON_TERM');
         if (matchType(/id|string|number/, node, true)) {
             matchToken(/:/, node);
-            Expr(node, current);
+            expr(node, current);
             ast.append(node, parent);
             if (matchToken(/\,/, node, true)) {
                 objectContent(node);
@@ -312,7 +365,7 @@ module.exports = function (tokens) {
 
     function arrayContent(parent) {
         const node = ast.append(new Node('ARRAY_CONTENT', 'NON_TERM'), parent);
-        Expr(node, current);
+        expr(node, current);
         if (matchToken(/\,/, node, true)) {
             arrayContent(node);
         }
@@ -349,7 +402,7 @@ module.exports = function (tokens) {
         }
     }
 
-    Expr(null, 0);
+    expr(null, 0);
     flattenAST(ast.root);
     clearAST(ast.root);
     return ast.root;

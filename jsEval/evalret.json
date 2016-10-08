@@ -3,72 +3,94 @@
     "type": "NON_TERM",
     "children": [
         {
-            "token": "LVAL",
-            "type": "NON_TERM",
-            "children": [
-                {
-                    "token": "(",
-                    "type": "punctuation"
-                },
-                {
-                    "token": "b",
-                    "type": "id"
-                },
-                {
-                    "token": ")",
-                    "type": "punctuation"
-                }
-            ]
+            "token": "b",
+            "type": "id"
         },
         {
             "token": "=",
             "type": "assign"
         },
         {
-            "token": "ASSIGN",
+            "token": "PLUS_MINUS",
             "type": "NON_TERM",
             "children": [
                 {
-                    "token": "a",
-                    "type": "id"
-                },
-                {
-                    "token": "*=",
-                    "type": "operator"
-                },
-                {
-                    "token": "PLUS_MINUS",
+                    "token": "MULTI_DIV",
                     "type": "NON_TERM",
                     "children": [
                         {
-                            "token": "2",
-                            "type": "number"
-                        },
-                        {
-                            "token": "PLUS_MINUS_REST",
+                            "token": "FACTOR",
                             "type": "NON_TERM",
                             "children": [
                                 {
-                                    "token": "+",
+                                    "token": "typeof",
+                                    "type": "keyword"
+                                },
+                                {
+                                    "token": "5",
+                                    "type": "number"
+                                }
+                            ]
+                        },
+                        {
+                            "token": "MULTI_DIV_REST",
+                            "type": "NON_TERM",
+                            "children": [
+                                {
+                                    "token": "*",
                                     "type": "operator"
                                 },
                                 {
-                                    "token": "2",
+                                    "token": "6",
                                     "type": "number"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "token": "PLUS_MINUS_REST",
+                    "type": "NON_TERM",
+                    "children": [
+                        {
+                            "token": "+",
+                            "type": "operator"
+                        },
+                        {
+                            "token": "FACTOR",
+                            "type": "NON_TERM",
+                            "children": [
+                                {
+                                    "token": "(",
+                                    "type": "punctuation"
                                 },
                                 {
-                                    "token": "PLUS_MINUS_REST",
+                                    "token": "INSTANCEOF_AND_IN",
                                     "type": "NON_TERM",
                                     "children": [
                                         {
-                                            "token": "+",
-                                            "type": "operator"
+                                            "token": "666",
+                                            "type": "number"
                                         },
                                         {
-                                            "token": "3",
-                                            "type": "number"
+                                            "token": "INSTANCEOF_AND_IN_REST",
+                                            "type": "NON_TERM",
+                                            "children": [
+                                                {
+                                                    "token": "instanceof",
+                                                    "type": "keyword"
+                                                },
+                                                {
+                                                    "token": "a",
+                                                    "type": "id"
+                                                }
+                                            ]
                                         }
                                     ]
+                                },
+                                {
+                                    "token": ")",
+                                    "type": "punctuation"
                                 }
                             ]
                         }

@@ -1,1 +1,1 @@
-(b)=a*=2+2+3
+b=typeof 5*6+(666 instanceof a)

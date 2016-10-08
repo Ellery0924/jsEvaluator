@@ -1,0 +1,80 @@
+{
+    "token": "ASSIGN",
+    "type": "NON_TERM",
+    "children": [
+        {
+            "token": "LVAL",
+            "type": "NON_TERM",
+            "children": [
+                {
+                    "token": "(",
+                    "type": "punctuation"
+                },
+                {
+                    "token": "b",
+                    "type": "id"
+                },
+                {
+                    "token": ")",
+                    "type": "punctuation"
+                }
+            ]
+        },
+        {
+            "token": "=",
+            "type": "assign"
+        },
+        {
+            "token": "ASSIGN",
+            "type": "NON_TERM",
+            "children": [
+                {
+                    "token": "a",
+                    "type": "id"
+                },
+                {
+                    "token": "*=",
+                    "type": "operator"
+                },
+                {
+                    "token": "PLUS_MINUS",
+                    "type": "NON_TERM",
+                    "children": [
+                        {
+                            "token": "2",
+                            "type": "number"
+                        },
+                        {
+                            "token": "PLUS_MINUS_REST",
+                            "type": "NON_TERM",
+                            "children": [
+                                {
+                                    "token": "+",
+                                    "type": "operator"
+                                },
+                                {
+                                    "token": "2",
+                                    "type": "number"
+                                },
+                                {
+                                    "token": "PLUS_MINUS_REST",
+                                    "type": "NON_TERM",
+                                    "children": [
+                                        {
+                                            "token": "+",
+                                            "type": "operator"
+                                        },
+                                        {
+                                            "token": "3",
+                                            "type": "number"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

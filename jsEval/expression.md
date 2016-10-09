@@ -3,6 +3,7 @@ js表达式文法!终于要开始做了!干巴呆!
 js表达式优先级
 
 最低优先级
+0. ,
 1. = += -= *= /= %= 赋值操作
 
 三元运算符
@@ -24,7 +25,10 @@ instanceof in
 终结符: identifier(id) | string | number|  object | array | undefined | null | bool | e(空字符) | () |  以上所有运算符
 
 //表达式文法入口
-Expr->Expr0 | Expr1 | Expr2
+Expr->Comma | Expr0 | Expr1 | Expr2
+//逗号运算符
+Comma->Expr0Comma'
+Comma'->,Expr0Comma'
 //赋值运算符文法 左值=右值
 Expr0->Lval=Rval | Lval+=Rval | Lval-=Rval | Lval*=Rval | Lval/=Rval
 Rval->Expr

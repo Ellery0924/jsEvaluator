@@ -80,12 +80,12 @@ module.exports = function (tokens) {
     function findFirstKeyTerm(from) {
         return tokens.slice(from).find(token=>
                 token.token === '='
-                || token.token === '?'
                 || token.token === '+='
                 || token.token === '-='
                 || token.token === '*='
                 || token.token === '/='
                 || token.token === '%='
+                || token.token === '?'
             ) || {token: 'others'};
     }
 
@@ -107,6 +107,7 @@ module.exports = function (tokens) {
                     break;
                 default:
                     or(exprRoot);
+                    break;
             }
         }
     }

@@ -271,7 +271,7 @@ module.exports = function (tokens) {
         if (type.match(/string|number|bool|undefined|null/)) {
             matchType(/string|number|bool|undefined|null/, node);
         }
-        else if (type.match(/id|\(/)) {
+        else if (type.match(/id/)) {
             lVal(node);
             if (matchToken(/\+\+|\-\-/, node, true)) {
                 node.token = 'SELF_PLUS_MINUS_BACKWARDS';

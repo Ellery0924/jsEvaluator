@@ -1,6 +1,5 @@
 'use strict';
 module.exports = function parse(tokens) {
-
     class AST {
         constructor(root) {
             this.root = root || null;

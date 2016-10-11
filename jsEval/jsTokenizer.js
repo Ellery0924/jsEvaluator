@@ -7,7 +7,7 @@
 const rnum = /\-?\d+(\.\d+)?/,
     rbool = /^(true|false)$/,
     rstring = /(['"])(\\\'|\\\"|[^'"])*\1/,
-    rkeyword = /^(new|if|while|for|var|else|function|null|undefined|return|do|break|continue|typeof|delete|void|instanceof|in)$/,
+    rkeyword = /^(new|if|while|for|var|else|function|null|undefined|return|do|break|continue|typeof|delete|void|instanceof|in|debugger|default|case|try|catch|finally|throw)$/,
     rid = /[a-zA-Z$_]([\w$_]+)?/,
     rpunctuation = /\.|,|;|\(|\)|\{|\}|\[|\]/,
     roperator = /\+\+|\-\-|\+=|\-=|\*=|\/=|\+|\-|\*|\/|<=|>=|<<|>>|>|<|===|!==|==|!=|!|&&|\|\||&|\||\?|:|~|%/,

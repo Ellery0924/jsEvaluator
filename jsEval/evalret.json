@@ -231,6 +231,40 @@
                     ]
                 }
             ]
+        },
+        {
+            "token": "FACTOR",
+            "type": "NON_TERM",
+            "children": [
+                {
+                    "token": "delete",
+                    "type": "keyword"
+                },
+                {
+                    "token": "LVAL",
+                    "type": "NON_TERM",
+                    "children": [
+                        {
+                            "token": "e",
+                            "type": "id"
+                        },
+                        {
+                            "token": "LVAL_REST",
+                            "type": "NON_TERM",
+                            "children": [
+                                {
+                                    "token": ".",
+                                    "type": "punctuation"
+                                },
+                                {
+                                    "token": "f",
+                                    "type": "id"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
         }
     ],
     "parent": null

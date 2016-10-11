@@ -29,53 +29,6 @@ module.exports = function parse(tokens) {
 
     const ast = new AST();
 
-    //function error() {
-    //    throw new Error('syntax error, parsing:' + tokens[current].token);
-    //}
-    //
-    //function toNextPos() {
-    //    current++;
-    //    lookAhead = current + 1;
-    //}
-    //
-    //function matchToken(token, parent, optional) {
-    //    const currentToken = tokens[current];
-    //    if (current < tokens.length) {
-    //        const m = currentToken.token.match(token);
-    //        if (m) {
-    //            toNextPos();
-    //            ast.append(new Node(currentToken.token, currentToken.type), parent);
-    //            return true;
-    //        }
-    //        else {
-    //            if (optional) {
-    //                return false;
-    //            }
-    //            else {
-    //                error();
-    //            }
-    //        }
-    //    }
-    //}
-    //
-    //function matchType(type, parent, optional) {
-    //    const currentToken = tokens[current];
-    //    if (current < tokens.length) {
-    //        const m = currentToken.type.match(type);
-    //        if (m) {
-    //            toNextPos();
-    //            ast.append(new Node(currentToken.token, currentToken.type), parent);
-    //            return true;
-    //        }
-    //        else {
-    //            if (optional) {
-    //                return false;
-    //            }
-    //            error();
-    //        }
-    //    }
-    //}
-
     function expression(tokens, node) {
         let current = 0, lookAhead = 1;
 

@@ -10,7 +10,7 @@ const rnum = /\-?\d+(\.\d+)?/,
     rkeyword = /^(new|if|while|for|var|else|function|null|undefined|return|do|break|continue|typeof|delete|void|instanceof|in)$/,
     rid = /[a-zA-Z$_]([\w$_]+)?/,
     rpunctuation = /\.|,|;|\(|\)|\{|\}|\[|\]/,
-    roperator = /\+\+|\-\-|\+=|\-=|\*=|\/=|\+|\-|\*|\/|<=|>=|<<|>>|>|<|===|!==|==|!=|!|&&|\|\||&|\||\?|:|~/,
+    roperator = /\+\+|\-\-|\+=|\-=|\*=|\/=|\+|\-|\*|\/|<=|>=|<<|>>|>|<|===|!==|==|!=|!|&&|\|\||&|\||\?|:|~|%/,
     rassign = /=/,
     rspace = /[\s\n\r\t]/,
     rquotation = /['"]/;

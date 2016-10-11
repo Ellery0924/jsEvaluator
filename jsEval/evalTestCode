@@ -1,1 +1,1 @@
-a={b:typeof 5*6+(666 instanceof a) in b?3:2}
+a,b={d:{3:5}},c=2*3+5,d=3?2:3-5/2%1

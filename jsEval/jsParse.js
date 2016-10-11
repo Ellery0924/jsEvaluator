@@ -1,435 +1,354 @@
 'use strict';
-module.exports = function parse(tokens) {
-    class AST {
-        constructor(root) {
-            this.root = root || null;
-        }
+const Parser = require('./Parser');
+const AST = require('./AST').AST;
+const Node = require('./AST').Node;
 
-        append(node, target) {
-            if (this.root === null) {
-                this.root = node;
-            }
-            else {
-                target.children.push(node);
-                node.parent = target;
-            }
-            return node;
-        }
+class Expression extends Parser {
+    constructor(ast, tokens) {
+        super(ast, tokens);
     }
 
-    class Node {
-        constructor(token, type) {
-            this.token = token;
-            this.type = type;
-            this.children = [];
-            this.parent = null;
-        }
-    }
+    parse() {
+        const self = this;
 
-    const ast = new AST();
+        function expression(tokens, node) {
+            function findFirstKeyTerm(from) {
+                return tokens.slice(from).find(token=>
+                        token.token === '='
+                        || token.token === '+='
+                        || token.token === '-='
+                        || token.token === '*='
+                        || token.token === '/='
+                        || token.token === '%='
+                        || token.token === '?'
+                    ) || {token: 'others'};
+            }
 
-    function expression(tokens, node) {
-        let current = 0, lookAhead = 1;
+            function expr(node, from) {
+                if (self.current < tokens.length) {
+                    const keyTerm = findFirstKeyTerm(from);
+                    const exprRoot = self.ast.append(new Node('EXPR', 'NON_TERM'), node);
+                    switch (keyTerm.token) {
+                        case '=':
+                        case '+=':
+                        case '-=':
+                        case '*=':
+                        case '/=':
+                        case '%=':
+                            assign(exprRoot);
+                            break;
+                        case '?':
+                            threeItemOperation(exprRoot);
+                            break;
+                        default:
+                            or(exprRoot);
+                            break;
+                    }
+                }
+            }
 
-        function error() {
-            throw new Error('syntax error, parsing:' + tokens[current].token);
-        }
+            function assign(parent) {
+                const node = self.ast.append(new Node('ASSIGN', 'NON_TERM'), parent);
+                lVal(node);
+                self.matchToken(/\+=|\-=|\*=|\/=|=/, node);
+                rVal(node, self.current);
+            }
 
-        function toNextPos() {
-            current++;
-            lookAhead = current + 1;
-        }
-
-        function matchToken(token, parent, optional) {
-            const currentToken = tokens[current];
-            if (current < tokens.length) {
-                const m = currentToken.token.match(token);
-                if (m) {
-                    toNextPos();
-                    ast.append(new Node(currentToken.token, currentToken.type), parent);
-                    return true;
+            function lVal(parent) {
+                const node = self.ast.append(new Node('LVAL', 'NON_TERM'), parent);
+                if (self.matchToken(/\(/, node, true)) {
+                    self.matchType(/id/, node);
+                    lValRest(node);
+                    self.matchToken(/\)/, node, true);
                 }
                 else {
-                    if (optional) {
-                        return false;
-                    }
-                    else {
-                        error();
-                    }
+                    self.matchType(/id/, node);
+                    lValRest(node);
                 }
             }
-        }
 
-        function matchType(type, parent, optional) {
-            const currentToken = tokens[current];
-            if (current < tokens.length) {
-                const m = currentToken.type.match(type);
-                if (m) {
-                    toNextPos();
-                    ast.append(new Node(currentToken.token, currentToken.type), parent);
-                    return true;
-                }
-                else {
-                    if (optional) {
-                        return false;
-                    }
-                    error();
-                }
+            function rVal(parent) {
+                const node = self.ast.append(new Node('RVAL', 'NON_TERM'), parent);
+                expr(node, self.current);
             }
-        }
 
-        function findFirstKeyTerm(from) {
-            return tokens.slice(from).find(token=>
-                    token.token === '='
-                    || token.token === '+='
-                    || token.token === '-='
-                    || token.token === '*='
-                    || token.token === '/='
-                    || token.token === '%='
-                    || token.token === '?'
-                ) || {token: 'others'};
-        }
-
-        function expr(node, from) {
-            if (current < tokens.length) {
-                const keyTerm = findFirstKeyTerm(from);
-                const exprRoot = ast.append(new Node('EXPR', 'NON_TERM'), node);
-                switch (keyTerm.token) {
-                    case '=':
-                    case '+=':
-                    case '-=':
-                    case '*=':
-                    case '/=':
-                    case '%=':
-                        assign(exprRoot);
-                        break;
-                    case '?':
-                        threeItemOperation(exprRoot);
-                        break;
-                    default:
-                        or(exprRoot);
-                        break;
+            function lValRest(parent) {
+                const node = new Node('LVAL_REST', 'NON_TERM');
+                if (self.matchToken(/\./, node, true)) {
+                    self.matchType(/id/, node);
+                    lValRest(node);
+                    self.ast.append(node, parent);
+                }
+                else if (self.matchToken(/\[/, node, true)) {
+                    self.matchType(/string|number|id|bool/, node);
+                    self.matchToken(/\]/, node);
+                    lValRest(node);
+                    self.ast.append(node, parent);
                 }
             }
-        }
 
-        function assign(parent) {
-            const node = ast.append(new Node('ASSIGN', 'NON_TERM'), parent);
-            lVal(node);
-            matchToken(/\+=|\-=|\*=|\/=|=/, node);
-            rVal(node, current);
-        }
-
-        function lVal(parent) {
-            const node = ast.append(new Node('LVAL', 'NON_TERM'), parent);
-            if (matchToken(/\(/, node, true)) {
-                matchType(/id/, node);
-                lValRest(node);
-                matchToken(/\)/, node, true);
+            function threeItemOperation(parent) {
+                const node = self.ast.append(new Node('THREE_ITEM_OPERATION', 'NON_TERM'), parent);
+                or(node);
+                if (self.matchToken(/\?/, node, true)) {
+                    threeItemOperation(node);
+                    self.matchToken(/:/, node);
+                    threeItemOperation(node);
+                }
             }
-            else {
-                matchType(/id/, node);
-                lValRest(node);
-            }
-        }
 
-        function rVal(parent) {
-            const node = ast.append(new Node('RVAL', 'NON_TERM'), parent);
-            expr(node, current);
-        }
-
-        function lValRest(parent) {
-            const node = new Node('LVAL_REST', 'NON_TERM');
-            if (matchToken(/\./, node, true)) {
-                matchType(/id/, node);
-                lValRest(node);
-                ast.append(node, parent);
-            }
-            else if (matchToken(/\[/, node, true)) {
-                matchType(/string|number|id|bool/, node);
-                matchToken(/\]/, node);
-                lValRest(node);
-                ast.append(node, parent);
-            }
-        }
-
-        function threeItemOperation(parent) {
-            const node = ast.append(new Node('THREE_ITEM_OPERATION', 'NON_TERM'), parent);
-            or(node);
-            if (matchToken(/\?/, node, true)) {
-                threeItemOperation(node);
-                matchToken(/:/, node);
-                threeItemOperation(node);
-            }
-        }
-
-        function or(parent) {
-            const node = ast.append(new Node('OR', 'NON_TERM'), parent);
-            and(node);
-            orRest(node);
-        }
-
-        function orRest(parent) {
-            const node = new Node('OR_REST', 'NON_TERM');
-            if (matchToken(/\|\|/, node, true)) {
+            function or(parent) {
+                const node = self.ast.append(new Node('OR', 'NON_TERM'), parent);
                 and(node);
                 orRest(node);
-                ast.append(node, parent);
             }
-        }
 
-        function and(parent) {
-            const node = ast.append(new Node('AND', 'NON_TERM'), parent);
-            instanceOfAndIn(node);
-            andRest(node);
-        }
+            function orRest(parent) {
+                const node = new Node('OR_REST', 'NON_TERM');
+                if (self.matchToken(/\|\|/, node, true)) {
+                    and(node);
+                    orRest(node);
+                    self.ast.append(node, parent);
+                }
+            }
 
-        function andRest(parent) {
-            const node = new Node('AND_REST', 'NON_TERM');
-            if (matchToken(/&&/, node, true)) {
+            function and(parent) {
+                const node = self.ast.append(new Node('AND', 'NON_TERM'), parent);
                 instanceOfAndIn(node);
                 andRest(node);
-                ast.append(node, parent);
             }
-        }
 
-        function instanceOfAndIn(parent) {
-            const node = ast.append(new Node('INSTANCEOF_AND_IN', 'NON_TERM'), parent);
-            compare(node);
-            instanceOfAndInRest(node)
-        }
-
-        function instanceOfAndInRest(parent) {
-            const node = new Node('INSTANCEOF_AND_IN_REST', 'NON_TERM');
-            const token = matchToken(/instanceof|in/, node, true);
-            if (token) {
-                if (token.token === 'instanceof') {
-                    lVal(node);
+            function andRest(parent) {
+                const node = new Node('AND_REST', 'NON_TERM');
+                if (self.matchToken(/&&/, node, true)) {
+                    instanceOfAndIn(node);
+                    andRest(node);
+                    self.ast.append(node, parent);
                 }
-                else {
-                    if (tokens[current].token === '{') {
-                        object(node);
-                    }
-                    else {
+            }
+
+            function instanceOfAndIn(parent) {
+                const node = self.ast.append(new Node('INSTANCEOF_AND_IN', 'NON_TERM'), parent);
+                compare(node);
+                instanceOfAndInRest(node)
+            }
+
+            function instanceOfAndInRest(parent) {
+                const node = new Node('INSTANCEOF_AND_IN_REST', 'NON_TERM');
+                const token = self.matchToken(/instanceof|in/, node, true);
+                if (token) {
+                    if (token.token === 'instanceof') {
                         lVal(node);
                     }
+                    else {
+                        if (tokens[self.current].token === '{') {
+                            object(node);
+                        }
+                        else {
+                            lVal(node);
+                        }
+                    }
+                    self.ast.append(node, parent);
                 }
-                ast.append(node, parent);
             }
-        }
 
-        function compare(parent) {
-            const node = ast.append(new Node('COMPARE', 'NON_TERM'), parent);
-            plusOrMinus(node);
-            compareRest(node);
-        }
-
-        function compareRest(parent) {
-            const node = new Node('COMPARE_REST', 'NON_TERM');
-            if (matchToken(/>|>=|<|<=|===|!==|!=|==/, node, true)) {
+            function compare(parent) {
+                const node = self.ast.append(new Node('COMPARE', 'NON_TERM'), parent);
                 plusOrMinus(node);
                 compareRest(node);
-                ast.append(node, parent);
             }
-        }
 
-        function plusOrMinus(parent) {
-            const node = ast.append(new Node('PLUS_MINUS', 'NON_TERM'), parent);
-            multiOrDiv(node);
-            plusOrMinusRest(node);
-        }
+            function compareRest(parent) {
+                const node = new Node('COMPARE_REST', 'NON_TERM');
+                if (self.matchToken(/>|>=|<|<=|===|!==|!=|==/, node, true)) {
+                    plusOrMinus(node);
+                    compareRest(node);
+                    self.ast.append(node, parent);
+                }
+            }
 
-        function plusOrMinusRest(parent) {
-            const node = new Node('PLUS_MINUS_REST', 'NON_TERM');
-            if (matchToken(/^(\+|\-)$/, node, true)) {
+            function plusOrMinus(parent) {
+                const node = self.ast.append(new Node('PLUS_MINUS', 'NON_TERM'), parent);
                 multiOrDiv(node);
                 plusOrMinusRest(node);
-                ast.append(node, parent);
             }
-        }
 
-        function multiOrDiv(parent) {
-            const node = ast.append(new Node('MULTI_DIV', 'NON_TERM'), parent);
-            factor(node);
-            multiOrDivRest(node);
-        }
+            function plusOrMinusRest(parent) {
+                const node = new Node('PLUS_MINUS_REST', 'NON_TERM');
+                if (self.matchToken(/^(\+|\-)$/, node, true)) {
+                    multiOrDiv(node);
+                    plusOrMinusRest(node);
+                    self.ast.append(node, parent);
+                }
+            }
 
-        function multiOrDivRest(parent) {
-            const node = new Node('MULTI_DIV_REST', 'NON_TERM');
-            if (matchToken(/^(\*|\/|%)$/, node, true)) {
+            function multiOrDiv(parent) {
+                const node = self.ast.append(new Node('MULTI_DIV', 'NON_TERM'), parent);
                 factor(node);
                 multiOrDivRest(node);
-                ast.append(node, parent);
             }
-        }
 
-        function factor(parent) {
-            const node = ast.append(new Node('FACTOR', 'NON_TERM'), parent);
-            const currentToken = tokens[current],
-                type = currentToken.type,
-                token = currentToken.token;
-
-            if (type.match(/string|number|bool|undefined|null/)) {
-                matchType(/string|number|bool|undefined|null/, node);
-            }
-            else if (type.match(/id/)) {
-                lVal(node);
-                if (matchToken(/\+\+|\-\-/, node, true)) {
-                    node.token = 'SELF_PLUS_MINUS_BACKWARDS';
+            function multiOrDivRest(parent) {
+                const node = new Node('MULTI_DIV_REST', 'NON_TERM');
+                if (self.matchToken(/^(\*|\/|%)$/, node, true)) {
+                    factor(node);
+                    multiOrDivRest(node);
+                    self.ast.append(node, parent);
                 }
             }
-            else if (token.match(/\+\+|\-\-/)) {
-                selfPlusOrMinus(node);
-            }
-            else if (token.match(/!/)) {
-                matchToken(/!/, node);
-                factor(node);
-            }
-            else if (token.match(/\{/)) {
-                object(node);
-            }
-            else if (token.match(/\[/)) {
-                array(node);
-            }
-            else if (token.match(/\(/)) {
-                matchToken(/\(/, node);
-                expr(node, current);
-                matchToken(/\)/, node);
-                if (matchToken(/\+\+|\-\-/, node, true)) {
-                    node.token = 'SELF_PLUS_MINUS_BACKWARDS';
+
+            function factor(parent) {
+                const node = self.ast.append(new Node('FACTOR', 'NON_TERM'), parent);
+                const currentToken = tokens[self.current],
+                    type = currentToken.type,
+                    token = currentToken.token;
+
+                if (type.match(/string|number|bool|undefined|null/)) {
+                    self.matchType(/string|number|bool|undefined|null/, node);
+                }
+                else if (type.match(/id/)) {
+                    lVal(node);
+                    if (self.matchToken(/\+\+|\-\-/, node, true)) {
+                        node.token = 'SELF_PLUS_MINUS_BACKWARDS';
+                    }
+                }
+                else if (token.match(/\+\+|\-\-/)) {
+                    selfPlusOrMinus(node);
+                }
+                else if (token.match(/!/)) {
+                    self.matchToken(/!/, node);
+                    factor(node);
+                }
+                else if (token.match(/\{/)) {
+                    object(node);
+                }
+                else if (token.match(/\[/)) {
+                    array(node);
+                }
+                else if (token.match(/\(/)) {
+                    self.matchToken(/\(/, node);
+                    expr(node, self.current);
+                    self.matchToken(/\)/, node);
+                    if (self.matchToken(/\+\+|\-\-/, node, true)) {
+                        node.token = 'SELF_PLUS_MINUS_BACKWARDS';
+                    }
+                }
+                else if (token.match(/\-/)) {
+                    self.matchToken(/\-/, node);
+                    factor(node);
+                }
+                else if (token.match(/void/)) {
+                    self.matchToken(/void/, node);
+                    factor(node);
+                }
+                else if (token.match(/delete/)) {
+                    self.matchToken(/delete/, node);
+                    lVal(node);
+                }
+                else if (token.match(/typeof/)) {
+                    self.matchToken(/typeof/, node);
+                    factor(node);
+                }
+                else if (token.match(/~/)) {
+                    self.matchToken(/~/, node);
+                    factor(node);
                 }
             }
-            else if (token.match(/\-/)) {
-                matchToken(/\-/, node);
-                factor(node);
-            }
-            else if (token.match(/void/)) {
-                matchToken(/void/, node);
-                factor(node);
-            }
-            else if (token.match(/delete/)) {
-                matchToken(/delete/, node);
-                lVal(node);
-            }
-            else if (token.match(/typeof/)) {
-                matchToken(/typeof/, node);
-                factor(node);
-            }
-            else if (token.match(/~/)) {
-                matchToken(/~/, node);
-                factor(node);
-            }
-        }
 
-        function selfPlusOrMinus(parent) {
-            const node = ast.append(new Node('SELF_PLUS_MINUS', 'NON_TERM'), parent);
-            matchToken(/\-\-|\+\+/, node);
-            selfPlusOrMinusRest(node);
-        }
-
-        function selfPlusOrMinusRest(parent) {
-            const node = new Node('SELF_PLUS_MINUS_REST', 'NON_TERM');
-            if (matchToken(/\(/, node, true)) {
-                lVal(node);
-                matchToken(/\)/, node);
+            function selfPlusOrMinus(parent) {
+                const node = self.ast.append(new Node('SELF_PLUS_MINUS', 'NON_TERM'), parent);
+                self.matchToken(/\-\-|\+\+/, node);
+                selfPlusOrMinusRest(node);
             }
-            else {
-                lVal(node);
+
+            function selfPlusOrMinusRest(parent) {
+                const node = new Node('SELF_PLUS_MINUS_REST', 'NON_TERM');
+                if (self.matchToken(/\(/, node, true)) {
+                    lVal(node);
+                    self.matchToken(/\)/, node);
+                }
+                else {
+                    lVal(node);
+                }
+                self.ast.append(node, parent);
             }
-            ast.append(node, parent);
-        }
 
-        function object(parent) {
-            const node = ast.append(new Node('OBJECT', 'NON_TERM'), parent);
-            matchToken(/\{/, node);
-            objectContent(node);
-            matchToken(/\}/, node);
-        }
+            function object(parent) {
+                const node = self.ast.append(new Node('OBJECT', 'NON_TERM'), parent);
+                self.matchToken(/\{/, node);
+                objectContent(node);
+                self.matchToken(/\}/, node);
+            }
 
-        function objectContent(parent) {
-            const node = new Node('OBJECT_CONTENT', 'NON_TERM');
-            if (matchType(/id|string|number/, node, true)) {
-                matchToken(/:/, node);
-                expr(node, current);
-                ast.append(node, parent);
-                if (matchToken(/\,/, node, true)) {
-                    objectContent(node);
+            function objectContent(parent) {
+                const node = new Node('OBJECT_CONTENT', 'NON_TERM');
+                if (self.matchType(/id|string|number/, node, true)) {
+                    self.matchToken(/:/, node);
+                    expr(node, self.current);
+                    self.ast.append(node, parent);
+                    if (self.matchToken(/\,/, node, true)) {
+                        objectContent(node);
+                    }
                 }
             }
-        }
 
-        function array(parent) {
-            const node = ast.append(new Node('ARRAY', 'NON_TERM'), parent);
-            matchToken(/\[/, node, true);
-            arrayContent(node);
-            matchToken(/\]/, node, true);
-        }
-
-        function arrayContent(parent) {
-            const node = ast.append(new Node('ARRAY_CONTENT', 'NON_TERM'), parent);
-            expr(node, current);
-            if (matchToken(/\,/, node, true)) {
+            function array(parent) {
+                const node = self.ast.append(new Node('ARRAY', 'NON_TERM'), parent);
+                self.matchToken(/\[/, node, true);
                 arrayContent(node);
+                self.matchToken(/\]/, node, true);
             }
+
+            function arrayContent(parent) {
+                const node = self.ast.append(new Node('ARRAY_CONTENT', 'NON_TERM'), parent);
+                expr(node, self.current);
+                if (self.matchToken(/\,/, node, true)) {
+                    arrayContent(node);
+                }
+            }
+
+            expr(node, 0);
         }
 
-        expr(node, 0);
+        expression(self.tokens, self.ast.root);
+
+        return self.ast.root;
+    }
+}
+
+class Comma extends Parser {
+    constructor(ast, tokens) {
+        super(ast, tokens);
     }
 
-    function flattenAST(node) {
-        if (node.children.length === 1) {
-            const onlyChild = node.children[0];
-            if (node === ast.root) {
-                ast.root = onlyChild;
-                flattenAST(onlyChild);
-            }
-            else {
-                const indexInParent = node.parent.children.indexOf(node);
-                node.parent.children.splice(indexInParent, 1, onlyChild);
-                onlyChild.parent = node.parent;
-                flattenAST(onlyChild);
-            }
-        }
-        else {
-            node.children.forEach(child=>flattenAST(child));
-        }
-    }
-
-    function clearAST(node) {
-        if (node.parent) {
-            delete node.parent;
-        }
-        if (node.children.length === 0) {
-            delete node.children;
-        }
-        else {
-            node.children.forEach(child=>clearAST(child));
-        }
-    }
-
-    function comma(tokens) {
+    parse() {
         function findCommaPosition(restTokens) {
             return restTokens.findIndex(t=>t.token === ',');
         }
 
         const node = new Node('COMMA', 'NON_TERM');
-        ast.root = node;
+        const tokens = this.tokens;
+        this.ast.root = node;
 
         let commaPos = findCommaPosition(tokens) !== -1 ?
                 findCommaPosition(tokens) : tokens.length, restTokens = tokens,
             tokensToBeParsed = restTokens.slice(0, commaPos);
 
         while (commaPos !== -1) {
-            expression(tokensToBeParsed, node);
+            this.ast.append(new Expression(new AST(node), tokensToBeParsed).parse(), node);
             restTokens = commaPos < restTokens.length ? restTokens.slice(commaPos + 1) : [];
             commaPos = findCommaPosition(restTokens);
             tokensToBeParsed = commaPos !== -1 ? restTokens.slice(0, commaPos) : restTokens;
         }
-        expression(tokensToBeParsed, node);
-    }
 
-    comma(tokens);
-    flattenAST(ast.root);
-    clearAST(ast.root);
+        this.ast.append(new Expression(new AST(node), tokensToBeParsed).parse(), node);
+        return this.ast;
+    }
+}
+
+module.exports = function (tokens) {
+    const ast = new Comma(new AST(), tokens).parse();
+    ast.flatten();
+    ast.clear();
     return ast.root;
 };

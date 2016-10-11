@@ -16,7 +16,8 @@ If->if ( Expr ) ControlBlock
 If'->e | else ControlBlock
 
 //for
-For->for ( Initialize ; Expr ; Expr ) ControlBlock
+For->for ( ControlHandle ) ControlBlock
+ControlHandle->Var in LVal | id in LVal | Initialize ; Expr ; Expr
 Initialize->Var | Expr
 
 //while

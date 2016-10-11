@@ -1,7 +1,62 @@
 js语句文法
-Program->Block | Stmts
-Block->{Stmts}
-Stmts->Stmt | Stmt;Stmts | Block
-Stmt->Var | If | Switch | For | While | DoWhile | Function | Apply | TryCatchFinally | Debugger | Break | Continue | Return | Throw
-Var->var AssignVar'
-Var'->e | ,AssignVar'
+Program-> Stmts
+Stmts->Stmt | Stmt ; Stmts | Block
+Block->{ Stmts }
+Stmt->Var | If | Switch | For | While | DoWhile | Function | Apply | TryCatchFinally | Debugger | Break | Continue | Return | Throw | New | e
+
+//var
+Var->var \s AssignList
+AssignList->id = RVal AssignList' | id = Function AssignList'
+AssignList'->e | , AssignList
+
+ControlBlock->Stmt | Block
+
+//if
+If->if ( Expr ) ControlBlock
+If'->e | else ControlBlock
+
+//for
+For->for ( Initialize ; Expr ; Expr ) ControlBlock
+Initialize->Var | Expr
+
+//while
+While->while ( Expr ) ControlBlock
+
+//do-while
+DoWhile->do ControlBlock while ( Expr )
+
+//Function
+Function->function FuncName ( ArgList ) Block | ( Function )
+ArgList->e | id ArgList'
+ArgList'-> e | ,id ArgList'
+FuncName->e | id
+
+//Apply
+Apply->Function ( ApplyArgs ) | LVal ( ApplyArgs )
+ApplyArgs->e | Expr0 ApplyArgs' | New ApplyArgs' | Apply ApplyArgs'
+ApplyArgs'->e | , Expr0 ApplyArgs' | , New ApplyArgs' | , Apply ApplyArgs'
+
+//try-catch
+TryCatchFinally->try Block TryCatchFinally'
+TryCatchFinally'->e | catch ( id ) Block Finally
+Finally->e | finally Block
+
+//debugger
+Debugger->debugger
+
+//Break
+Break->break
+
+//continue
+Continue->continue
+
+//return
+Return->return Expr
+
+//throw
+Throw->throw Throw'
+Throw'->New | Apply | Expr
+
+//new
+New->new Apply
+

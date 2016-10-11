@@ -265,6 +265,30 @@
                     ]
                 }
             ]
+        },
+        {
+            "token": "INSTANCEOF_AND_IN",
+            "type": "NON_TERM",
+            "children": [
+                {
+                    "token": "d",
+                    "type": "id"
+                },
+                {
+                    "token": "INSTANCEOF_AND_IN_REST",
+                    "type": "NON_TERM",
+                    "children": [
+                        {
+                            "token": "in",
+                            "type": "keyword"
+                        },
+                        {
+                            "token": "Object",
+                            "type": "id"
+                        }
+                    ]
+                }
+            ]
         }
     ],
     "parent": null

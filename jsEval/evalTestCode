@@ -1,6 +1,8 @@
-a,
+{
+var a,
 b={d:{3:5}},
 c=2*3+5,
 d=3?2:3-5/2%1.33333,
-delete e.f,
-d in Object
+sss;
+{var b;}
+}

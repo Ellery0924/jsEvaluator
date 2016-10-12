@@ -1,13 +1,13 @@
 js语句文法
-Program-> Stmts
 Stmts->Stmt | Stmt ; Stmts | Block
 Block->{ Stmts }
 Stmt->Var | If | Switch | For | While | DoWhile | Function | Apply | TryCatchFinally | Debugger | Break | Continue | Return | Throw | New | e
 
 //var
-Var->var \s AssignList
-AssignList->id = RVal AssignList' | id = Function AssignList'
-AssignList'->e | , AssignList
+Var->var VarBody
+VarBody->id VarBody' | id = Right VarBody'
+Right->RVal | Function
+VarBody'->e | , VarBody
 
 ControlBlock->Stmt | Block
 

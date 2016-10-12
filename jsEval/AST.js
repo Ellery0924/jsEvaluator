@@ -26,6 +26,7 @@ module.exports = {
                 const onlyChild = node.children[0];
                 if (!node.parent) {
                     this.root = onlyChild;
+                    onlyChild.parent = null;
                     this.flatten(onlyChild);
                 }
                 else {

@@ -3,7 +3,7 @@ const Parser = require('./Parser');
 const AST = require('./AST').AST;
 const Node = require('./AST').Node;
 
-class Expression extends Parser {
+class _Expression extends Parser {
     constructor(ast, tokens) {
         super(ast, tokens);
     }
@@ -316,7 +316,7 @@ class Expression extends Parser {
     }
 }
 
-class Comma extends Parser {
+class Expression extends Parser {
     constructor(ast, tokens) {
         super(ast, tokens);
     }
@@ -335,19 +335,135 @@ class Comma extends Parser {
             tokensToBeParsed = restTokens.slice(0, commaPos);
 
         while (commaPos !== -1) {
-            this.ast.append(new Expression(new AST(node), tokensToBeParsed).parse(), node);
+            this.ast.append(new _Expression(new AST(node), tokensToBeParsed).parse(), node);
             restTokens = commaPos < restTokens.length ? restTokens.slice(commaPos + 1) : [];
             commaPos = findCommaPosition(restTokens);
             tokensToBeParsed = commaPos !== -1 ? restTokens.slice(0, commaPos) : restTokens;
         }
 
-        this.ast.append(new Expression(new AST(node), tokensToBeParsed).parse(), node);
+        this.ast.append(new _Expression(new AST(node), tokensToBeParsed).parse(), node);
+        return this.ast;
+    }
+}
+
+class JSParser extends Parser {
+    constructor(ast, tokens) {
+        super(ast, tokens);
+    }
+
+    parseExpr(node, parent, tokens) {
+        this.ast.append(new _Expression(new AST(node), tokens).parse(), parent);
+        this.current += tokens.length;
+    }
+
+    parse() {
+        const self = this;
+
+        function stmts(parent) {
+            const node = new Node('STMTS', 'NON_TERM');
+            const cur = self.currentToken();
+            if (cur.token === '{') {
+                block(node);
+            }
+            else {
+                stmt(node);
+                if (self.matchToken(/;/, node, true)) {
+                    console.log('dfdfdfdfdf')
+                    stmts(node);
+                }
+            }
+            self.ast.append(node, parent);
+            console.log('JSParser: Stmts Parsed');
+        }
+
+        function block(parent) {
+            const node = new Node('BLOCK', 'NON_TERM');
+            self.matchToken(/{/, node);
+            stmts(node);
+            self.matchToken(/}/, node);
+            self.ast.append(node, parent);
+            console.log('JSParser: Block Parsed');
+        }
+
+        function stmt(parent) {
+            const node = new Node('STMT', 'NON_TERM');
+            switch (self.currentToken().token) {
+                case 'var':
+                    _var(node);
+            }
+            //self.matchToken(/[\;\n]/, node);
+            self.ast.append(node, parent);
+            console.log('JSParser: Stmt Parsed');
+        }
+
+        function _var(parent) {
+            const node = new Node('VAR', 'NON_TERM');
+            self.matchToken(/var/, node);
+            varBody(node);
+            self.ast.append(node, parent);
+            console.log('JSParser: Var Parsed');
+        }
+
+        function varBody(parent) {
+            const node = new Node('VAR_BODY', 'NON_TERM');
+            self.matchType(/id/, node);
+            if (self.matchToken(/=/, node, true)) {
+                varBodyRight(node);
+                varBodyRest(node);
+            }
+            else {
+                varBodyRest(node);
+            }
+            console.log('JSParser: VarBody Parsed');
+            self.ast.append(node, parent);
+        }
+
+        function varBodyRight(parent) {
+            const node = new Node('VAR_BODY_RIGHT', 'NON_TERM');
+            const t = self.currentToken();
+            if (t.token === 'function') {
+                _function(node)
+            }
+            else {
+                const rightTokens = self.getTokensUntil(',');
+                self.parseExpr(node, parent, rightTokens);
+                varBodyRest(node);
+            }
+            self.ast.append(node, parent);
+            console.log('JSParser: VarBodyRight Parsed');
+        }
+
+        function varBodyRest(parent) {
+            const node = new Node('VAR_BODY_REST', 'NON_TERM');
+            if (self.matchToken(/,/, node, true)) {
+                varBody(node);
+                self.ast.append(node, parent);
+                console.log('JSParser: VarBodyRest Parsed');
+            }
+            else if (!self.currentToken() && self.currentToken().token.match(/;|\n/)) {
+                self.error();
+            }
+        }
+
+        //function varBodyRest(parent) {
+        //    const node = new Node('VAR_BODY_REST', 'NON_TERM');
+        //    if (self.matchToken(/,/, node, true)) {
+        //        varBody(node);
+        //        self.ast.append(node, parent);
+        //    }
+        //}
+
+        function _function(parent) {
+        }
+
+        this.ast.root = new Node('STMTS', 'NON_TERM');
+        stmts(this.ast.root);
         return this.ast;
     }
 }
 
 module.exports = function (tokens) {
-    const ast = new Comma(new AST(), tokens).parse();
+    const ast = new JSParser(new AST(new Node('PROGRAM', 'NON_TERM')), tokens).parse();
     ast.flatten();
     ast.clear();
     return ast.root;

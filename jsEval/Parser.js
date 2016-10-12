@@ -8,8 +8,12 @@ module.exports = class {
         this.tokens = tokens;
     }
 
+    currentToken() {
+        return this.tokens[this.current];
+    }
+
     error() {
-        throw new Error('syntax error, parsing:' + this.tokens[this.current].token);
+        throw new Error('syntax error, parsing:' + JSON.stringify(this.tokens[this.current]));
     }
 
     toNextPos() {
@@ -23,6 +27,7 @@ module.exports = class {
             if (m) {
                 this.toNextPos();
                 this.ast.append(new Node(currentToken.token, currentToken.type), parent);
+                console.log('JSParser: token matched \'' + currentToken.token + '\'');
                 return true;
             }
             else {
@@ -43,6 +48,7 @@ module.exports = class {
             if (m) {
                 this.toNextPos();
                 this.ast.append(new Node(currentToken.token, currentToken.type), parent);
+                console.log('JSParser: token matched \'' + currentToken.token + '\'');
                 return true;
             }
             else {
@@ -52,5 +58,19 @@ module.exports = class {
                 this.error();
             }
         }
+    }
+
+    getTokensUntil(token) {
+        const ret = [];
+        for (let i = this.current; i < this.tokens.length; i++) {
+            const t = this.tokens[i];
+            if (t.token !== token) {
+                ret.push(t);
+            }
+            else {
+                break;
+            }
+        }
+        return ret;
     }
 };

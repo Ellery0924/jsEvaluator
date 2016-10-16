@@ -39,25 +39,32 @@ module.exports = {
             else {
                 node.children.forEach(child=>this.flatten(child));
             }
+
         }
 
         clear(node) {
             if (!node) {
                 node = this.root;
             }
-            if (node.parent !== undefined) {
-                delete node.parent;
-            }
             if (node.children.length === 0) {
                 delete node.children;
+                if (node.type === 'NON_TERM') {
+                    node.parent.children.splice(node.parent.children.indexOf(node), 1);
+                }
             }
             else {
                 node.children.forEach(child=>this.clear(child));
+            }
+            if (node.parent !== undefined) {
+                delete node.parent;
             }
         }
     },
     Node: class {
         constructor(token, type) {
+            if (!type) {
+                type = 'NON_TERM';
+            }
             this.token = token;
             this.type = type;
             this.children = [];

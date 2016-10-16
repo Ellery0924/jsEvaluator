@@ -3,7 +3,7 @@
  */
 'use strict';
 const fs = require('fs');
-const testCode = fs.readFileSync('./evalTestCode', 'utf8');
+const testCode = fs.readFileSync('./evalTestCode.js', 'utf8');
 const parse = require('./jsParse');
 const tokenizer = require('./jsTokenizer');
 

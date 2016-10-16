@@ -36,7 +36,7 @@ Rval->Expr
 Lval->Lval.id | Lval[string] | Lval[number] | Lval[id] | id
 //消除左递归的左值文法
 Lval->idLval' | (Lval)
-Lval'->.idLval' | [string]Lval' | [number]Lval' | [id]Lval'| [bool]Lval' | e
+Lval'->.idLval' | [lVal] Lval' | e
 //三元操作符
 Expr1->Expr2?Expr1:Expr1 | Expr2
 //二元操作符

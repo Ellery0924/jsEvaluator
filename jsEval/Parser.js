@@ -9,11 +9,19 @@ module.exports = class {
     }
 
     currentToken() {
-        return this.tokens[this.current];
+        return this.nthToken(0);
     }
 
-    error() {
-        throw new Error('syntax error, parsing:' + JSON.stringify(this.tokens[this.current]));
+    nextToken() {
+        return this.nthToken(1);
+    }
+
+    nthToken(n) {
+        return this.tokens[this.current + n];
+    }
+
+    error(expection) {
+        throw new Error('syntax error, parsing:' + JSON.stringify(this.tokens[this.current]) + ", expecting: " + expection);
     }
 
     toNextPos() {
@@ -35,7 +43,7 @@ module.exports = class {
                     return false;
                 }
                 else {
-                    this.error();
+                    this.error(token);
                 }
             }
         }
@@ -55,7 +63,7 @@ module.exports = class {
                 if (optional) {
                     return false;
                 }
-                this.error();
+                this.error(type);
             }
         }
     }
@@ -64,7 +72,7 @@ module.exports = class {
         const ret = [];
         for (let i = this.current; i < this.tokens.length; i++) {
             const t = this.tokens[i];
-            if (t.token !== token) {
+            if (!t.token.match(new RegExp(token))) {
                 ret.push(t);
             }
             else {

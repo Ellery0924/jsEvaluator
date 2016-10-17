@@ -48,8 +48,18 @@
                                                 "type": "assign"
                                             },
                                             {
-                                                "token": "2",
-                                                "type": "number"
+                                                "token": "OBJECT",
+                                                "type": "NON_TERM",
+                                                "children": [
+                                                    {
+                                                        "token": "{",
+                                                        "type": "punctuation"
+                                                    },
+                                                    {
+                                                        "token": "}",
+                                                        "type": "punctuation"
+                                                    }
+                                                ]
                                             },
                                             {
                                                 "token": "VAR_BODY_REST",
@@ -114,30 +124,6 @@
                                     {
                                         "token": "=",
                                         "type": "assign"
-                                    },
-                                    {
-                                        "token": "5",
-                                        "type": "number"
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "token": ";",
-                        "type": "punctuation"
-                    },
-                    {
-                        "token": "STMTS",
-                        "type": "NON_TERM",
-                        "children": [
-                            {
-                                "token": "EXPR_CALL",
-                                "type": "NON_TERM",
-                                "children": [
-                                    {
-                                        "token": "(",
-                                        "type": "punctuation"
                                     },
                                     {
                                         "token": "FUNCTION",
@@ -208,518 +194,16 @@
                                                                                                         "type": "punctuation"
                                                                                                     },
                                                                                                     {
-                                                                                                        "token": "VAR_BODY",
-                                                                                                        "type": "NON_TERM",
-                                                                                                        "children": [
-                                                                                                            {
-                                                                                                                "token": "c",
-                                                                                                                "type": "id"
-                                                                                                            },
-                                                                                                            {
-                                                                                                                "token": "=",
-                                                                                                                "type": "assign"
-                                                                                                            },
-                                                                                                            {
-                                                                                                                "token": "2",
-                                                                                                                "type": "number"
-                                                                                                            }
-                                                                                                        ]
-                                                                                                    }
-                                                                                                ]
-                                                                                            }
-                                                                                        ]
-                                                                                    }
-                                                                                ]
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                ]
-                                                            },
-                                                            {
-                                                                "token": ";",
-                                                                "type": "punctuation"
-                                                            },
-                                                            {
-                                                                "token": "STMTS",
-                                                                "type": "NON_TERM",
-                                                                "children": [
-                                                                    {
-                                                                        "token": "VAR",
-                                                                        "type": "NON_TERM",
-                                                                        "children": [
-                                                                            {
-                                                                                "token": "var",
-                                                                                "type": "keyword"
-                                                                            },
-                                                                            {
-                                                                                "token": "VAR_BODY",
-                                                                                "type": "NON_TERM",
-                                                                                "children": [
-                                                                                    {
-                                                                                        "token": "iii",
-                                                                                        "type": "id"
-                                                                                    },
-                                                                                    {
-                                                                                        "token": "=",
-                                                                                        "type": "assign"
-                                                                                    },
-                                                                                    {
-                                                                                        "token": "FUNCTION",
-                                                                                        "type": "NON_TERM",
-                                                                                        "children": [
-                                                                                            {
-                                                                                                "token": "function",
-                                                                                                "type": "keyword"
-                                                                                            },
-                                                                                            {
-                                                                                                "token": "foo",
-                                                                                                "type": "id"
-                                                                                            },
-                                                                                            {
-                                                                                                "token": "(",
-                                                                                                "type": "punctuation"
-                                                                                            },
-                                                                                            {
-                                                                                                "token": ")",
-                                                                                                "type": "punctuation"
-                                                                                            },
-                                                                                            {
-                                                                                                "token": "BLOCK",
-                                                                                                "type": "NON_TERM",
-                                                                                                "children": [
-                                                                                                    {
-                                                                                                        "token": "{",
-                                                                                                        "type": "punctuation"
-                                                                                                    },
-                                                                                                    {
-                                                                                                        "token": "STMTS",
-                                                                                                        "type": "NON_TERM",
-                                                                                                        "children": [
-                                                                                                            {
-                                                                                                                "token": "VAR",
-                                                                                                                "type": "NON_TERM",
-                                                                                                                "children": [
-                                                                                                                    {
-                                                                                                                        "token": "var",
-                                                                                                                        "type": "keyword"
-                                                                                                                    },
-                                                                                                                    {
-                                                                                                                        "token": "VAR_BODY",
-                                                                                                                        "type": "NON_TERM",
-                                                                                                                        "children": [
-                                                                                                                            {
-                                                                                                                                "token": "u",
-                                                                                                                                "type": "id"
-                                                                                                                            },
-                                                                                                                            {
-                                                                                                                                "token": "VAR_BODY_REST",
-                                                                                                                                "type": "NON_TERM",
-                                                                                                                                "children": [
-                                                                                                                                    {
-                                                                                                                                        "token": ",",
-                                                                                                                                        "type": "punctuation"
-                                                                                                                                    },
-                                                                                                                                    {
-                                                                                                                                        "token": "VAR_BODY",
-                                                                                                                                        "type": "NON_TERM",
-                                                                                                                                        "children": [
-                                                                                                                                            {
-                                                                                                                                                "token": "i",
-                                                                                                                                                "type": "id"
-                                                                                                                                            },
-                                                                                                                                            {
-                                                                                                                                                "token": "VAR_BODY_REST",
-                                                                                                                                                "type": "NON_TERM",
-                                                                                                                                                "children": [
-                                                                                                                                                    {
-                                                                                                                                                        "token": ",",
-                                                                                                                                                        "type": "punctuation"
-                                                                                                                                                    },
-                                                                                                                                                    {
-                                                                                                                                                        "token": "VAR_BODY",
-                                                                                                                                                        "type": "NON_TERM",
-                                                                                                                                                        "children": [
-                                                                                                                                                            {
-                                                                                                                                                                "token": "p",
-                                                                                                                                                                "type": "id"
-                                                                                                                                                            },
-                                                                                                                                                            {
-                                                                                                                                                                "token": "=",
-                                                                                                                                                                "type": "assign"
-                                                                                                                                                            },
-                                                                                                                                                            {
-                                                                                                                                                                "token": "666",
-                                                                                                                                                                "type": "number"
-                                                                                                                                                            }
-                                                                                                                                                        ]
-                                                                                                                                                    }
-                                                                                                                                                ]
-                                                                                                                                            }
-                                                                                                                                        ]
-                                                                                                                                    }
-                                                                                                                                ]
-                                                                                                                            }
-                                                                                                                        ]
-                                                                                                                    }
-                                                                                                                ]
-                                                                                                            },
-                                                                                                            {
-                                                                                                                "token": ";",
-                                                                                                                "type": "punctuation"
-                                                                                                            },
-                                                                                                            {
-                                                                                                                "token": "STMTS",
-                                                                                                                "type": "NON_TERM",
-                                                                                                                "children": [
-                                                                                                                    {
-                                                                                                                        "token": "VAR",
-                                                                                                                        "type": "NON_TERM",
-                                                                                                                        "children": [
-                                                                                                                            {
-                                                                                                                                "token": "var",
-                                                                                                                                "type": "keyword"
-                                                                                                                            },
-                                                                                                                            {
-                                                                                                                                "token": "bbb",
-                                                                                                                                "type": "id"
-                                                                                                                            }
-                                                                                                                        ]
-                                                                                                                    },
-                                                                                                                    {
-                                                                                                                        "token": ";",
-                                                                                                                        "type": "punctuation"
-                                                                                                                    },
-                                                                                                                    {
-                                                                                                                        "token": "STMTS",
-                                                                                                                        "type": "NON_TERM",
-                                                                                                                        "children": [
-                                                                                                                            {
-                                                                                                                                "token": "VAR",
-                                                                                                                                "type": "NON_TERM",
-                                                                                                                                "children": [
-                                                                                                                                    {
-                                                                                                                                        "token": "var",
-                                                                                                                                        "type": "keyword"
-                                                                                                                                    },
-                                                                                                                                    {
-                                                                                                                                        "token": "uuu",
-                                                                                                                                        "type": "id"
-                                                                                                                                    }
-                                                                                                                                ]
-                                                                                                                            },
-                                                                                                                            {
-                                                                                                                                "token": ";",
-                                                                                                                                "type": "punctuation"
-                                                                                                                            },
-                                                                                                                            {
-                                                                                                                                "token": "STMTS",
-                                                                                                                                "type": "NON_TERM",
-                                                                                                                                "children": [
-                                                                                                                                    {
-                                                                                                                                        "token": "VAR",
-                                                                                                                                        "type": "NON_TERM",
-                                                                                                                                        "children": [
-                                                                                                                                            {
-                                                                                                                                                "token": "var",
-                                                                                                                                                "type": "keyword"
-                                                                                                                                            },
-                                                                                                                                            {
-                                                                                                                                                "token": "oooooo",
-                                                                                                                                                "type": "id"
-                                                                                                                                            }
-                                                                                                                                        ]
-                                                                                                                                    },
-                                                                                                                                    {
-                                                                                                                                        "token": ";",
-                                                                                                                                        "type": "punctuation"
-                                                                                                                                    },
-                                                                                                                                    {
-                                                                                                                                        "token": "FUNCTION",
-                                                                                                                                        "type": "NON_TERM",
-                                                                                                                                        "children": [
-                                                                                                                                            {
-                                                                                                                                                "token": "function",
-                                                                                                                                                "type": "keyword"
-                                                                                                                                            },
-                                                                                                                                            {
-                                                                                                                                                "token": "bar",
-                                                                                                                                                "type": "id"
-                                                                                                                                            },
-                                                                                                                                            {
-                                                                                                                                                "token": "(",
-                                                                                                                                                "type": "punctuation"
-                                                                                                                                            },
-                                                                                                                                            {
-                                                                                                                                                "token": ")",
-                                                                                                                                                "type": "punctuation"
-                                                                                                                                            },
-                                                                                                                                            {
-                                                                                                                                                "token": "BLOCK",
-                                                                                                                                                "type": "NON_TERM",
-                                                                                                                                                "children": [
-                                                                                                                                                    {
-                                                                                                                                                        "token": "{",
-                                                                                                                                                        "type": "punctuation"
-                                                                                                                                                    },
-                                                                                                                                                    {
-                                                                                                                                                        "token": "STMTS",
-                                                                                                                                                        "type": "NON_TERM",
-                                                                                                                                                        "children": [
-                                                                                                                                                            {
-                                                                                                                                                                "token": "VAR",
-                                                                                                                                                                "type": "NON_TERM",
-                                                                                                                                                                "children": [
-                                                                                                                                                                    {
-                                                                                                                                                                        "token": "var",
-                                                                                                                                                                        "type": "keyword"
-                                                                                                                                                                    },
-                                                                                                                                                                    {
-                                                                                                                                                                        "token": "o",
-                                                                                                                                                                        "type": "id"
-                                                                                                                                                                    }
-                                                                                                                                                                ]
-                                                                                                                                                            },
-                                                                                                                                                            {
-                                                                                                                                                                "token": ";",
-                                                                                                                                                                "type": "punctuation"
-                                                                                                                                                            }
-                                                                                                                                                        ]
-                                                                                                                                                    },
-                                                                                                                                                    {
-                                                                                                                                                        "token": "}",
-                                                                                                                                                        "type": "punctuation"
-                                                                                                                                                    }
-                                                                                                                                                ]
-                                                                                                                                            }
-                                                                                                                                        ]
-                                                                                                                                    }
-                                                                                                                                ]
-                                                                                                                            }
-                                                                                                                        ]
-                                                                                                                    }
-                                                                                                                ]
-                                                                                                            }
-                                                                                                        ]
-                                                                                                    },
-                                                                                                    {
-                                                                                                        "token": "}",
-                                                                                                        "type": "punctuation"
-                                                                                                    }
-                                                                                                ]
-                                                                                            }
-                                                                                        ]
-                                                                                    }
-                                                                                ]
-                                                                            }
-                                                                        ]
-                                                                    },
-                                                                    {
-                                                                        "token": ";",
-                                                                        "type": "punctuation"
-                                                                    },
-                                                                    {
-                                                                        "token": "STMTS",
-                                                                        "type": "NON_TERM",
-                                                                        "children": [
-                                                                            {
-                                                                                "token": "RETURN",
-                                                                                "type": "NON_TERM",
-                                                                                "children": [
-                                                                                    {
-                                                                                        "token": "return",
-                                                                                        "type": "keyword"
-                                                                                    },
-                                                                                    {
-                                                                                        "token": "OBJECT",
-                                                                                        "type": "NON_TERM",
-                                                                                        "children": [
-                                                                                            {
-                                                                                                "token": "{",
-                                                                                                "type": "punctuation"
-                                                                                            },
-                                                                                            {
-                                                                                                "token": "OBJECT_CONTENT",
-                                                                                                "type": "NON_TERM",
-                                                                                                "children": [
-                                                                                                    {
-                                                                                                        "token": "a",
+                                                                                                        "token": "c",
                                                                                                         "type": "id"
-                                                                                                    },
-                                                                                                    {
-                                                                                                        "token": ":",
-                                                                                                        "type": "operator"
-                                                                                                    },
-                                                                                                    {
-                                                                                                        "token": "1",
-                                                                                                        "type": "number"
-                                                                                                    },
-                                                                                                    {
-                                                                                                        "token": ",",
-                                                                                                        "type": "punctuation"
-                                                                                                    },
-                                                                                                    {
-                                                                                                        "token": "OBJECT_CONTENT",
-                                                                                                        "type": "NON_TERM",
-                                                                                                        "children": [
-                                                                                                            {
-                                                                                                                "token": "b",
-                                                                                                                "type": "id"
-                                                                                                            },
-                                                                                                            {
-                                                                                                                "token": ":",
-                                                                                                                "type": "operator"
-                                                                                                            },
-                                                                                                            {
-                                                                                                                "token": "OBJECT",
-                                                                                                                "type": "NON_TERM",
-                                                                                                                "children": [
-                                                                                                                    {
-                                                                                                                        "token": "{",
-                                                                                                                        "type": "punctuation"
-                                                                                                                    },
-                                                                                                                    {
-                                                                                                                        "token": "OBJECT_CONTENT",
-                                                                                                                        "type": "NON_TERM",
-                                                                                                                        "children": [
-                                                                                                                            {
-                                                                                                                                "token": "2",
-                                                                                                                                "type": "number"
-                                                                                                                            },
-                                                                                                                            {
-                                                                                                                                "token": ":",
-                                                                                                                                "type": "operator"
-                                                                                                                            },
-                                                                                                                            {
-                                                                                                                                "token": "3",
-                                                                                                                                "type": "number"
-                                                                                                                            }
-                                                                                                                        ]
-                                                                                                                    },
-                                                                                                                    {
-                                                                                                                        "token": "}",
-                                                                                                                        "type": "punctuation"
-                                                                                                                    }
-                                                                                                                ]
-                                                                                                            }
-                                                                                                        ]
                                                                                                     }
                                                                                                 ]
-                                                                                            },
-                                                                                            {
-                                                                                                "token": "}",
-                                                                                                "type": "punctuation"
                                                                                             }
                                                                                         ]
                                                                                     }
                                                                                 ]
-                                                                            },
-                                                                            {
-                                                                                "token": ";",
-                                                                                "type": "punctuation"
                                                                             }
                                                                         ]
-                                                                    }
-                                                                ]
-                                                            }
-                                                        ]
-                                                    },
-                                                    {
-                                                        "token": "}",
-                                                        "type": "punctuation"
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "token": ")",
-                                        "type": "punctuation"
-                                    },
-                                    {
-                                        "token": "CALL",
-                                        "type": "NON_TERM",
-                                        "children": [
-                                            {
-                                                "token": "(",
-                                                "type": "punctuation"
-                                            },
-                                            {
-                                                "token": ")",
-                                                "type": "punctuation"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "token": ";",
-                                "type": "punctuation"
-                            },
-                            {
-                                "token": "STMTS",
-                                "type": "NON_TERM",
-                                "children": [
-                                    {
-                                        "token": "VAR",
-                                        "type": "NON_TERM",
-                                        "children": [
-                                            {
-                                                "token": "var",
-                                                "type": "keyword"
-                                            },
-                                            {
-                                                "token": "dddd",
-                                                "type": "id"
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "token": ";",
-                                        "type": "punctuation"
-                                    },
-                                    {
-                                        "token": "FUNCTION",
-                                        "type": "NON_TERM",
-                                        "children": [
-                                            {
-                                                "token": "function",
-                                                "type": "keyword"
-                                            },
-                                            {
-                                                "token": "baz",
-                                                "type": "id"
-                                            },
-                                            {
-                                                "token": "(",
-                                                "type": "punctuation"
-                                            },
-                                            {
-                                                "token": ")",
-                                                "type": "punctuation"
-                                            },
-                                            {
-                                                "token": "BLOCK",
-                                                "type": "NON_TERM",
-                                                "children": [
-                                                    {
-                                                        "token": "{",
-                                                        "type": "punctuation"
-                                                    },
-                                                    {
-                                                        "token": "STMTS",
-                                                        "type": "NON_TERM",
-                                                        "children": [
-                                                            {
-                                                                "token": "RETURN",
-                                                                "type": "NON_TERM",
-                                                                "children": [
-                                                                    {
-                                                                        "token": "return",
-                                                                        "type": "keyword"
-                                                                    },
-                                                                    {
-                                                                        "token": "hahaha",
-                                                                        "type": "id"
                                                                     }
                                                                 ]
                                                             },
@@ -735,11 +219,53 @@
                                                     }
                                                 ]
                                             }
-                                        ]
+                                        ],
+                                        "identifier": 1476718555288
                                     }
                                 ]
                             }
                         ]
+                    },
+                    {
+                        "token": ";",
+                        "type": "punctuation"
+                    },
+                    {
+                        "token": "FUNCTION",
+                        "type": "NON_TERM",
+                        "children": [
+                            {
+                                "token": "function",
+                                "type": "keyword"
+                            },
+                            {
+                                "token": "b",
+                                "type": "id"
+                            },
+                            {
+                                "token": "(",
+                                "type": "punctuation"
+                            },
+                            {
+                                "token": ")",
+                                "type": "punctuation"
+                            },
+                            {
+                                "token": "BLOCK",
+                                "type": "NON_TERM",
+                                "children": [
+                                    {
+                                        "token": "{",
+                                        "type": "punctuation"
+                                    },
+                                    {
+                                        "token": "}",
+                                        "type": "punctuation"
+                                    }
+                                ]
+                            }
+                        ],
+                        "identifier": "b"
                     }
                 ]
             }

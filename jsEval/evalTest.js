@@ -9,6 +9,6 @@ const tokenizer = require('./jsTokenizer');
 const evaluator = require('./jsEval');
 
 console.log('evaluating javascript expression ' + testCode);
-const parsed = parse(tokenizer(testCode));
-fs.writeFileSync('./evalret.json', JSON.stringify(parse(tokenizer((testCode))), null, 4));
-fs.writeFileSync('./env.json', JSON.stringify(evaluator(parsed), null, 4));
+const ret = evaluator(parse(tokenizer(testCode)));
+fs.writeFileSync('./env.json', JSON.stringify(ret.env, null, 4));
+fs.writeFileSync('./evalret.json', JSON.stringify(ret.ast, null, 4));

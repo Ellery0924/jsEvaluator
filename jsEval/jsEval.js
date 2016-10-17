@@ -9,12 +9,12 @@ function error(node) {
     throw new Error('syntax error:' + JSON.stringify(node));
 }
 
-function extractFunctionDeclaration(node, env) {
+function hoistFunctionDeclaration(node, env) {
     if (node.token === 'BLOCK') {
         const children = node.children;
         const target = children[1];
         if (target.token === 'STMTS') {
-            extractFunctionDeclaration(target, env);
+            hoistFunctionDeclaration(target, env);
         }
         else if (target.token !== '}') {
             extractFunctionDeclarationFromStmt(target, env);
@@ -25,7 +25,7 @@ function extractFunctionDeclaration(node, env) {
         const restStmts = node.children[1].token === ';' ? node.children[2] : node.children[1];
         extractFunctionDeclarationFromStmt(stmt, env);
         if (restStmts) {
-            extractFunctionDeclaration(restStmts, env);
+            hoistFunctionDeclaration(restStmts, env);
         }
     }
     else {
@@ -45,7 +45,7 @@ function flattenFuncArgs(args) {
     }, []).map(arg=>arg.token);
 }
 
-function extractFunctionDeclarationFromStmt(stmt, env, notCallable) {
+function extractFunctionDeclarationFromStmt(stmt, env, oneOff) {
     const stmtChildren = stmt.children;
     if (stmtChildren) {
         const funcNonTermIndex = stmtChildren.findIndex(child=>child.token === 'FUNCTION');
@@ -60,16 +60,19 @@ function extractFunctionDeclarationFromStmt(stmt, env, notCallable) {
             const funcArgs = flattenFuncArgs(stmtChildren.slice(argsIndex, stmtChildren.findIndex(child=>child.token === ')')));
             const funcBody = stmtChildren.find(child=>child.token === 'BLOCK');
             const funcScope = {};
-            env[!notCallable ? funcName.token : Date.now()] = {
+            const identifier = !oneOff ? funcName.token : Date.now();
+            env[identifier] = {
+                parent: env,
                 type: 'function',
                 name: funcName ? funcName.token : null,
                 body: funcBody,
                 args: funcArgs,
                 length: funcArgs.length,
                 scope: funcScope,
-                notCallable: notCallable
+                oneOff: oneOff
             };
-            extractFunctionDeclaration(funcBody, funcScope);
+            stmt.identifier = identifier;
+            hoistFunctionDeclaration(funcBody, funcScope);
         }
         else if (funcNonTermIndex !== -1) {
             extractFunctionDeclarationFromStmt(stmtChildren[funcNonTermIndex], env, true);
@@ -126,26 +129,88 @@ function hoistVariablesInStmt(node, env) {
             varBodyRest = null;
             varName = varBody;
         }
-
         env[varName.token] = {
             type: 'variable',
             value: UNDEF
         };
-
         if (varBodyRest && varBodyRest.children[1]) {
             hoistVariablesInStmt(varBodyRest, env);
         }
     }
 }
 
-function evaluate(node, env) {
-
+function clearEnv(env) {
+    for (var key in env) {
+        if (env.hasOwnProperty(key)) {
+            const item = env[key];
+            if (item.type === 'function') {
+                delete item.parent;
+                delete item.body;
+                clearEnv(item.scope);
+            }
+        }
+    }
 }
 
+function evaluate(node, env) {
+    const token = node.token;
+    switch (token) {
+        case 'STMTS':
+            stmts(node, env);
+    }
+}
+
+function stmts(node, env) {
+    const children = node.children;
+    const stmt = children[0];
+    const stmtToken = stmt.token;
+    const rest = children[1].token !== ';' ? children[1] : children[2];
+    switch (stmtToken) {
+        case 'VAR':
+            _var(stmt, env);
+            if (rest) {
+                stmts(rest, env);
+            }
+    }
+}
+
+function _var(node, env) {
+    const body = node.children[1];
+    const id = body.children[0];
+    const assign = body.children[1];
+    const rest = body.children.find(child=>child.token === 'VAR_BODY_REST');
+    if (assign.token === '=') {
+        const valObj = body.children[2];
+        let valT = valObj.token;
+        let valType = valObj.type;
+        if (valT === 'FUNCTION') {
+            env[id.token] = env[valObj.identifier];
+            delete env[valObj.identifier];
+        }
+        else if (env[id.token]) {
+            env[id.token].value = valObj;
+        }
+        else {
+            global[id.token] = {
+                value: valObj,
+                valType: valType
+            };
+        }
+    }
+    if (rest) {
+        _var(rest, env);
+    }
+}
+
+const global = {};
+
 module.exports = (ast)=> {
-    const env = {};
-    extractFunctionDeclaration(ast.root, env);
-    hoistVariables(ast.root, env);
-    evaluate(ast.root, env);
-    return env;
+    hoistFunctionDeclaration(ast.root, global);
+    hoistVariables(ast.root, global);
+    evaluate(ast.root, global);
+    clearEnv(global);
+    return {
+        ast: ast,
+        env: global
+    };
 };

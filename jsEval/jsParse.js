@@ -623,12 +623,6 @@ class JSParser extends Parser {
             append(node, parent);
         }
 
-        //function program(parent) {
-        //    const node = new Node('PROGRAM');
-        //    append(node, parent);
-        //    stmts(node);
-        //}
-
         this.ast.root = new Node('PROGRAM', 'NON_TERM');
         stmts(this.ast.root);
         return this.ast;

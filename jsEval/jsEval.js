@@ -182,19 +182,12 @@ function _var(node, env) {
     if (assign.token === '=') {
         const valObj = body.children[2];
         let valT = valObj.token;
-        let valType = valObj.type;
-        if (valT === 'FUNCTION') {
+        if (valT === 'FUNCTION' && env[id.token]) {
             env[id.token] = env[valObj.identifier];
             delete env[valObj.identifier];
         }
         else if (env[id.token]) {
             env[id.token].value = valObj;
-        }
-        else {
-            global[id.token] = {
-                value: valObj,
-                valType: valType
-            };
         }
     }
     if (rest) {

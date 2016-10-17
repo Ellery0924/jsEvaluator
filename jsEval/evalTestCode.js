@@ -4,4 +4,8 @@ var e = function () {
 };
 
 function b() {
+    if (1) {
+        a = b ? c : b;
+        console.log(333);
+    }
 }

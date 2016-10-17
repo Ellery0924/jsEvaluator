@@ -39,7 +39,6 @@ module.exports = {
             else {
                 node.children.forEach(child=>this.flatten(child));
             }
-
         }
 
         clear(node) {
@@ -53,13 +52,14 @@ module.exports = {
                 }
             }
             else {
-                node.children.forEach(child=>{
+                node.children.forEach(child=> {
                     this.clear(child)
                 });
             }
             if (node.parent !== undefined) {
                 delete node.parent;
             }
+            delete node.nextSibling;
         }
     },
     Node: class {
@@ -71,6 +71,13 @@ module.exports = {
             this.type = type;
             this.children = [];
             this.parent = null;
+        }
+
+        nextSibling() {
+            const indexInParent = this.parent.indexOf(this);
+            if (indexInParent && indexInParent < this.parent.length - 1) {
+                return this.parent[indexInParent + 1];
+            }
         }
     }
 };

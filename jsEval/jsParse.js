@@ -623,7 +623,13 @@ class JSParser extends Parser {
             append(node, parent);
         }
 
-        this.ast.root = new Node('STMTS', 'NON_TERM');
+        //function program(parent) {
+        //    const node = new Node('PROGRAM');
+        //    append(node, parent);
+        //    stmts(node);
+        //}
+
+        this.ast.root = new Node('PROGRAM', 'NON_TERM');
         stmts(this.ast.root);
         return this.ast;
     }
@@ -633,5 +639,5 @@ module.exports = function (tokens) {
     const ast = new JSParser(new AST(new Node('PROGRAM', 'NON_TERM')), tokens).parse();
     ast.flatten();
     ast.clear();
-    return ast.root;
+    return ast;
 };

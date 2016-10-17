@@ -53,7 +53,9 @@ module.exports = {
                 }
             }
             else {
-                node.children.forEach(child=>this.clear(child));
+                node.children.forEach(child=>{
+                    this.clear(child)
+                });
             }
             if (node.parent !== undefined) {
                 delete node.parent;

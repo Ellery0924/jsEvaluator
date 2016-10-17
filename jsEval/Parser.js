@@ -8,6 +8,10 @@ module.exports = class {
         this.tokens = tokens;
     }
 
+    currentTokenStr() {
+        return this.currentToken() ? this.currentToken().token : null;
+    }
+
     currentToken() {
         return this.nthToken(0);
     }
@@ -16,8 +20,12 @@ module.exports = class {
         return this.nthToken(1);
     }
 
+    fallbackTo(index) {
+        this.current = index;
+    }
+
     nthToken(n) {
-        return this.tokens[this.current + n];
+        return this.tokens[this.current + n] || null;
     }
 
     error(expection) {

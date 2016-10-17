@@ -83,9 +83,11 @@ PlusOrMinus'-> e | + MultiOrDiv PlusOrMinus' | - MultiOrDiv PlusOrMinus'
 MultiOrDiv->Factor MultiOrDiv'
 MultiOrDiv'-> e | * Factor MultiOrDiv' | / Factor MultiOrDiv'
 
+EXPR_CALL->FACTOR ( CALL_ARGS )
+
 Factor->BasicType | Object | Array | (Expr) | - Factor | + Factor | ~ Factor
         | ! Factor | Typeof | Delete | Void | Function | Access | Call | New
-        | SelfPlusOrMinus | SelfPlusOrMinusBackward
+        | SelfPlusOrMinus | SelfPlusOrMinusBackward | e
 
 SelfPlusOrMinus->++ LVal | -- LVal
 SelfPlusOrMinusBackward-> LVal ++ | LVal --
@@ -101,16 +103,15 @@ ArgList->e | id ArgList'
 ArgList'-> e | , id ArgList'
 FuncName->e | id
 
-//Call
-Call->Function ( Comma ) | id ( Comma )
-
 //Access
-Access->id . Access | Call . Access | id | Call
+Access->( Expr ) . Access | (Expr) [Expr] . ( CallArgs ) | LVal ( CallArgs ) . Access | LVal | ( Expr ) [Expr]
+CallArgs->( Expr RestArgs )
+RestArgs->e | , Expr RestArgs
 
 //对象
 Object->{ObjContent}
 //对象内容
-ObjContent->key:Comma,ObjContent | key:Comma | e
+ObjContent->key:Comma,ObjContent | Key:Comma | e
 //键值
 Key->id | string | number
 //数组

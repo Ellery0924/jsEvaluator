@@ -459,19 +459,15 @@ class JSParser extends Parser {
             }
             else if (matchToken(/typeof/, node, true)) {
                 factor(node);
-                node.token = 'TYPE_OF';
             }
             else if (matchToken(/void/, node, true)) {
                 factor(node);
-                node.token = 'VOID';
             }
             else if (matchToken(/\+\+|\-\-/, node, true)) {
                 lVal(node);
-                node.token = 'SELF_PLUS_OR_MINUS';
             }
             else if (matchToken(/delete/, node, true)) {
                 lVal(node);
-                node.token = 'DELETE';
             }
             else if (token === 'new') {
                 _new(node);
@@ -534,8 +530,8 @@ class JSParser extends Parser {
             if (matchToken(/\(/, node, true)) {
                 callArgs(node);
                 matchToken(/\)/, node);
-                accessCall(parent);
                 append(node, parent);
+                accessCall(parent);
                 parent.token = 'ACCESS_CALL'
             }
         }

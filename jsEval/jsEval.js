@@ -310,7 +310,7 @@ function factor(node, env, _this) {
     const children = node.children;
     const car = children[0];
     const cadr = children[1];
-    if (!cadr.children) {
+    if (!cadr) {
         return evaluate(car, env, _this);
     }
     switch (car.token) {
@@ -324,7 +324,38 @@ function factor(node, env, _this) {
             return +evaluate(cadr, env, _this);
         case '~':
             return ~evaluate(cadr, env, _this);
+        case 'delete':
+            return _delete(cadr, env, _this);
+        case 'typeof':
+            return typeof evaluate(cadr, env, _this);
+        case 'void':
+            return void evaluate(cadr, env, _this);
+        case '++':
+            return selfPlusOrMinus(cadr, env, _this, true);
+        case '--':
+            return selfPlusOrMinus(cadr, env, _this, false);
     }
+}
+
+function _delete(cadr, env, _this) {
+    const lvalRet = cadr.token === 'LVAL' ? lVal(cadr, env, _this) : {
+        value: lookupVariable(cadr.token, env, _this),
+        context: env,
+        lastRef: cadr.token
+    };
+    return delete lvalRet.context[lvalRet.lastRef];
+}
+
+function selfPlusOrMinus(cadr, env, _this, isPlus) {
+    const lvalRet = cadr.token === 'LVAL' ? lVal(cadr, env, _this) : {
+        value: lookupVariable(cadr.token, env, _this),
+        context: env,
+        lastRef: cadr.token
+    };
+    const context = lvalRet.context;
+    const lastRef = lvalRet.lastRef;
+    context[lastRef] = lvalRet.value + (isPlus ? 1 : -1);
+    return context[lastRef];
 }
 
 function lookupVariable(id, env, _this) {
@@ -362,13 +393,15 @@ function lVal(node, env, context, _this) {
         if (!context || context.isGlobal) {
             return {
                 context: global,
-                value: lookupVariable(id, env, _this)
+                value: lookupVariable(id, env, _this),
+                lastRef: id
             };
         }
         else {
             return {
                 context: context,
-                value: context[id]
+                value: context[id],
+                lastRef: id
             };
         }
     }
@@ -398,7 +431,6 @@ function accessCall(node, env, context, _this) {
             if (!func || func.type !== 'function') {
                 throw new Error(func + ' is not callable.');
             }
-
             const actualArgs = accessCallArgs(argsNode, env, _this);
             applyActualArgs(actualArgs, func.args, func.scope);
             block(func.body, func.scope, func.THIS, func);
@@ -408,9 +440,11 @@ function accessCall(node, env, context, _this) {
         }
     }
 
-    if (children[2] && children[2].token === '.') {
+    const dotIndex = children.findIndex(child=>child.token === '.');
+
+    if (dotIndex !== -1) {
         if (typeof currentContext === 'function' || typeof currentContext === 'object') {
-            const next = children[3];
+            const next = children[dotIndex + 1];
             if (next.type === 'id') {
                 currentContext = currentContext[next.token];
             }
@@ -431,7 +465,9 @@ function accessCall(node, env, context, _this) {
 
 function applyActualArgs(actualArgs, params, scope) {
     actualArgs.forEach((arg, i)=> {
-        scope[params[i]].value = arg;
+        if (scope[params[i]]) {
+            scope[params[i]].value = arg;
+        }
     });
 }
 

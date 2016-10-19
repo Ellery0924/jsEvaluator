@@ -87,7 +87,7 @@ EXPR_CALL->FACTOR ( CALL_ARGS )
 
 Factor->BasicType | Object | Array | (Expr) | - Factor | + Factor | ~ Factor
         | ! Factor | Typeof | Delete | Void | Function | Access | Call | New
-        | SelfPlusOrMinus | SelfPlusOrMinusBackward | e
+        | SelfPlusOrMinus | SelfPlusOrMinusBackward | this | e
 
 SelfPlusOrMinus->++ LVal | -- LVal
 SelfPlusOrMinusBackward-> LVal ++ | LVal --

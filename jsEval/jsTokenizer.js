@@ -6,7 +6,7 @@
 //不处理科学计数法的数字
 const rnum = /\-?\d+(\.\d+)?/,
     rbool = /^(true|false)$/,
-    rstring = /(['"])(\\\'|\\\"|[^'"])*\1/,
+    rstring = /(['"])((\'|\"|[^'"])*)\1/,
     rkeyword = /^(new|if|while|for|var|else|function|null|undefined|return|do|break|continue|typeof|delete|void|instanceof|in|debugger|default|case|try|catch|finally|throw)$/,
     rid = /[a-zA-Z$_]([\w$_]+)?/,
     rpunctuation = /\.|,|;|\(|\)|\{|\}|\[|\]/,
@@ -28,13 +28,13 @@ function getToken(match, type) {
         type = token;
     }
     console.warn({
-        token: token,
+        token: type !== 'string' ? token : match[2],
         len: token.length,
         type: type,
         pos: cachedIndex
     });
     return {
-        token: token,
+        token: type !== 'string' ? token : match[2],
         len: token.length,
         type: type,
         pos: cachedIndex
@@ -88,7 +88,6 @@ module.exports = function tokenizer(testCode) {
                     || currentCode.length > 1 && currentLastLetter !== currentFirstLetter
                     || currentLastLetter === currentFirstLetter && currentCode[currentCode.length - 2] === '\\') {
                     //如果匹配到空白符,则可以认定为非法字符串
-                    //我的天哪 字符串是怎么parse的啊
                     if (nextLetter.match(rspace)) {
                         throwSyntaxError(currentCode, line, lastIndex);
                     }
@@ -101,6 +100,7 @@ module.exports = function tokenizer(testCode) {
             }
             //匹配字符串
             if (mstring) {
+                console.log(mstring)
                 parsed.push(getToken(mstring, 'string'));
                 break;
             }
@@ -155,7 +155,7 @@ module.exports = function tokenizer(testCode) {
                 const currentLetter = moperator[0];
                 //以下操作符可能是某个更长的操作符的一部分
                 //因此遇到以下操作符直接向缓冲区追加一个字符进行匹配
-               if (currentLetter === '|' && nextLetter === '|' ||
+                if (currentLetter === '|' && nextLetter === '|' ||
                     currentLetter === '&' && nextLetter === '&') {
                     lookahead++;
                     break;

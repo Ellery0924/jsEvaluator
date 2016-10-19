@@ -259,7 +259,7 @@ class JSParser extends Parser {
                     || token.token === '/='
                     || token.token === '%='
                     || token.token === '?'
-                ) || {token: 'others'};
+                ) || { token: 'others' };
         }
 
         const assignTerm = /=|\+=|-=|\/=|\*=|%=/;
@@ -443,7 +443,7 @@ class JSParser extends Parser {
                 }
                 if (matchToken(/\./, node, true)) {
                     access(node);
-                    node.token = 'ACCESS';
+                    node.token = 'EXPR_ACCESS';
                 }
                 else if (matchToken(/\[/, node, true)) {
                     expression(node);
@@ -451,7 +451,7 @@ class JSParser extends Parser {
                     if (matchToken(/\./, node, true)) {
                         access(node);
                     }
-                    node.token = 'ACCESS';
+                    node.token = 'EXPR_ACCESS';
                 }
             }
             else if (matchToken(/^(\-|\+|\~|\!)$/, node, true)) {
@@ -507,7 +507,7 @@ class JSParser extends Parser {
                 parent.token = 'EXPR_CALL';
                 append(node, parent);
                 if (self.currentTokenStr() === '(') {
-                    call(parent);
+                    call(node);
                 }
             }
         }

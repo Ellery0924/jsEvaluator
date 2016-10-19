@@ -1,27 +1,33 @@
-var e = function (arg1, arg2, arg3) {
-    return {
-        b: function (a, b, c) {
-        },
-        e: {
-            f: function () {
-                return {
-                    c: function () {
-                        return function (a) {
-                            return {
-                                g: function () {
-                                    return a * 100;
-                                }
-                            };
-                        };
-                    }
-                };
+function Klass(a, b) {
+    this.a = a;
+    this.b = b;
+}
+Klass.prototype = {
+    c: function () {
+        return d;
+    }
+};
+var testObj = {
+    klass: Klass,
+    highOrderFunction: function (a) {
+        return function (b) {
+            return function (c) {
+                return a + b + c;
             }
         }
-    };
-};
-var a = [1, 2, [1, 2, { 3: 2 }]],
-    d = 5;
+    }
+}
+function fibonacci(n) {
+    if (n === 1 || n === 2) {
+        return 1;
+    }
+    else {
+        return fibonacci(n - 1) + fibonacci(n - 2);
+    }
+}
 
-var d = e(a, 2, this.d).e.f().c()(200).g();
-var f = !(a[2][1]++ * (3 + 2) <= 3) && 6;
+var ins = new testObj.klass("a", "b");
+var h = testObj.highOrderFunction(1)(5)(100);
+var fibRet = fibonacci(10);
+var instOf = ins instanceof testObj.klass;
 

@@ -10,7 +10,7 @@ const rnum = /\-?\d+(\.\d+)?/,
     rkeyword = /^(new|if|while|for|var|else|function|null|undefined|return|do|break|continue|typeof|delete|void|instanceof|in|debugger|default|case|try|catch|finally|throw)$/,
     rid = /[a-zA-Z$_]([\w$_]+)?/,
     rpunctuation = /\.|,|;|\(|\)|\{|\}|\[|\]/,
-    roperator = /\+\+|\-\-|\+=|\-=|\*=|\/=|\+|\-|\*|\/|<=|>=|<<|>>|>|<|===|!==|==|!=|!|&&|\|\||&|\||\?|:|~|%/,
+    roperator = /\+\+|\-\-|\+=|\-=|\*=|%=|\/=|\+|\-|\*|\/|<=|>=|<<|>>|>|<|===|!==|==|!=|!|&&|\|\||&|\||\?|:|~|%/,
     rassign = /=/,
     rspace = /[\s\n\r\t]/,
     rquotation = /['"]/;
@@ -173,7 +173,8 @@ module.exports = function tokenizer(testCode) {
                 else if (currentLetter === '+'
                     || currentLetter === '-'
                     || currentLetter === '*'
-                    || currentLetter === '/') {
+                    || currentLetter === '/'
+                    || currentLetter === '%') {
                     if (nextLetter === '=') {
                         lookahead++;
                         break;
@@ -184,6 +185,9 @@ module.exports = function tokenizer(testCode) {
                     //匹配!==
                     if (nextLetter === '=') {
                         lookahead++;
+                        if (currentCode[lookahead + 1] === '=') {
+                            lookahead++;
+                        }
                         break;
                     }
                 }
@@ -193,8 +197,12 @@ module.exports = function tokenizer(testCode) {
             //匹配赋值(=)
             else if (massign) {
                 //=可能是===的一部分,因此直接追加一个字符
+                const extended = testCode.slice(lastIndex, lookahead + 1);
                 if (nextLetter === '=') {
                     lookahead++;
+                    if (extended.charAt(extended.length - 1) === '=') {
+                        lookahead++;
+                    }
                     break;
                 }
                 parsed.push(getToken(massign, 'assign'));

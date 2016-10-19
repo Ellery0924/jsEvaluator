@@ -169,12 +169,9 @@ function clearEnv(env) {
 }
 
 function evaluate(node, env, _this, func, isNew) {
-    //console.log(node.type);
     const token = node.token;
     const type = node.type;
-    //console.log('evaluate', node)
     if (type === 'NON_TERM') {
-        //console.log('evaluating: ' + token);
         switch (token) {
             case 'STMTS':
                 stmts(node, env, _this, func);
@@ -192,9 +189,6 @@ function evaluate(node, env, _this, func, isNew) {
             case 'LVAL':
                 return lVal(node, env, null, _this, func).value;
             case 'ACCESS_CALL':
-                //console.log(
-                //    'access'
-                //)
                 return accessCall(node, env, global, _this, isNew, func);
             case 'BLOCK':
                 block(node, env, _this, func);
@@ -254,7 +248,6 @@ function _if(node, env, _this, func) {
     }
     else if (elseNode) {
         if (elseNode.children[1]) {
-            //console.log(evaluate(elseNode.children[1], env, _this, func))
             evaluate(elseNode.children[1], env, _this, func);
         }
     }

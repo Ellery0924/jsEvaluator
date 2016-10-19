@@ -222,10 +222,6 @@
                                                                                                                 "type": "keyword"
                                                                                                             },
                                                                                                             {
-                                                                                                                "token": "fff",
-                                                                                                                "type": "id"
-                                                                                                            },
-                                                                                                            {
                                                                                                                 "token": "(",
                                                                                                                 "type": "punctuation"
                                                                                                             },
@@ -282,10 +278,6 @@
                                                                                                                                                                 "type": "keyword"
                                                                                                                                                             },
                                                                                                                                                             {
-                                                                                                                                                                "token": "ddd",
-                                                                                                                                                                "type": "id"
-                                                                                                                                                            },
-                                                                                                                                                            {
                                                                                                                                                                 "token": "(",
                                                                                                                                                                 "type": "punctuation"
                                                                                                                                                             },
@@ -320,10 +312,6 @@
                                                                                                                                                                                             {
                                                                                                                                                                                                 "token": "function",
                                                                                                                                                                                                 "type": "keyword"
-                                                                                                                                                                                            },
-                                                                                                                                                                                            {
-                                                                                                                                                                                                "token": "ccccc",
-                                                                                                                                                                                                "type": "id"
                                                                                                                                                                                             },
                                                                                                                                                                                             {
                                                                                                                                                                                                 "token": "(",
@@ -414,8 +402,28 @@
                                                                                                                                                                                                                                                                         "type": "keyword"
                                                                                                                                                                                                                                                                     },
                                                                                                                                                                                                                                                                     {
-                                                                                                                                                                                                                                                                        "token": "a",
-                                                                                                                                                                                                                                                                        "type": "id"
+                                                                                                                                                                                                                                                                        "token": "MULTI_OR_DIV",
+                                                                                                                                                                                                                                                                        "type": "NON_TERM",
+                                                                                                                                                                                                                                                                        "children": [
+                                                                                                                                                                                                                                                                            {
+                                                                                                                                                                                                                                                                                "token": "a",
+                                                                                                                                                                                                                                                                                "type": "id"
+                                                                                                                                                                                                                                                                            },
+                                                                                                                                                                                                                                                                            {
+                                                                                                                                                                                                                                                                                "token": "MULTI_OR_DIV_REST",
+                                                                                                                                                                                                                                                                                "type": "NON_TERM",
+                                                                                                                                                                                                                                                                                "children": [
+                                                                                                                                                                                                                                                                                    {
+                                                                                                                                                                                                                                                                                        "token": "*",
+                                                                                                                                                                                                                                                                                        "type": "operator"
+                                                                                                                                                                                                                                                                                    },
+                                                                                                                                                                                                                                                                                    {
+                                                                                                                                                                                                                                                                                        "token": "100",
+                                                                                                                                                                                                                                                                                        "type": "number"
+                                                                                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                                                                                ]
+                                                                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                                                                        ]
                                                                                                                                                                                                                                                                     }
                                                                                                                                                                                                                                                                 ]
                                                                                                                                                                                                                                                             },
@@ -992,58 +1000,176 @@
                                                         "type": "assign"
                                                     },
                                                     {
-                                                        "token": "SELF_PLUS_OR_MINUS_BACKWARD",
+                                                        "token": "AND",
                                                         "type": "NON_TERM",
                                                         "children": [
                                                             {
-                                                                "token": "LVAL",
+                                                                "token": "FACTOR",
                                                                 "type": "NON_TERM",
                                                                 "children": [
                                                                     {
-                                                                        "token": "a",
-                                                                        "type": "id"
+                                                                        "token": "!",
+                                                                        "type": "operator"
                                                                     },
                                                                     {
-                                                                        "token": "LVAL_REST",
+                                                                        "token": "FACTOR",
                                                                         "type": "NON_TERM",
                                                                         "children": [
                                                                             {
-                                                                                "token": "[",
+                                                                                "token": "(",
                                                                                 "type": "punctuation"
                                                                             },
                                                                             {
-                                                                                "token": "2",
-                                                                                "type": "number"
-                                                                            },
-                                                                            {
-                                                                                "token": "]",
-                                                                                "type": "punctuation"
-                                                                            },
-                                                                            {
-                                                                                "token": "LVAL_REST",
+                                                                                "token": "COMPARE",
                                                                                 "type": "NON_TERM",
                                                                                 "children": [
                                                                                     {
-                                                                                        "token": "[",
-                                                                                        "type": "punctuation"
+                                                                                        "token": "MULTI_OR_DIV",
+                                                                                        "type": "NON_TERM",
+                                                                                        "children": [
+                                                                                            {
+                                                                                                "token": "SELF_PLUS_OR_MINUS_BACKWARD",
+                                                                                                "type": "NON_TERM",
+                                                                                                "children": [
+                                                                                                    {
+                                                                                                        "token": "LVAL",
+                                                                                                        "type": "NON_TERM",
+                                                                                                        "children": [
+                                                                                                            {
+                                                                                                                "token": "a",
+                                                                                                                "type": "id"
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "token": "LVAL_REST",
+                                                                                                                "type": "NON_TERM",
+                                                                                                                "children": [
+                                                                                                                    {
+                                                                                                                        "token": "[",
+                                                                                                                        "type": "punctuation"
+                                                                                                                    },
+                                                                                                                    {
+                                                                                                                        "token": "2",
+                                                                                                                        "type": "number"
+                                                                                                                    },
+                                                                                                                    {
+                                                                                                                        "token": "]",
+                                                                                                                        "type": "punctuation"
+                                                                                                                    },
+                                                                                                                    {
+                                                                                                                        "token": "LVAL_REST",
+                                                                                                                        "type": "NON_TERM",
+                                                                                                                        "children": [
+                                                                                                                            {
+                                                                                                                                "token": "[",
+                                                                                                                                "type": "punctuation"
+                                                                                                                            },
+                                                                                                                            {
+                                                                                                                                "token": "1",
+                                                                                                                                "type": "number"
+                                                                                                                            },
+                                                                                                                            {
+                                                                                                                                "token": "]",
+                                                                                                                                "type": "punctuation"
+                                                                                                                            }
+                                                                                                                        ]
+                                                                                                                    }
+                                                                                                                ]
+                                                                                                            }
+                                                                                                        ]
+                                                                                                    },
+                                                                                                    {
+                                                                                                        "token": "++",
+                                                                                                        "type": "operator"
+                                                                                                    }
+                                                                                                ]
+                                                                                            },
+                                                                                            {
+                                                                                                "token": "MULTI_OR_DIV_REST",
+                                                                                                "type": "NON_TERM",
+                                                                                                "children": [
+                                                                                                    {
+                                                                                                        "token": "*",
+                                                                                                        "type": "operator"
+                                                                                                    },
+                                                                                                    {
+                                                                                                        "token": "FACTOR",
+                                                                                                        "type": "NON_TERM",
+                                                                                                        "children": [
+                                                                                                            {
+                                                                                                                "token": "(",
+                                                                                                                "type": "punctuation"
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "token": "PLUS_OR_MINUS",
+                                                                                                                "type": "NON_TERM",
+                                                                                                                "children": [
+                                                                                                                    {
+                                                                                                                        "token": "3",
+                                                                                                                        "type": "number"
+                                                                                                                    },
+                                                                                                                    {
+                                                                                                                        "token": "PLUS_OR_MINUS_REST",
+                                                                                                                        "type": "NON_TERM",
+                                                                                                                        "children": [
+                                                                                                                            {
+                                                                                                                                "token": "+",
+                                                                                                                                "type": "operator"
+                                                                                                                            },
+                                                                                                                            {
+                                                                                                                                "token": "2",
+                                                                                                                                "type": "number"
+                                                                                                                            }
+                                                                                                                        ]
+                                                                                                                    }
+                                                                                                                ]
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "token": ")",
+                                                                                                                "type": "punctuation"
+                                                                                                            }
+                                                                                                        ]
+                                                                                                    }
+                                                                                                ]
+                                                                                            }
+                                                                                        ]
                                                                                     },
                                                                                     {
-                                                                                        "token": "1",
-                                                                                        "type": "number"
-                                                                                    },
-                                                                                    {
-                                                                                        "token": "]",
-                                                                                        "type": "punctuation"
+                                                                                        "token": "COMPARE_REST",
+                                                                                        "type": "NON_TERM",
+                                                                                        "children": [
+                                                                                            {
+                                                                                                "token": "<=",
+                                                                                                "type": "operator"
+                                                                                            },
+                                                                                            {
+                                                                                                "token": "3",
+                                                                                                "type": "number"
+                                                                                            }
+                                                                                        ]
                                                                                     }
                                                                                 ]
+                                                                            },
+                                                                            {
+                                                                                "token": ")",
+                                                                                "type": "punctuation"
                                                                             }
                                                                         ]
                                                                     }
                                                                 ]
                                                             },
                                                             {
-                                                                "token": "++",
-                                                                "type": "operator"
+                                                                "token": "AND_REST",
+                                                                "type": "NON_TERM",
+                                                                "children": [
+                                                                    {
+                                                                        "token": "&&",
+                                                                        "type": "operator"
+                                                                    },
+                                                                    {
+                                                                        "token": "6",
+                                                                        "type": "number"
+                                                                    }
+                                                                ]
                                                             }
                                                         ]
                                                     }

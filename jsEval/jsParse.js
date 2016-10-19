@@ -284,15 +284,8 @@ class JSParser extends Parser {
 
         function lVal(parent) {
             const node = new Node('LVAL');
-            //if (matchToken(/\(/, node, true)) {
-            //    matchType(/id/, node);
-            //    lValRest(node);
-            //    matchToken(/\)/, node);
-            //}
-            //else {
             matchType(/id/, node);
             lValRest(node);
-            //}
             append(node, parent);
         }
 

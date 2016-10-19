@@ -53,22 +53,28 @@ function extractFunctionDeclarationFromStmt(stmt, env, oneOff) {
     const stmtChildren = stmt.children;
     if (stmtChildren) {
         const funcTokenIndex = stmtChildren.findIndex(child=>child.token === 'function');
+
         if (funcTokenIndex === 0) {
             let funcName = stmtChildren[1];
             let argsIndex = 3;
+
             if (funcName.type !== 'id') {
                 argsIndex = 2;
                 funcName = null;
             }
+
             const funcArgs = flattenFuncArgs(stmtChildren.slice(argsIndex, stmtChildren.findIndex(child=>child.token === ')')));
             const funcBody = stmtChildren.find(child=>child.token === 'BLOCK');
             const funcScope = {};
+
             funcArgs.forEach(arg=> {
                 funcScope[arg] = {
                     type: 'variable'
                 }
             });
+
             const identifier = !oneOff ? funcName.token : String('function_' + ++guid);
+
             env[identifier] = {
                 type: 'function',
                 name: funcName ? funcName.token : null,
@@ -193,6 +199,15 @@ function evaluate(node, env, _this, func) {
                 const car = node.children[0];
                 const cadr = node.children[1];
                 return selfPlusOrMinus(car, env, _this, cadr.token === '++', true);
+            case 'MULTI_OR_DIV':
+            case 'PLUS_OR_MINUS':
+            case 'COMPARE':
+            case 'INSTANCE_OF_OR_IN':
+            case 'AND':
+            case 'OR':
+                return twoOperateeOperation(node, env, _this);
+            case 'THREE_ITEM_OPERATION':
+                return threeItemOperation(node, env, _this);
         }
     }
     else {
@@ -211,6 +226,82 @@ function evaluate(node, env, _this, func) {
                 return lookupVariable(token, env);
         }
     }
+}
+
+function threeItemOperation(node, env, _this) {
+
+}
+
+function twoOperateeOperation(node, env, _this) {
+    const children = node.children;
+    const car = children[0];
+
+    let rest = children[1];
+    let ret = evaluate(car, env, _this);
+
+    while (rest) {
+        const operator = rest.children[0].token;
+        const operatee = evaluate(rest.children[1], env, _this);
+
+        switch (operator) {
+            case '*':
+                ret = ret * operatee;
+                break;
+            case '/':
+                ret = ret / operatee;
+                break;
+            case '%':
+                ret = ret % operatee;
+                break;
+            case '+':
+                ret = ret + operatee;
+                break;
+            case '-':
+                ret = ret - operatee;
+                break;
+            case '<':
+                ret = ret < operatee;
+                break;
+            case '>':
+                ret = ret > operatee;
+                break;
+            case '<=':
+                ret = ret <= operatee;
+                break;
+            case '>=':
+                ret = ret >= operatee;
+                break;
+            case '===':
+                ret = ret === operatee;
+                break;
+            case '!==':
+                ret = ret !== operatee;
+                break;
+            case '==':
+                ret = ret == operatee;
+                break;
+            case '!=':
+                ret = ret != operatee;
+                break;
+            case 'instanceof':
+                console.log(operatee.prototype);
+                return ret.___proto___ === operatee.prototype;
+                break;
+            case 'in':
+                ret = ret in operatee;
+                break;
+            case '&&':
+                ret = ret && operatee;
+                break;
+            case '||':
+                ret = ret || operatee;
+                break;
+        }
+
+        rest = rest.children.find(child=>child.token.search('_REST') !== -1);
+    }
+
+    return ret;
 }
 
 function _return(node, env, _this, func) {
@@ -255,6 +346,7 @@ function arrayContent(node, env, ret, _this) {
     const car = children[0];
     const cadr = children[1];
     const rest = children.find(child=>child.token === 'COMMA_REST');
+
     if (car.token !== ',') {
         ret.push(evaluate(car, env, _this));
     }
@@ -264,6 +356,7 @@ function arrayContent(node, env, ret, _this) {
     if (rest) {
         arrayContent(rest, env, ret, _this);
     }
+
     return ret;
 }
 
@@ -272,6 +365,7 @@ function stmts(node, env, _this, func) {
     const stmt = children[0];
     const rest = children.find(child=>child.token === 'STMTS');
     evaluate(stmt, env, _this, func);
+
     if (rest) {
         stmts(rest, env, _this, func);
     }
@@ -280,6 +374,7 @@ function stmts(node, env, _this, func) {
 function block(node, env, _this, func) {
     const children = node.children;
     const stmtsNode = children[1];
+
     if (stmtsNode.token === 'STMTS') {
         stmts(stmtsNode, env, _this, func);
     }
@@ -314,9 +409,11 @@ function factor(node, env, _this) {
     const children = node.children;
     const car = children[0];
     const cadr = children[1];
+
     if (!cadr) {
         return evaluate(car, env, _this);
     }
+
     switch (car.token) {
         case '!':
             return !evaluate(cadr, env, _this);
@@ -359,7 +456,6 @@ function selfPlusOrMinus(cadr, env, _this, isPlus, backward) {
     const context = lvalRet.context;
     const lastRef = lvalRet.lastRef;
     const newVal = context[lastRef] + (isPlus ? 1 : -1);
-    console.log(newVal)
 
     if (!backward) {
         context[lastRef] = newVal;

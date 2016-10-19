@@ -992,13 +992,9 @@
                                                         "type": "assign"
                                                     },
                                                     {
-                                                        "token": "FACTOR",
+                                                        "token": "SELF_PLUS_OR_MINUS_BACKWARD",
                                                         "type": "NON_TERM",
                                                         "children": [
-                                                            {
-                                                                "token": "++",
-                                                                "type": "operator"
-                                                            },
                                                             {
                                                                 "token": "LVAL",
                                                                 "type": "NON_TERM",
@@ -1044,6 +1040,10 @@
                                                                         ]
                                                                     }
                                                                 ]
+                                                            },
+                                                            {
+                                                                "token": "++",
+                                                                "type": "operator"
                                                             }
                                                         ]
                                                     }

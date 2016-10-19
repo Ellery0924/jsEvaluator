@@ -189,6 +189,10 @@ function evaluate(node, env, _this, func) {
             case 'RETURN':
                 _return(node, env, _this, func);
                 break;
+            case 'SELF_PLUS_OR_MINUS_BACKWARD':
+                const car = node.children[0];
+                const cadr = node.children[1];
+                return selfPlusOrMinus(car, env, _this, cadr.token === '++', true);
         }
     }
     else {
@@ -331,9 +335,9 @@ function factor(node, env, _this) {
         case 'void':
             return void evaluate(cadr, env, _this);
         case '++':
-            return selfPlusOrMinus(cadr, env, _this, true);
+            return selfPlusOrMinus(cadr, env, _this, true, false);
         case '--':
-            return selfPlusOrMinus(cadr, env, _this, false);
+            return selfPlusOrMinus(cadr, env, _this, false, false);
     }
 }
 
@@ -346,7 +350,7 @@ function _delete(cadr, env, _this) {
     return delete lvalRet.context[lvalRet.lastRef];
 }
 
-function selfPlusOrMinus(cadr, env, _this, isPlus) {
+function selfPlusOrMinus(cadr, env, _this, isPlus, backward) {
     const lvalRet = cadr.token === 'LVAL' ? lVal(cadr, env, _this) : {
         value: lookupVariable(cadr.token, env, _this),
         context: env,
@@ -354,8 +358,18 @@ function selfPlusOrMinus(cadr, env, _this, isPlus) {
     };
     const context = lvalRet.context;
     const lastRef = lvalRet.lastRef;
-    context[lastRef] = lvalRet.value + (isPlus ? 1 : -1);
-    return context[lastRef];
+    const newVal = context[lastRef] + (isPlus ? 1 : -1);
+    console.log(newVal)
+
+    if (!backward) {
+        context[lastRef] = newVal;
+        return context[lastRef];
+    }
+    else {
+        const currentVal = context[lastRef];
+        context[lastRef] = newVal;
+        return currentVal;
+    }
 }
 
 function lookupVariable(id, env, _this) {
@@ -367,7 +381,7 @@ function lookupVariable(id, env, _this) {
         return env[ret].type === 'variable' ? env[ret].value : env[ret];
     }
     else if (env.__1024__) {
-        return lookupVariable(id, env.__1024__);
+        return lookupVariable(id, env.__1024__, _this);
     }
     else {
         throw new Error(id + ' is not defined!');

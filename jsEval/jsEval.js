@@ -267,7 +267,6 @@ function _new(node, env, _this, func) {
     const callee = evaluate(calleeNode, env, __this, func, true).callee;
     if (!callee.RETURN) {
         __this.___proto___ = callee.prototype;
-        Object.assign(__this, callee.prototype);
     }
     else {
         __this = callee.RETURN;
@@ -659,9 +658,6 @@ function selfPlusOrMinus(cadr, env, _this, isPlus, backward, func) {
 }
 
 function lookupVariable(id, env, _this, func) {
-    //if (func) {
-    //    console.log('looking ' + id, id + '_' + func.callId)
-    //}
     if (id === 'this') {
         return { env: env, value: _this };
     }
@@ -674,13 +670,7 @@ function lookupVariable(id, env, _this, func) {
         if (env[ret].type === 'variable') {
             val = env[ret].value;
             if (func) {
-                //console.log(val, func.callId);
                 const argsKey = '__actual_args_' + func.callId + '__';
-                //if (func.callId > 1) {
-                //    if (val['__actual_args_' + (func.callId - 1) + '__']) {
-                //        val = val['__actual_args_' + (func.callId - 1) + '__'];
-                //    }
-                //}
                 if (val[argsKey] != null) {
                     val = val[argsKey];
                 }
@@ -702,6 +692,23 @@ function lookupVariable(id, env, _this, func) {
     }
 }
 
+function lookupAttrOnProtoChain(context, id) {
+    if (context[id] !== undefined) {
+        return context[id];
+    }
+    else {
+        let ret;
+        while (context.___proto___) {
+            context = context.___proto___;
+            if (context[id] !== undefined) {
+                ret = context[id];
+                break;
+            }
+        }
+        return ret;
+    }
+}
+
 function lVal(node, env, context, _this, func) {
     const children = node.children;
     const car = children[0];
@@ -714,7 +721,7 @@ function lVal(node, env, context, _this, func) {
             return lVal(rest, env, lookupVariable(id, env, _this, func).value, _this, func);
         }
         else {
-            return lVal(rest, env, context[id], _this, func);
+            return lVal(rest, env, lookupAttrOnProtoChain(context, id), _this, func);
         }
     }
     else {
@@ -728,7 +735,7 @@ function lVal(node, env, context, _this, func) {
         else {
             return {
                 context: context,
-                value: context[id],
+                value: lookupAttrOnProtoChain(context, id),
                 lastRef: id
             };
         }

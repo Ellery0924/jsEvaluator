@@ -27,6 +27,7 @@ function fibonacci(n) {
 }
 
 var ins = new testObj.klass("a", "b");
+var c = ins.c;
 var h = testObj.highOrderFunction(1)(5)(100);
 var fibRet = fibonacci(10);
 var instOf = ins instanceof testObj.klass;

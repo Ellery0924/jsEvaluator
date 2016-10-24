@@ -264,8 +264,164 @@
                                                                                                                         "type": "operator"
                                                                                                                     },
                                                                                                                     {
-                                                                                                                        "token": "200",
-                                                                                                                        "type": "number"
+                                                                                                                        "token": "FUNCTION",
+                                                                                                                        "type": "NON_TERM",
+                                                                                                                        "children": [
+                                                                                                                            {
+                                                                                                                                "token": "function",
+                                                                                                                                "type": "keyword",
+                                                                                                                                "funcId": "___function___0"
+                                                                                                                            },
+                                                                                                                            {
+                                                                                                                                "token": "(",
+                                                                                                                                "type": "punctuation",
+                                                                                                                                "funcId": "___function___0"
+                                                                                                                            },
+                                                                                                                            {
+                                                                                                                                "token": "FUNCTION_ARGS",
+                                                                                                                                "type": "NON_TERM",
+                                                                                                                                "children": [
+                                                                                                                                    {
+                                                                                                                                        "token": "a",
+                                                                                                                                        "type": "id",
+                                                                                                                                        "funcId": "___function___0"
+                                                                                                                                    },
+                                                                                                                                    {
+                                                                                                                                        "token": ",",
+                                                                                                                                        "type": "punctuation",
+                                                                                                                                        "funcId": "___function___0"
+                                                                                                                                    },
+                                                                                                                                    {
+                                                                                                                                        "token": "FUNCTION_ARGS",
+                                                                                                                                        "type": "NON_TERM",
+                                                                                                                                        "children": [
+                                                                                                                                            {
+                                                                                                                                                "token": "b",
+                                                                                                                                                "type": "id",
+                                                                                                                                                "funcId": "___function___0"
+                                                                                                                                            },
+                                                                                                                                            {
+                                                                                                                                                "token": ",",
+                                                                                                                                                "type": "punctuation",
+                                                                                                                                                "funcId": "___function___0"
+                                                                                                                                            },
+                                                                                                                                            {
+                                                                                                                                                "token": "c",
+                                                                                                                                                "type": "id",
+                                                                                                                                                "funcId": "___function___0"
+                                                                                                                                            }
+                                                                                                                                        ],
+                                                                                                                                        "funcId": "___function___0"
+                                                                                                                                    }
+                                                                                                                                ],
+                                                                                                                                "funcId": "___function___0"
+                                                                                                                            },
+                                                                                                                            {
+                                                                                                                                "token": ")",
+                                                                                                                                "type": "punctuation",
+                                                                                                                                "funcId": "___function___0"
+                                                                                                                            },
+                                                                                                                            {
+                                                                                                                                "token": "BLOCK",
+                                                                                                                                "type": "NON_TERM",
+                                                                                                                                "children": [
+                                                                                                                                    {
+                                                                                                                                        "token": "{",
+                                                                                                                                        "type": "punctuation",
+                                                                                                                                        "funcId": "___function___0"
+                                                                                                                                    },
+                                                                                                                                    {
+                                                                                                                                        "token": "STMTS",
+                                                                                                                                        "type": "NON_TERM",
+                                                                                                                                        "children": [
+                                                                                                                                            {
+                                                                                                                                                "token": "VAR",
+                                                                                                                                                "type": "NON_TERM",
+                                                                                                                                                "children": [
+                                                                                                                                                    {
+                                                                                                                                                        "token": "var",
+                                                                                                                                                        "type": "keyword",
+                                                                                                                                                        "funcId": "___function___0"
+                                                                                                                                                    },
+                                                                                                                                                    {
+                                                                                                                                                        "token": "VAR_BODY",
+                                                                                                                                                        "type": "NON_TERM",
+                                                                                                                                                        "children": [
+                                                                                                                                                            {
+                                                                                                                                                                "token": "u88888",
+                                                                                                                                                                "type": "id",
+                                                                                                                                                                "funcId": "___function___0"
+                                                                                                                                                            },
+                                                                                                                                                            {
+                                                                                                                                                                "token": "VAR_BODY_REST",
+                                                                                                                                                                "type": "NON_TERM",
+                                                                                                                                                                "children": [
+                                                                                                                                                                    {
+                                                                                                                                                                        "token": ",",
+                                                                                                                                                                        "type": "punctuation",
+                                                                                                                                                                        "funcId": "___function___0"
+                                                                                                                                                                    },
+                                                                                                                                                                    {
+                                                                                                                                                                        "token": "i99",
+                                                                                                                                                                        "type": "id",
+                                                                                                                                                                        "funcId": "___function___0"
+                                                                                                                                                                    }
+                                                                                                                                                                ],
+                                                                                                                                                                "funcId": "___function___0"
+                                                                                                                                                            }
+                                                                                                                                                        ],
+                                                                                                                                                        "funcId": "___function___0"
+                                                                                                                                                    }
+                                                                                                                                                ],
+                                                                                                                                                "funcId": "___function___0"
+                                                                                                                                            },
+                                                                                                                                            {
+                                                                                                                                                "token": ";",
+                                                                                                                                                "type": "punctuation",
+                                                                                                                                                "funcId": "___function___0"
+                                                                                                                                            },
+                                                                                                                                            {
+                                                                                                                                                "token": "STMTS",
+                                                                                                                                                "type": "NON_TERM",
+                                                                                                                                                "children": [
+                                                                                                                                                    {
+                                                                                                                                                        "token": "VAR",
+                                                                                                                                                        "type": "NON_TERM",
+                                                                                                                                                        "children": [
+                                                                                                                                                            {
+                                                                                                                                                                "token": "var",
+                                                                                                                                                                "type": "keyword",
+                                                                                                                                                                "funcId": "___function___0"
+                                                                                                                                                            },
+                                                                                                                                                            {
+                                                                                                                                                                "token": "uuu",
+                                                                                                                                                                "type": "id",
+                                                                                                                                                                "funcId": "___function___0"
+                                                                                                                                                            }
+                                                                                                                                                        ],
+                                                                                                                                                        "funcId": "___function___0"
+                                                                                                                                                    },
+                                                                                                                                                    {
+                                                                                                                                                        "token": ";",
+                                                                                                                                                        "type": "punctuation",
+                                                                                                                                                        "funcId": "___function___0"
+                                                                                                                                                    }
+                                                                                                                                                ],
+                                                                                                                                                "funcId": "___function___0"
+                                                                                                                                            }
+                                                                                                                                        ],
+                                                                                                                                        "funcId": "___function___0"
+                                                                                                                                    },
+                                                                                                                                    {
+                                                                                                                                        "token": "}",
+                                                                                                                                        "type": "punctuation",
+                                                                                                                                        "funcId": "___function___0"
+                                                                                                                                    }
+                                                                                                                                ],
+                                                                                                                                "funcId": "___function___0"
+                                                                                                                            }
+                                                                                                                        ],
+                                                                                                                        "funcId": "___function___0"
                                                                                                                     },
                                                                                                                     {
                                                                                                                         "token": ",",
@@ -840,6 +996,86 @@
                                             {
                                                 "token": ";",
                                                 "type": "punctuation"
+                                            },
+                                            {
+                                                "token": "STMTS",
+                                                "type": "NON_TERM",
+                                                "children": [
+                                                    {
+                                                        "token": "ASSIGN",
+                                                        "type": "NON_TERM",
+                                                        "children": [
+                                                            {
+                                                                "token": "a",
+                                                                "type": "id"
+                                                            },
+                                                            {
+                                                                "token": "=",
+                                                                "type": "assign"
+                                                            },
+                                                            {
+                                                                "token": "10000",
+                                                                "type": "number"
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "token": ";",
+                                                        "type": "punctuation"
+                                                    },
+                                                    {
+                                                        "token": "STMTS",
+                                                        "type": "NON_TERM",
+                                                        "children": [
+                                                            {
+                                                                "token": "ASSIGN",
+                                                                "type": "NON_TERM",
+                                                                "children": [
+                                                                    {
+                                                                        "token": "g",
+                                                                        "type": "id"
+                                                                    },
+                                                                    {
+                                                                        "token": "=",
+                                                                        "type": "assign"
+                                                                    },
+                                                                    {
+                                                                        "token": "555",
+                                                                        "type": "number"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "token": ";",
+                                                                "type": "punctuation"
+                                                            },
+                                                            {
+                                                                "token": "STMTS",
+                                                                "type": "NON_TERM",
+                                                                "children": [
+                                                                    {
+                                                                        "token": "FACTOR",
+                                                                        "type": "NON_TERM",
+                                                                        "children": [
+                                                                            {
+                                                                                "token": "--",
+                                                                                "type": "operator"
+                                                                            },
+                                                                            {
+                                                                                "token": "g",
+                                                                                "type": "id"
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    {
+                                                                        "token": ";",
+                                                                        "type": "punctuation"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
                                             }
                                         ]
                                     }

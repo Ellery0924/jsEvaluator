@@ -307,7 +307,6 @@ class JSParser extends Parser {
                 console.log('expr')
                 expression(node, /\]/);
                 matchToken(/\]/, node);
-                //console.log('finini')
                 lValRest(node);
                 append(node, parent);
             }

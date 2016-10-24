@@ -96,7 +96,9 @@ function extractFunctionDeclarationFromStmt(node, env) {
             value: {
                 body: funcBodyNode,
                 args: args,
-                scope: scope
+                scope: scope,
+                funcId: funcId,
+                type: 'function'
             }
         };
 
@@ -162,13 +164,19 @@ function hoistVariableInStmt(node, env) {
         if (varBodyRest) {
             hoistVariableInStmt(varBodyRest, env);
         }
+        children.forEach(child=> {
+            if (child !== varBodyRest && child !== idNode && child.token !== '=') {
+                hoistVariableInStmt(child, env);
+            }
+        });
     }
     else if (node.token === 'FUNCTION') {
         const funcBody = findNodeInChildrenBy(node, 'BLOCK');
         const funcId = node.funcId;
-
-        const scope = env[funcId].value.scope;
-        hoistVariable(funcBody, scope);
+        if (env[funcId].type === 'function') {
+            const scope = env[funcId].value.scope;
+            hoistVariable(funcBody, scope);
+        }
     }
     else if (children) {
         children.forEach(child=> {
@@ -249,7 +257,7 @@ function findRef(id, env, context) {
 function lookupId(id, env) {
     //合并实参
     if (callStack.length) {
-        env = Object.assign({}, callStack[callStack.length - 1].actualArgs,env);
+        env = Object.assign({}, callStack[callStack.length - 1].actualArgs, env);
     }
 
     if (env[id]) {
@@ -277,7 +285,7 @@ function objContent(node, env, ret) {
     const children = node.children;
     const keyNode = children[0];
     const value = children[2];
-    ret[keyNode.token] = evaluate(value);
+    ret[keyNode.token] = evaluate(value, env);
 
     const rest = findNodeInChildrenBy(node, 'OBJECT_CONTENT');
     if (rest) {
@@ -335,6 +343,37 @@ function factor(node, env) {
         case 'void':
             evaluate(rest, env);
             return;
+        case '++':
+        case '--':
+            return selfPlusOrMinus(rest, env, car);
+    }
+}
+
+function selfPlusOrMinus(node, env, operator, isBackward) {
+    const currentRef = accessRef(node, env);
+    const context = currentRef.context;
+    const lastRef = currentRef.lastRef;
+    const currentVal = context[lastRef];
+
+    if (!isBackward) {
+        if (operator === '++') {
+            context[lastRef] = currentVal + 1;
+            return context[lastRef];
+        }
+        else {
+            context[lastRef] = currentVal - 1;
+            return context[lastRef];
+        }
+    }
+    else {
+        if (operator === '++') {
+            context[lastRef] = currentVal + 1;
+            return currentVal;
+        }
+        else {
+            context[lastRef] = currentVal - 1;
+            return currentVal;
+        }
     }
 }
 
@@ -393,6 +432,76 @@ function threeItemOperation(node, env) {
     }
 }
 
+function lVal(node, env) {
+    const children = node.children;
+    const first = children[0];
+    const rest = findNodeInChildrenBy(node, 'LVAL_REST');
+    const context = lookupId(first.token, env).value;
+    return lValRest(rest, env, context);
+}
+
+function lValRest(node, env, context) {
+    const children = node.children;
+    const idNode = children[1];
+    const rest = findNodeInChildrenBy(node, 'LVAL_REST');
+    if (rest) {
+        return lValRest(rest, env, context[idNode.token]);
+    }
+    else {
+        return { context: context, lastRef: idNode.token, value: context[idNode.token] };
+    }
+}
+
+function accessRef(node, env) {
+    if (node.token === 'LVAL') {
+        return lVal(node, env);
+    }
+    else {
+        return { context: lookupId(node.token, env), lastRef: 'value' }
+    }
+}
+
+function accessValue(node, env) {
+    if (node.token === 'LVAL') {
+        return lVal(node, env).value;
+    }
+    else {
+        return lookupId(node, env).value;
+    }
+}
+
+function assign(node, env) {
+    const children = node.children;
+    const leftNode = children[0];
+    const rightNode = children[2];
+    const operator = children[1].token;
+    const leftRef = accessRef(leftNode, env);
+    const context = leftRef.context;
+    const lastRef = leftRef.lastRef;
+    const rightValue = evaluate(rightNode, env);
+
+    switch (operator) {
+        case '=':
+            context[lastRef] = rightValue;
+            return rightValue;
+        case '+=':
+            context[lastRef] = context[lastRef] + rightValue;
+            return rightValue;
+        case '-=':
+            context[lastRef] = context[lastRef] - rightValue;
+            return rightValue;
+        case '*=':
+            context[lastRef] = context[lastRef] * rightValue;
+            return rightValue;
+        case '/=':
+            context[lastRef] = context[lastRef] / rightValue;
+            return rightValue;
+        case '%=':
+            context[lastRef] = context[lastRef] % rightValue;
+            return rightValue;
+    }
+}
+
 function evaluate(node, env) {
     if (node) {
         const token = node.token;
@@ -418,6 +527,16 @@ function evaluate(node, env) {
                     return twoItemOperation(node, env);
                 case 'THREE_ITEM_OPERATION':
                     return threeItemOperation(node, env);
+                case 'LVAL':
+                    return lVal(node, env);
+                case 'SELF_PLUS_OR_MINUS_BACKWARD':
+                    const operator = node.children[1].token;
+                    const operatee = node.children[0];
+                    return selfPlusOrMinus(operatee, env, operator, true);
+                case 'ASSIGN':
+                    return assign(node, env);
+                case 'FUNCTION':
+                    return accessValue(node.funcId, env);
             }
         }
         else {
@@ -433,6 +552,8 @@ function evaluate(node, env) {
                     return null;
                 case 'undefined':
                     return undefined;
+                case 'id':
+                    return accessValue(node, env);
             }
         }
     }

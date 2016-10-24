@@ -228,15 +228,15 @@ class JSParser extends Parser {
             }
         }
 
-        function expression(parent) {
+        function expression(parent, until) {
             const node = new Node('EXPR');
-            comma(node);
+            comma(node, until);
             append(node, parent);
         }
 
-        function comma(parent) {
+        function comma(parent, until) {
             const node = new Node('COMMA');
-            assign(node);
+            assign(node, until);
             commaRest(node);
             append(node, parent);
         }
@@ -250,8 +250,12 @@ class JSParser extends Parser {
             }
         }
 
-        function findFirstKeyTerm() {
-            return self.getTokensUntil(/[;,\{\}\(]/).find(token=>
+        function findFirstKeyTerm(until) {
+            let regex = /[;,\{\}\(]/;
+            if (until) {
+                regex = until;
+            }
+            return self.getTokensUntil(regex).find(token=>
                     token.token === '='
                     || token.token === '+='
                     || token.token === '-='
@@ -264,9 +268,10 @@ class JSParser extends Parser {
 
         const assignTerm = /=|\+=|-=|\/=|\*=|%=/;
 
-        function assign(parent) {
+        function assign(parent, until) {
             const node = new Node('ASSIGN');
-            const firstKeyTerm = findFirstKeyTerm();
+            const firstKeyTerm = findFirstKeyTerm(until);
+            //console.log(firstKeyTerm)
 
             if (firstKeyTerm.token.match(assignTerm)) {
                 lVal(node);
@@ -277,12 +282,14 @@ class JSParser extends Parser {
                 threeItemOperation(node);
             }
             else {
+                //console.log('or')
                 or(node);
             }
             append(node, parent);
         }
 
         function lVal(parent) {
+            console.log('lval')
             const node = new Node('LVAL');
             matchType(/id/, node);
             lValRest(node);
@@ -297,8 +304,10 @@ class JSParser extends Parser {
                 append(node, parent);
             }
             else if (matchToken(/\[/, node, true)) {
-                expression(node);
+                console.log('expr')
+                expression(node, /\]/);
                 matchToken(/\]/, node);
+                //console.log('finini')
                 lValRest(node);
                 append(node, parent);
             }
@@ -429,23 +438,24 @@ class JSParser extends Parser {
             }
             else if (token === '(') {
                 matchToken(/\(/, node);
-                expression(node);
+                expression(node, /\)/);
                 matchToken(/\)/, node);
-                if (self.currentTokenStr() === '(') {
-                    call(node);
-                }
-                if (matchToken(/\./, node, true)) {
-                    access(node);
-                    node.token = 'EXPR_ACCESS';
-                }
-                else if (matchToken(/\[/, node, true)) {
-                    expression(node);
-                    matchToken(/\]/, node);
-                    if (matchToken(/\./, node, true)) {
-                        access(node);
-                    }
-                    node.token = 'EXPR_ACCESS';
-                }
+                //console.log('end')
+                //if (self.currentTokenStr() === '(') {
+                //    call(node);
+                //}
+                //else if (matchToken(/\./, node, true)) {
+                //    access(node);
+                //    node.token = 'EXPR_ACCESS';
+                //}
+                //else if (matchToken(/\[/, node, true)) {
+                //    expression(node);
+                //    matchToken(/\]/, node);
+                //    if (matchToken(/\./, node, true)) {
+                //        access(node);
+                //    }
+                //    node.token = 'EXPR_ACCESS';
+                //}
             }
             else if (matchToken(/^(\-|\+|\~|\!)$/, node, true)) {
                 factor(node);
@@ -466,6 +476,7 @@ class JSParser extends Parser {
                 _new(node);
             }
             else if (type.match(/id/)) {
+                console.log('access')
                 access(node);
                 if (matchToken(/\+\+|\-\-/, node, true)) {
                     node.token = 'SELF_PLUS_OR_MINUS_BACKWARD';
@@ -506,6 +517,7 @@ class JSParser extends Parser {
             lVal(node);
             accessCall(node);
             if (matchToken(/\./, node, true)) {
+                //console.log('.')
                 access(node);
             }
             else if (matchToken(/\[/, node, true)) {
@@ -565,7 +577,7 @@ class JSParser extends Parser {
             const node = new Node('FUNCTION_ARGS');
             if (matchType(/id/, node, true)) {
                 if (matchToken(/,/, node, true)) {
-                    functionArgs(parent);
+                    functionArgs(node);
                 }
                 append(node, parent);
             }
@@ -608,8 +620,10 @@ class JSParser extends Parser {
 
         function arrayContent(parent) {
             const node = new Node('ARRAY_CONTENT');
-            comma(node);
-            append(node, parent);
+            if (self.currentTokenStr() !== ']') {
+                comma(node);
+                append(node, parent);
+            }
         }
 
         this.ast.root = new Node('PROGRAM', 'NON_TERM');

@@ -3,6 +3,9 @@
  * 根据生成的抽象语法树运行js代码
  */
 'use strict';
+//全局作用域
+const global = { isGlobal: true };
+//函数调用栈
 const callStack = [];
 let guid = -1;
 
@@ -558,8 +561,6 @@ function evaluate(node, env) {
         }
     }
 }
-
-const global = { isGlobal: true };
 
 //js求值器,根据抽象语法树运行js代码
 module.exports = (ast)=> {

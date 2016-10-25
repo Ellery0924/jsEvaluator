@@ -52,6 +52,8 @@ Expr->Comma
 Comma->Assign Comma'
 Comma'->e | , Assign Comma'
 
+Assign->ThreeItemOpr AssignOperator Assign
+
 //赋值运算符
 Assign->LVal AssignOperator RVal | ThreeItemOpr | Or
 //LVal 左值

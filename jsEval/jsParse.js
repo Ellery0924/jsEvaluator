@@ -252,18 +252,40 @@ class JSParser extends Parser {
 
         function findFirstKeyTerm(until) {
             let regex = /[;,\{\}\(]/;
-            if (until) {
-                regex = until;
-            }
-            return self.getTokensUntil(regex).find(token=>
-                    token.token === '='
+
+            function predicate(token) {
+                return token.token === '='
                     || token.token === '+='
                     || token.token === '-='
                     || token.token === '*='
                     || token.token === '/='
                     || token.token === '%='
-                    || token.token === '?'
-                ) || { token: 'others' };
+                    || token.token === '?';
+            }
+
+            if (until) {
+                const tokens = self.tokens;
+                const leftMatch = until === ']' ? '[' : '(';
+                let leftMatchCount = 1;
+                let end = 0;
+
+                for (let i = self.current; i < tokens.length; i++) {
+                    const t = tokens[i];
+                    if (t.token === leftMatch) {
+                        leftMatchCount++;
+                    }
+                    else if (t.token === until) {
+                        leftMatchCount--;
+                        if (leftMatchCount === 0) {
+                            end = i;
+                            break;
+                        }
+                    }
+                }
+
+                return tokens.slice(self.current, end).find(predicate) || { token: 'others' };
+            }
+            return self.getTokensUntil(regex).find(predicate) || { token: 'others' };
         }
 
         const assignTerm = /=|\+=|-=|\/=|\*=|%=/;
@@ -271,7 +293,6 @@ class JSParser extends Parser {
         function assign(parent, until) {
             const node = new Node('ASSIGN');
             const firstKeyTerm = findFirstKeyTerm(until);
-            //console.log(firstKeyTerm)
 
             if (firstKeyTerm.token.match(assignTerm)) {
                 lVal(node);
@@ -282,7 +303,6 @@ class JSParser extends Parser {
                 threeItemOperation(node);
             }
             else {
-                //console.log('or')
                 or(node);
             }
             append(node, parent);
@@ -304,8 +324,7 @@ class JSParser extends Parser {
                 append(node, parent);
             }
             else if (matchToken(/\[/, node, true)) {
-                console.log('expr')
-                expression(node, /\]/);
+                expression(node, ']');
                 matchToken(/\]/, node);
                 lValRest(node);
                 append(node, parent);
@@ -437,7 +456,7 @@ class JSParser extends Parser {
             }
             else if (token === '(') {
                 matchToken(/\(/, node);
-                expression(node, /\)/);
+                expression(node, ')');
                 matchToken(/\)/, node);
                 //console.log('end')
                 //if (self.currentTokenStr() === '(') {

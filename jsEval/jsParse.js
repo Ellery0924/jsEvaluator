@@ -283,6 +283,8 @@ class JSParser extends Parser {
                     }
                 }
 
+                console.log('slice:', tokens.slice(self.current, end), self.current, end)
+
                 return tokens.slice(self.current, end).find(predicate) || { token: 'others' };
             }
             return self.getTokensUntil(regex).find(predicate) || { token: 'others' };
@@ -458,22 +460,6 @@ class JSParser extends Parser {
                 matchToken(/\(/, node);
                 expression(node, ')');
                 matchToken(/\)/, node);
-                //console.log('end')
-                //if (self.currentTokenStr() === '(') {
-                //    call(node);
-                //}
-                //else if (matchToken(/\./, node, true)) {
-                //    access(node);
-                //    node.token = 'EXPR_ACCESS';
-                //}
-                //else if (matchToken(/\[/, node, true)) {
-                //    expression(node);
-                //    matchToken(/\]/, node);
-                //    if (matchToken(/\./, node, true)) {
-                //        access(node);
-                //    }
-                //    node.token = 'EXPR_ACCESS';
-                //}
             }
             else if (matchToken(/^(\-|\+|\~|\!)$/, node, true)) {
                 factor(node);
@@ -494,7 +480,6 @@ class JSParser extends Parser {
                 _new(node);
             }
             else if (type.match(/id/)) {
-                console.log('access')
                 access(node);
                 if (matchToken(/\+\+|\-\-/, node, true)) {
                     node.token = 'SELF_PLUS_OR_MINUS_BACKWARD';
@@ -535,7 +520,6 @@ class JSParser extends Parser {
             lVal(node);
             accessCall(node);
             if (matchToken(/\./, node, true)) {
-                //console.log('.')
                 access(node);
             }
             else if (matchToken(/\[/, node, true)) {

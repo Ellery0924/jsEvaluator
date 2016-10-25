@@ -528,7 +528,7 @@ function evaluate(node, env) {
                 case 'THREE_ITEM_OPERATION':
                     return threeItemOperation(node, env);
                 case 'LVAL':
-                    return lVal(node, env);
+                    return accessValue(node, env);
                 case 'SELF_PLUS_OR_MINUS_BACKWARD':
                     const operator = node.children[1].token;
                     const operatee = node.children[0];
@@ -553,7 +553,7 @@ function evaluate(node, env) {
                 case 'undefined':
                     return undefined;
                 case 'id':
-                    return accessValue(node, env);
+                    return accessValue(node.token, env);
             }
         }
     }

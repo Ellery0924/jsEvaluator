@@ -7,6 +7,7 @@
 const global = { isGlobal: true };
 //函数调用栈
 const callStack = [];
+const callEnvironments = [];
 let guid = -1;
 
 function error(node) {
@@ -17,6 +18,7 @@ function hoistFunctionDeclaration(node, env) {
     if (node.token === 'BLOCK') {
         const children = node.children;
         const target = children[1];
+
         if (target.token === 'STMTS') {
             hoistFunctionDeclaration(target, env);
         }
@@ -27,8 +29,8 @@ function hoistFunctionDeclaration(node, env) {
     else if (node.token === 'STMTS') {
         const stmt = node.children[0];
         const restStmts = findNodeInChildrenBy(node, 'STMTS');
-        extractFunctionDeclarationFromStmt(stmt, env);
 
+        extractFunctionDeclarationFromStmt(stmt, env);
         if (restStmts) {
             hoistFunctionDeclaration(restStmts, env);
         }
@@ -101,7 +103,9 @@ function extractFunctionDeclarationFromStmt(node, env) {
                 args: args,
                 scope: scope,
                 funcId: funcId,
-                type: 'function'
+                type: 'function',
+                name: funcName || null,
+                length: args.length
             }
         };
 
@@ -153,6 +157,7 @@ function hoistVariable(node, env) {
 
 function hoistVariableInStmt(node, env) {
     const children = node.children;
+
     if (node.token === 'VAR' || node.token === 'VAR_BODY_REST') {
         const varBody = findNodeInChildrenBy(node, 'VAR_BODY');
         let idNode = findNodeInChildrenBy(varBody, 'id', 'type');
@@ -164,6 +169,7 @@ function hoistVariableInStmt(node, env) {
         env[idNode.token] = { type: 'variable' };
 
         const varBodyRest = findNodeInChildrenBy(varBody, 'VAR_BODY_REST');
+
         if (varBodyRest) {
             hoistVariableInStmt(varBodyRest, env);
         }
@@ -176,6 +182,7 @@ function hoistVariableInStmt(node, env) {
     else if (node.token === 'FUNCTION') {
         const funcBody = findNodeInChildrenBy(node, 'BLOCK');
         const funcId = node.funcId;
+
         if (env[funcId].type === 'function') {
             const scope = env[funcId].value.scope;
             hoistVariable(funcBody, scope);
@@ -192,6 +199,7 @@ function clearEnv(env) {
     for (var key in env) {
         if (env.hasOwnProperty(key)) {
             const item = env[key];
+
             if (item.type === 'function') {
                 delete item.value.scope.___parent___;
                 delete item.value.body;
@@ -206,6 +214,7 @@ function stmts(node, env) {
     const children = node.children;
     const stmt = children[0];
     const rest = findNodeInChildrenBy(node, 'STMTS');
+
     evaluate(stmt, env);
     if (rest) {
         stmts(rest, env);
@@ -218,7 +227,10 @@ function stmts(node, env) {
 
 function _var(node, env) {
     const varBody = findNodeInChildrenBy(node, 'VAR_BODY');
-    return _varBody(varBody, env);
+    //没有varBody是没有赋值的var语句
+    if (varBody) {
+        return _varBody(varBody, env);
+    }
 }
 
 function _varBody(node, env) {
@@ -231,7 +243,6 @@ function _varBody(node, env) {
         && child.token !== '='
         && child !== rest
     );
-
     const id = idNode.token;
     const value = valueNode ? evaluate(valueNode, env) : undefined;
 
@@ -258,11 +269,18 @@ function findRef(id, env, context) {
 }
 
 function lookupId(id, env) {
-    //合并实参
+    //获取当前调用函数的闭包
+    const topCall = callStack[callStack.length - 1];
+    const closureId = topCall ? topCall.callee.___closure___ : null;
+    const closure = closureId ? global['closure_' + closureId] : null;
+    //如果存在闭包,取闭包作为环境,然后合并实参到当前环境
     if (callStack.length) {
-        env = Object.assign({}, callStack[callStack.length - 1].actualArgs, env);
+        env = Object.assign({}, topCall.appliedArgs, closure, env);
     }
 
+    if (id === 'this') {
+        return callStack[callStack.length - 1].context;
+    }
     if (env[id]) {
         return env[id];
     }
@@ -270,12 +288,13 @@ function lookupId(id, env) {
         return lookupId(id, env.___parent___);
     }
     else {
-        return undefined;
+        throw new Error('Referrence error: ' + id + ' is not defined.');
     }
 }
 
 function _object(node, env) {
     const content = findNodeInChildrenBy(node, 'OBJECT_CONTENT');
+
     if (content) {
         return objContent(content, env, {});
     }
@@ -288,9 +307,11 @@ function objContent(node, env, ret) {
     const children = node.children;
     const keyNode = children[0];
     const value = children[2];
+
     ret[keyNode.token] = evaluate(value, env);
 
     const rest = findNodeInChildrenBy(node, 'OBJECT_CONTENT');
+
     if (rest) {
         return objContent(rest, env, ret);
     }
@@ -349,6 +370,11 @@ function factor(node, env) {
         case '++':
         case '--':
             return selfPlusOrMinus(rest, env, car);
+        case 'delete':
+            const ref = accessRef(rest, env);
+            const context = ref.context;
+            const lastRef = ref.lastRef;
+            return delete context[lastRef];
     }
 }
 
@@ -382,43 +408,72 @@ function selfPlusOrMinus(node, env, operator, isBackward) {
 
 function twoItemOperation(node, env) {
     const children = node.children;
-    const ret = evaluate(children[0], env);
-    const rest = children.find(child=>child.token.match(/_REST/));
-    const operator = rest.children[0].token;
-    const operatee = evaluate(rest.children[1], env);
+    let ret = evaluate(children[0], env);
+    let next = children.find(child=>child.token.match(/_REST/));
+    let operator = next.children[0].token;
+    let operatee = evaluate(next.children[1], env);
 
-    switch (operator) {
-        case '*':
-            return ret * operatee;
-        case '/':
-            return ret / operatee;
-        case '%':
-            return ret % operatee;
-        case '+':
-            return ret + operatee;
-        case '-':
-            return ret - operatee;
-        case '>':
-            return ret > operatee;
-        case '<':
-            return ret < operatee;
-        case '>=':
-            return ret >= operatee;
-        case '<=':
-            return ret <= operatee;
-        case '===':
-            return ret === operatee;
-        case '!==':
-            return ret !== operatee;
-        case '==':
-            return ret == operatee;
-        case '!=':
-            return ret != operatee;
-        case '&&':
-            return ret && operatee;
-        case '||':
-            return ret || operatee;
+    while (operator && operatee) {
+        // console.log(operator, operatee, ret);
+        switch (operator) {
+            case '*':
+                ret = ret * operatee;
+                break;
+            case '/':
+                ret = ret / operatee;
+                break;
+            case '%':
+                ret = ret % operatee;
+                break;
+            case '+':
+                ret = ret + operatee;
+                break;
+            case '-':
+                ret = ret - operatee;
+                break;
+            case '>':
+                ret = ret > operatee;
+                break;
+            case '<':
+                ret = ret < operatee;
+                break;
+            case '>=':
+                ret = ret >= operatee;
+                break;
+            case '<=':
+                ret = ret <= operatee;
+                break;
+            case '===':
+                ret = ret === operatee;
+                break;
+            case '!==':
+                ret = ret !== operatee;
+                break;
+            case '==':
+                ret = ret == operatee;
+                break;
+            case '!=':
+                ret = ret != operatee;
+                break;
+            case '&&':
+                ret = ret && operatee;
+                break;
+            case '||':
+                ret = ret || operatee;
+                break;
+        }
+
+        next = next.children.find(child=>child.token.match(/_REST/));
+        if (next) {
+            operator = next.children[0].token;
+            operatee = evaluate(next.children[1], env);
+        }
+        else {
+            break;
+        }
     }
+
+    return ret;
 }
 
 function threeItemOperation(node, env) {
@@ -440,6 +495,7 @@ function lVal(node, env) {
     const first = children[0];
     const rest = findNodeInChildrenBy(node, 'LVAL_REST');
     const context = lookupId(first.token, env).value;
+
     return lValRest(rest, env, context);
 }
 
@@ -447,11 +503,20 @@ function lValRest(node, env, context) {
     const children = node.children;
     const idNode = children[1];
     const rest = findNodeInChildrenBy(node, 'LVAL_REST');
-    if (rest) {
-        return lValRest(rest, env, context[idNode.token]);
+
+    let id;
+    if (idNode.type !== 'id') {
+        id = evaluate(idNode, env);
     }
     else {
-        return { context: context, lastRef: idNode.token, value: context[idNode.token] };
+        id = idNode.token;
+    }
+
+    if (rest) {
+        return lValRest(rest, env, context[id]);
+    }
+    else {
+        return { context: context, lastRef: id, value: context[id] };
     }
 }
 
@@ -460,7 +525,7 @@ function accessRef(node, env) {
         return lVal(node, env);
     }
     else {
-        return { context: lookupId(node.token, env), lastRef: 'value' }
+        return { context: lookupId(node.token, env), lastRef: 'value' };
     }
 }
 
@@ -505,12 +570,230 @@ function assign(node, env) {
     }
 }
 
+function comma(node, env) {
+    const children = node.children;
+    const exprNode = children.find(child=>child.token !== ',' && child.token !== 'COMMA_REST');
+    const rest = findNodeInChildrenBy(node, 'COMMA_REST');
+    const exprVal = evaluate(exprNode, env);
+
+    if (rest) {
+        return comma(rest, env);
+    }
+    else {
+        return exprVal;
+    }
+}
+
+function block(node, env) {
+    const stmts = node.children[1];
+    evaluate(stmts, env);
+}
+
+function _if(node, env) {
+    const children = node.children;
+    const conditionNode = children[2];
+    const thenBlock = findNodeInChildrenBy(node, 'BLOCK');
+    const elseNode = findNodeInChildrenBy(node, 'IF_REST');
+    const elseBlock = findNodeInChildrenBy(elseNode, 'BLOCK');
+    const condRet = evaluate(conditionNode, env);
+
+    if (condRet) {
+        evaluate(thenBlock, env);
+    }
+    else {
+        evaluate(elseBlock, env);
+    }
+}
+
+function accessFromContext(node, env, context) {
+    if (node.type === 'id') {
+        return context[node.token];
+    }
+    else if (node.token === 'LVAL') {
+        const children = node.children;
+        const first = children[0];
+        const nextContext = context[first.token];
+        const rest = findNodeInChildrenBy(node, 'LVAL_REST');
+        return lValRest(rest, env, context);
+    }
+}
+
+function _return(node, env) {
+    const children = node.children;
+    const val = children[1];
+    callStack[callStack.length - 1].RETURN = evaluate(val, env);
+}
+
+function callArgs(node, env, ret) {
+    const children = node.children;
+    const first = children[0];
+    const rest = children[2];
+
+    ret.push(evaluate(first, env));
+
+    if (rest.token !== 'CALL_ARGS') {
+        ret.push(evaluate(rest, env));
+        return ret;
+    }
+    else {
+        return callArgs(rest, env, ret);
+    }
+}
+
+function accessArgs(node, env) {
+    const children = node.children;
+    const evalArgs = children[1];
+    if (evalArgs.token === 'CALL_ARGS') {
+        return callArgs(evalArgs, env, []);
+    }
+    else {
+        return evaluate(evalArgs, env);
+    }
+}
+
+function accessCall(node, env, context) {
+    const children = node.children;
+
+    let currentContext = context || null;
+    for (let i = 0; i < children.length; i++) {
+        let currentNode = children[i];
+        if (currentNode.token === 'LVAL') {
+            if (!currentContext) {
+                currentContext = accessValue(currentNode, env);
+            }
+            else {
+                currentContext = accessFromContext(currentNode, env, currentContext);
+            }
+        }
+        else if (currentNode.type === 'id') {
+            if (!currentContext) {
+                currentContext = accessValue(currentNode.token, env);
+            }
+            else {
+                currentContext = accessFromContext(currentNode, env, currentContext);
+            }
+        }
+        else if (currentNode.token === '.') {
+            let next = children[i + 1];
+            //console.log(next)
+            if (next.token !== 'ACCESS_CALL') {
+                if (!currentContext) {
+                    currentContext = accessValue(next.token, env);
+                }
+                else {
+                    currentContext = accessFromContext(next, env, currentContext);
+                }
+                i++;
+            }
+        }
+        else if (currentNode.token === '[') {
+            let expr = children[i + 1];
+            currentContext = currentContext[evaluate(expr, env)];
+            i = i + 2;
+        }
+        else if (currentNode.token === 'ACCESS_CAL_ARGS') {
+            const argsNode = currentNode;
+            const callee = currentContext;
+
+            const actualArgs = accessArgs(argsNode, env);
+            let appliedArgs;
+
+            if (Array.isArray(actualArgs)) {
+                appliedArgs = actualArgs.reduce((ret, arg, i)=> {
+                    ret[callee.args[i]] = { type: 'variable', value: arg };
+                    return ret;
+                }, {});
+            }
+            else {
+                if (callee.args[0] != null) {
+                    appliedArgs = {
+                        [callee.args[0]]: { type: 'variable', value: actualArgs }
+                    };
+                }
+            }
+
+            callStack.push({
+                context: currentContext || global,
+                callee: callee,
+                appliedArgs: appliedArgs
+            });
+
+            evaluate(callee.body, callee.scope);
+            const lastCall = callStack.pop();
+            currentContext = lastCall.RETURN;
+
+            // 如果返回值是对象或者函数, 尝试创建闭包
+            if (lastCall.RETURN &&
+                (lastCall.RETURN.type === 'function'
+                || typeof lastCall.RETURN === 'object')) {
+                makeClosure(lastCall, lastCall.RETURN, callee);
+            }
+        }
+        else if (currentNode.token === 'ACCESS_CALL') {
+            currentContext = accessCall(currentNode, env, currentContext);
+        }
+    }
+
+    return currentContext;
+}
+
+let closureId = -1;
+
+function makeClosure(call, ret, callee) {
+    closureId++;
+    let scopeCopy = Object.assign({}, call.callee.scope);
+    const appliedArgs = call.appliedArgs;
+    if (appliedArgs) {
+        Object.keys(appliedArgs).forEach(key=> {
+            const val = appliedArgs[key];
+            if (scopeCopy[key] == null || scopeCopy[key].value == null) {
+                scopeCopy[key] = val;
+            }
+        });
+    }
+    // 合并外层函数的闭包
+    const parentClosure = global['closure_' + callee.___closure___];
+    let closure = Object.assign({}, parentClosure);
+    // 最内层的变量应该取当前环境的, 其余的父级作用域应该取外层函数的闭包的
+    let lvl = 0;
+    while (scopeCopy) {
+        Object.keys(scopeCopy).forEach(key=> {
+            const variable = scopeCopy[key];
+            const value = variable.value;
+            if (value &&
+                (closure[key] == null || closure[key].value == null)
+                || (lvl === 0 && key !== '___parent___')) {
+                closure[key] = variable;
+            }
+        });
+        lvl++;
+        scopeCopy = scopeCopy.___parent___;
+    }
+    global['closure_' + closureId] = closure;
+
+    function bindClosure(target) {
+        if (target.type === 'function') {
+            target.___closure___ = closureId;
+        }
+        else {
+            Object.keys(target).forEach(key=> {
+                const val = target[key];
+                bindClosure(val);
+            });
+        }
+    }
+
+    bindClosure(ret);
+}
+
 function evaluate(node, env) {
     if (node) {
         const token = node.token;
         if (node.type === 'NON_TERM') {
             console.log('evaluating:', token);
             switch (token) {
+                case 'BLOCK':
+                    return block(node, env);
                 case 'STMTS':
                     return stmts(node, env);
                 case 'VAR':
@@ -540,6 +823,14 @@ function evaluate(node, env) {
                     return assign(node, env);
                 case 'FUNCTION':
                     return accessValue(node.funcId, env);
+                case 'COMMA':
+                    return comma(node, env);
+                case 'IF':
+                    return _if(node, env);
+                case 'ACCESS_CALL':
+                    return accessCall(node, env);
+                case 'RETURN':
+                    return _return(node, env);
             }
         }
         else {
@@ -570,7 +861,9 @@ module.exports = (ast)=> {
     hoistVariable(ast.root, global);
     //求值
     evaluate(ast.root, global);
+    //清理循环引用以输出JSON
     clearEnv(global);
+
     return {
         ast: ast,
         env: global

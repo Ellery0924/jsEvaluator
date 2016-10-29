@@ -271,6 +271,10 @@ class JSParser extends Parser {
 
                 for (let i = self.current; i < tokens.length; i++) {
                     const t = tokens[i];
+                    if (t.token.match(regex)) {
+                        end = i;
+                        break;
+                    }
                     if (t.token === leftMatch) {
                         leftMatchCount++;
                     }

@@ -6,13 +6,33 @@ var e, f, g = 1000, ddd = ({
         }
     },
     2: function (a, b, c) {
-        var u88888, i99;
-        var uuu;
+        return {
+            foo: {
+                sa: function (d) {
+                    var a = 10000;
+                    return function uu() {
+                        var d = 66;
+                        return function ccc() {
+                            return a + b + c + d;
+                        }
+                    }
+                }
+            }
+        };
     },
-    3: {}
+    3: {
+        4: 5
+    }
 });
-var dddc = 100 === (3 + ( 2 * (!![3.4, { 1: 3 }]) + 5) / 6 && 100);
-var e = 3 / !![1, 2, 3, 4, 5, 6, 7];
-var f = [];
 
-g = ddd[2];
+function fibonacci(n) {
+    if (n === 1 || n === 2) {
+        return 1;
+    }
+    else {
+        return fibonacci(n - 1) + fibonacci(n - 2);
+    }
+}
+
+var fibRet = fibonacci(10);
+var dddRet = ddd[2](1, 100, 6)['foo'].sa(7)()();

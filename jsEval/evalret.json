@@ -10,27 +10,22 @@
                     {
                         "token": "function",
                         "type": "keyword",
-                        "funcId": "fib"
+                        "funcId": "a"
                     },
                     {
-                        "token": "fib",
+                        "token": "a",
                         "type": "id",
-                        "funcId": "fib"
+                        "funcId": "a"
                     },
                     {
                         "token": "(",
                         "type": "punctuation",
-                        "funcId": "fib"
-                    },
-                    {
-                        "token": "n",
-                        "type": "id",
-                        "funcId": "fib"
+                        "funcId": "a"
                     },
                     {
                         "token": ")",
                         "type": "punctuation",
-                        "funcId": "fib"
+                        "funcId": "a"
                     },
                     {
                         "token": "BLOCK",
@@ -39,645 +34,707 @@
                             {
                                 "token": "{",
                                 "type": "punctuation",
-                                "funcId": "fib"
+                                "funcId": "a"
                             },
                             {
-                                "token": "IF",
+                                "token": "STMTS",
                                 "type": "NON_TERM",
                                 "children": [
                                     {
-                                        "token": "if",
-                                        "type": "keyword",
-                                        "funcId": "fib"
-                                    },
-                                    {
-                                        "token": "(",
-                                        "type": "punctuation",
-                                        "funcId": "fib"
-                                    },
-                                    {
-                                        "token": "OR",
+                                        "token": "VAR",
                                         "type": "NON_TERM",
                                         "children": [
                                             {
-                                                "token": "COMPARE",
-                                                "type": "NON_TERM",
-                                                "children": [
-                                                    {
-                                                        "token": "n",
-                                                        "type": "id",
-                                                        "funcId": "fib"
-                                                    },
-                                                    {
-                                                        "token": "COMPARE_REST",
-                                                        "type": "NON_TERM",
-                                                        "children": [
-                                                            {
-                                                                "token": "===",
-                                                                "type": "operator",
-                                                                "funcId": "fib"
-                                                            },
-                                                            {
-                                                                "token": "1",
-                                                                "type": "number",
-                                                                "funcId": "fib"
-                                                            }
-                                                        ],
-                                                        "funcId": "fib"
-                                                    }
-                                                ],
-                                                "funcId": "fib"
+                                                "token": "var",
+                                                "type": "keyword",
+                                                "funcId": "a"
                                             },
                                             {
-                                                "token": "OR_REST",
+                                                "token": "VAR_BODY",
                                                 "type": "NON_TERM",
                                                 "children": [
                                                     {
-                                                        "token": "||",
-                                                        "type": "operator",
-                                                        "funcId": "fib"
+                                                        "token": "privateAttr",
+                                                        "type": "id",
+                                                        "funcId": "a"
                                                     },
                                                     {
-                                                        "token": "COMPARE",
+                                                        "token": "=",
+                                                        "type": "assign",
+                                                        "funcId": "a"
+                                                    },
+                                                    {
+                                                        "token": "OBJECT",
                                                         "type": "NON_TERM",
                                                         "children": [
                                                             {
-                                                                "token": "n",
-                                                                "type": "id",
-                                                                "funcId": "fib"
+                                                                "token": "{",
+                                                                "type": "punctuation",
+                                                                "funcId": "a"
                                                             },
                                                             {
-                                                                "token": "COMPARE_REST",
+                                                                "token": "OBJECT_CONTENT",
                                                                 "type": "NON_TERM",
                                                                 "children": [
                                                                     {
-                                                                        "token": "===",
-                                                                        "type": "operator",
-                                                                        "funcId": "fib"
+                                                                        "token": "num",
+                                                                        "type": "id",
+                                                                        "funcId": "a"
                                                                     },
                                                                     {
-                                                                        "token": "2",
-                                                                        "type": "number",
-                                                                        "funcId": "fib"
+                                                                        "token": ":",
+                                                                        "type": "operator",
+                                                                        "funcId": "a"
+                                                                    },
+                                                                    {
+                                                                        "token": "FACTOR",
+                                                                        "type": "NON_TERM",
+                                                                        "children": [
+                                                                            {
+                                                                                "token": "-",
+                                                                                "type": "operator",
+                                                                                "funcId": "a"
+                                                                            },
+                                                                            {
+                                                                                "token": "1",
+                                                                                "type": "number",
+                                                                                "funcId": "a"
+                                                                            }
+                                                                        ],
+                                                                        "funcId": "a"
+                                                                    },
+                                                                    {
+                                                                        "token": ",",
+                                                                        "type": "punctuation",
+                                                                        "funcId": "a"
+                                                                    },
+                                                                    {
+                                                                        "token": "OBJECT_CONTENT",
+                                                                        "type": "NON_TERM",
+                                                                        "children": [
+                                                                            {
+                                                                                "token": "obj",
+                                                                                "type": "id",
+                                                                                "funcId": "a"
+                                                                            },
+                                                                            {
+                                                                                "token": ":",
+                                                                                "type": "operator",
+                                                                                "funcId": "a"
+                                                                            },
+                                                                            {
+                                                                                "token": "OBJECT",
+                                                                                "type": "NON_TERM",
+                                                                                "children": [
+                                                                                    {
+                                                                                        "token": "{",
+                                                                                        "type": "punctuation",
+                                                                                        "funcId": "a"
+                                                                                    },
+                                                                                    {
+                                                                                        "token": "OBJECT_CONTENT",
+                                                                                        "type": "NON_TERM",
+                                                                                        "children": [
+                                                                                            {
+                                                                                                "token": "num2",
+                                                                                                "type": "id",
+                                                                                                "funcId": "a"
+                                                                                            },
+                                                                                            {
+                                                                                                "token": ":",
+                                                                                                "type": "operator",
+                                                                                                "funcId": "a"
+                                                                                            },
+                                                                                            {
+                                                                                                "token": "1000",
+                                                                                                "type": "number",
+                                                                                                "funcId": "a"
+                                                                                            }
+                                                                                        ],
+                                                                                        "funcId": "a"
+                                                                                    },
+                                                                                    {
+                                                                                        "token": "}",
+                                                                                        "type": "punctuation",
+                                                                                        "funcId": "a"
+                                                                                    }
+                                                                                ],
+                                                                                "funcId": "a"
+                                                                            }
+                                                                        ],
+                                                                        "funcId": "a"
                                                                     }
                                                                 ],
-                                                                "funcId": "fib"
-                                                            }
-                                                        ],
-                                                        "funcId": "fib"
-                                                    }
-                                                ],
-                                                "funcId": "fib"
-                                            }
-                                        ],
-                                        "funcId": "fib"
-                                    },
-                                    {
-                                        "token": ")",
-                                        "type": "punctuation",
-                                        "funcId": "fib"
-                                    },
-                                    {
-                                        "token": "BLOCK",
-                                        "type": "NON_TERM",
-                                        "children": [
-                                            {
-                                                "token": "{",
-                                                "type": "punctuation",
-                                                "funcId": "fib"
-                                            },
-                                            {
-                                                "token": "STMTS",
-                                                "type": "NON_TERM",
-                                                "children": [
-                                                    {
-                                                        "token": "RETURN",
-                                                        "type": "NON_TERM",
-                                                        "children": [
-                                                            {
-                                                                "token": "return",
-                                                                "type": "keyword",
-                                                                "funcId": "fib"
+                                                                "funcId": "a"
                                                             },
                                                             {
-                                                                "token": "1",
-                                                                "type": "number",
-                                                                "funcId": "fib"
+                                                                "token": "}",
+                                                                "type": "punctuation",
+                                                                "funcId": "a"
                                                             }
                                                         ],
-                                                        "funcId": "fib"
-                                                    },
-                                                    {
-                                                        "token": ";",
-                                                        "type": "punctuation",
-                                                        "funcId": "fib"
+                                                        "funcId": "a"
                                                     }
                                                 ],
-                                                "funcId": "fib"
-                                            },
-                                            {
-                                                "token": "}",
-                                                "type": "punctuation",
-                                                "funcId": "fib"
+                                                "funcId": "a"
                                             }
                                         ],
-                                        "funcId": "fib"
+                                        "funcId": "a"
                                     },
                                     {
-                                        "token": "IF_REST",
+                                        "token": ";",
+                                        "type": "punctuation",
+                                        "funcId": "a"
+                                    },
+                                    {
+                                        "token": "RETURN",
                                         "type": "NON_TERM",
                                         "children": [
                                             {
-                                                "token": "else",
+                                                "token": "return",
                                                 "type": "keyword",
-                                                "funcId": "fib"
+                                                "funcId": "a"
                                             },
                                             {
-                                                "token": "BLOCK",
+                                                "token": "OBJECT",
                                                 "type": "NON_TERM",
                                                 "children": [
                                                     {
                                                         "token": "{",
                                                         "type": "punctuation",
-                                                        "funcId": "fib"
+                                                        "funcId": "a"
                                                     },
                                                     {
-                                                        "token": "STMTS",
+                                                        "token": "OBJECT_CONTENT",
                                                         "type": "NON_TERM",
                                                         "children": [
                                                             {
-                                                                "token": "RETURN",
+                                                                "token": "foo",
+                                                                "type": "id",
+                                                                "funcId": "a"
+                                                            },
+                                                            {
+                                                                "token": ":",
+                                                                "type": "operator",
+                                                                "funcId": "a"
+                                                            },
+                                                            {
+                                                                "token": "FUNCTION",
                                                                 "type": "NON_TERM",
                                                                 "children": [
                                                                     {
-                                                                        "token": "return",
+                                                                        "token": "function",
                                                                         "type": "keyword",
-                                                                        "funcId": "fib"
+                                                                        "funcId": "___function___0"
                                                                     },
                                                                     {
-                                                                        "token": "PLUS_OR_MINUS",
+                                                                        "token": "(",
+                                                                        "type": "punctuation",
+                                                                        "funcId": "___function___0"
+                                                                    },
+                                                                    {
+                                                                        "token": ")",
+                                                                        "type": "punctuation",
+                                                                        "funcId": "___function___0"
+                                                                    },
+                                                                    {
+                                                                        "token": "BLOCK",
                                                                         "type": "NON_TERM",
                                                                         "children": [
                                                                             {
-                                                                                "token": "ACCESS_CALL",
-                                                                                "type": "NON_TERM",
-                                                                                "children": [
-                                                                                    {
-                                                                                        "token": "fib",
-                                                                                        "type": "id",
-                                                                                        "funcId": "fib"
-                                                                                    },
-                                                                                    {
-                                                                                        "token": "ACCESS_CAL_ARGS",
-                                                                                        "type": "NON_TERM",
-                                                                                        "children": [
-                                                                                            {
-                                                                                                "token": "(",
-                                                                                                "type": "punctuation",
-                                                                                                "funcId": "fib"
-                                                                                            },
-                                                                                            {
-                                                                                                "token": "PLUS_OR_MINUS",
-                                                                                                "type": "NON_TERM",
-                                                                                                "children": [
-                                                                                                    {
-                                                                                                        "token": "n",
-                                                                                                        "type": "id",
-                                                                                                        "funcId": "fib"
-                                                                                                    },
-                                                                                                    {
-                                                                                                        "token": "PLUS_OR_MINUS_REST",
-                                                                                                        "type": "NON_TERM",
-                                                                                                        "children": [
-                                                                                                            {
-                                                                                                                "token": "-",
-                                                                                                                "type": "operator",
-                                                                                                                "funcId": "fib"
-                                                                                                            },
-                                                                                                            {
-                                                                                                                "token": "1",
-                                                                                                                "type": "number",
-                                                                                                                "funcId": "fib"
-                                                                                                            }
-                                                                                                        ],
-                                                                                                        "funcId": "fib"
-                                                                                                    }
-                                                                                                ],
-                                                                                                "funcId": "fib"
-                                                                                            },
-                                                                                            {
-                                                                                                "token": ")",
-                                                                                                "type": "punctuation",
-                                                                                                "funcId": "fib"
-                                                                                            }
-                                                                                        ],
-                                                                                        "funcId": "fib"
-                                                                                    }
-                                                                                ],
-                                                                                "funcId": "fib"
+                                                                                "token": "{",
+                                                                                "type": "punctuation",
+                                                                                "funcId": "___function___0"
                                                                             },
                                                                             {
-                                                                                "token": "PLUS_OR_MINUS_REST",
+                                                                                "token": "STMTS",
                                                                                 "type": "NON_TERM",
                                                                                 "children": [
                                                                                     {
-                                                                                        "token": "+",
-                                                                                        "type": "operator",
-                                                                                        "funcId": "fib"
-                                                                                    },
-                                                                                    {
-                                                                                        "token": "ACCESS_CALL",
+                                                                                        "token": "FACTOR",
                                                                                         "type": "NON_TERM",
                                                                                         "children": [
                                                                                             {
-                                                                                                "token": "fib",
-                                                                                                "type": "id",
-                                                                                                "funcId": "fib"
+                                                                                                "token": "++",
+                                                                                                "type": "operator",
+                                                                                                "funcId": "___function___0"
                                                                                             },
                                                                                             {
-                                                                                                "token": "ACCESS_CAL_ARGS",
+                                                                                                "token": "LVAL",
                                                                                                 "type": "NON_TERM",
                                                                                                 "children": [
                                                                                                     {
-                                                                                                        "token": "(",
-                                                                                                        "type": "punctuation",
-                                                                                                        "funcId": "fib"
+                                                                                                        "token": "privateAttr",
+                                                                                                        "type": "id",
+                                                                                                        "funcId": "___function___0"
                                                                                                     },
                                                                                                     {
-                                                                                                        "token": "PLUS_OR_MINUS",
+                                                                                                        "token": "LVAL_REST",
                                                                                                         "type": "NON_TERM",
                                                                                                         "children": [
                                                                                                             {
-                                                                                                                "token": "n",
-                                                                                                                "type": "id",
-                                                                                                                "funcId": "fib"
+                                                                                                                "token": ".",
+                                                                                                                "type": "punctuation",
+                                                                                                                "funcId": "___function___0"
                                                                                                             },
                                                                                                             {
-                                                                                                                "token": "PLUS_OR_MINUS_REST",
+                                                                                                                "token": "num",
+                                                                                                                "type": "id",
+                                                                                                                "funcId": "___function___0"
+                                                                                                            }
+                                                                                                        ],
+                                                                                                        "funcId": "___function___0"
+                                                                                                    }
+                                                                                                ],
+                                                                                                "funcId": "___function___0"
+                                                                                            }
+                                                                                        ],
+                                                                                        "funcId": "___function___0"
+                                                                                    },
+                                                                                    {
+                                                                                        "token": ";",
+                                                                                        "type": "punctuation",
+                                                                                        "funcId": "___function___0"
+                                                                                    },
+                                                                                    {
+                                                                                        "token": "STMTS",
+                                                                                        "type": "NON_TERM",
+                                                                                        "children": [
+                                                                                            {
+                                                                                                "token": "FACTOR",
+                                                                                                "type": "NON_TERM",
+                                                                                                "children": [
+                                                                                                    {
+                                                                                                        "token": "--",
+                                                                                                        "type": "operator",
+                                                                                                        "funcId": "___function___0"
+                                                                                                    },
+                                                                                                    {
+                                                                                                        "token": "LVAL",
+                                                                                                        "type": "NON_TERM",
+                                                                                                        "children": [
+                                                                                                            {
+                                                                                                                "token": "privateAttr",
+                                                                                                                "type": "id",
+                                                                                                                "funcId": "___function___0"
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "token": "LVAL_REST",
                                                                                                                 "type": "NON_TERM",
                                                                                                                 "children": [
                                                                                                                     {
-                                                                                                                        "token": "-",
-                                                                                                                        "type": "operator",
-                                                                                                                        "funcId": "fib"
+                                                                                                                        "token": ".",
+                                                                                                                        "type": "punctuation",
+                                                                                                                        "funcId": "___function___0"
                                                                                                                     },
                                                                                                                     {
-                                                                                                                        "token": "2",
-                                                                                                                        "type": "number",
-                                                                                                                        "funcId": "fib"
+                                                                                                                        "token": "obj",
+                                                                                                                        "type": "id",
+                                                                                                                        "funcId": "___function___0"
+                                                                                                                    },
+                                                                                                                    {
+                                                                                                                        "token": "LVAL_REST",
+                                                                                                                        "type": "NON_TERM",
+                                                                                                                        "children": [
+                                                                                                                            {
+                                                                                                                                "token": ".",
+                                                                                                                                "type": "punctuation",
+                                                                                                                                "funcId": "___function___0"
+                                                                                                                            },
+                                                                                                                            {
+                                                                                                                                "token": "num2",
+                                                                                                                                "type": "id",
+                                                                                                                                "funcId": "___function___0"
+                                                                                                                            }
+                                                                                                                        ],
+                                                                                                                        "funcId": "___function___0"
                                                                                                                     }
                                                                                                                 ],
-                                                                                                                "funcId": "fib"
+                                                                                                                "funcId": "___function___0"
                                                                                                             }
                                                                                                         ],
-                                                                                                        "funcId": "fib"
-                                                                                                    },
-                                                                                                    {
-                                                                                                        "token": ")",
-                                                                                                        "type": "punctuation",
-                                                                                                        "funcId": "fib"
+                                                                                                        "funcId": "___function___0"
                                                                                                     }
                                                                                                 ],
-                                                                                                "funcId": "fib"
+                                                                                                "funcId": "___function___0"
+                                                                                            },
+                                                                                            {
+                                                                                                "token": ";",
+                                                                                                "type": "punctuation",
+                                                                                                "funcId": "___function___0"
+                                                                                            },
+                                                                                            {
+                                                                                                "token": "STMTS",
+                                                                                                "type": "NON_TERM",
+                                                                                                "children": [
+                                                                                                    {
+                                                                                                        "token": "RETURN",
+                                                                                                        "type": "NON_TERM",
+                                                                                                        "children": [
+                                                                                                            {
+                                                                                                                "token": "return",
+                                                                                                                "type": "keyword",
+                                                                                                                "funcId": "___function___0"
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "token": "this",
+                                                                                                                "type": "id",
+                                                                                                                "funcId": "___function___0"
+                                                                                                            }
+                                                                                                        ],
+                                                                                                        "funcId": "___function___0"
+                                                                                                    },
+                                                                                                    {
+                                                                                                        "token": ";",
+                                                                                                        "type": "punctuation",
+                                                                                                        "funcId": "___function___0"
+                                                                                                    }
+                                                                                                ],
+                                                                                                "funcId": "___function___0"
                                                                                             }
                                                                                         ],
-                                                                                        "funcId": "fib"
+                                                                                        "funcId": "___function___0"
                                                                                     }
                                                                                 ],
-                                                                                "funcId": "fib"
+                                                                                "funcId": "___function___0"
+                                                                            },
+                                                                            {
+                                                                                "token": "}",
+                                                                                "type": "punctuation",
+                                                                                "funcId": "___function___0"
                                                                             }
                                                                         ],
-                                                                        "funcId": "fib"
+                                                                        "funcId": "___function___0"
                                                                     }
                                                                 ],
-                                                                "funcId": "fib"
+                                                                "funcId": "___function___0"
                                                             },
                                                             {
-                                                                "token": ";",
+                                                                "token": ",",
                                                                 "type": "punctuation",
-                                                                "funcId": "fib"
+                                                                "funcId": "a"
+                                                            },
+                                                            {
+                                                                "token": "OBJECT_CONTENT",
+                                                                "type": "NON_TERM",
+                                                                "children": [
+                                                                    {
+                                                                        "token": "log",
+                                                                        "type": "id",
+                                                                        "funcId": "a"
+                                                                    },
+                                                                    {
+                                                                        "token": ":",
+                                                                        "type": "operator",
+                                                                        "funcId": "a"
+                                                                    },
+                                                                    {
+                                                                        "token": "FUNCTION",
+                                                                        "type": "NON_TERM",
+                                                                        "children": [
+                                                                            {
+                                                                                "token": "function",
+                                                                                "type": "keyword",
+                                                                                "funcId": "___function___1"
+                                                                            },
+                                                                            {
+                                                                                "token": "(",
+                                                                                "type": "punctuation",
+                                                                                "funcId": "___function___1"
+                                                                            },
+                                                                            {
+                                                                                "token": ")",
+                                                                                "type": "punctuation",
+                                                                                "funcId": "___function___1"
+                                                                            },
+                                                                            {
+                                                                                "token": "BLOCK",
+                                                                                "type": "NON_TERM",
+                                                                                "children": [
+                                                                                    {
+                                                                                        "token": "{",
+                                                                                        "type": "punctuation",
+                                                                                        "funcId": "___function___1"
+                                                                                    },
+                                                                                    {
+                                                                                        "token": "STMTS",
+                                                                                        "type": "NON_TERM",
+                                                                                        "children": [
+                                                                                            {
+                                                                                                "token": "ACCESS_CALL",
+                                                                                                "type": "NON_TERM",
+                                                                                                "children": [
+                                                                                                    {
+                                                                                                        "token": "LVAL",
+                                                                                                        "type": "NON_TERM",
+                                                                                                        "children": [
+                                                                                                            {
+                                                                                                                "token": "console",
+                                                                                                                "type": "id",
+                                                                                                                "funcId": "___function___1"
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "token": "LVAL_REST",
+                                                                                                                "type": "NON_TERM",
+                                                                                                                "children": [
+                                                                                                                    {
+                                                                                                                        "token": ".",
+                                                                                                                        "type": "punctuation",
+                                                                                                                        "funcId": "___function___1"
+                                                                                                                    },
+                                                                                                                    {
+                                                                                                                        "token": "log",
+                                                                                                                        "type": "id",
+                                                                                                                        "funcId": "___function___1"
+                                                                                                                    }
+                                                                                                                ],
+                                                                                                                "funcId": "___function___1"
+                                                                                                            }
+                                                                                                        ],
+                                                                                                        "funcId": "___function___1"
+                                                                                                    },
+                                                                                                    {
+                                                                                                        "token": "ACCESS_CAL_ARGS",
+                                                                                                        "type": "NON_TERM",
+                                                                                                        "children": [
+                                                                                                            {
+                                                                                                                "token": "(",
+                                                                                                                "type": "punctuation",
+                                                                                                                "funcId": "___function___1"
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "token": "privateAttr",
+                                                                                                                "type": "id",
+                                                                                                                "funcId": "___function___1"
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "token": ")",
+                                                                                                                "type": "punctuation",
+                                                                                                                "funcId": "___function___1"
+                                                                                                            }
+                                                                                                        ],
+                                                                                                        "funcId": "___function___1"
+                                                                                                    }
+                                                                                                ],
+                                                                                                "funcId": "___function___1"
+                                                                                            },
+                                                                                            {
+                                                                                                "token": ";",
+                                                                                                "type": "punctuation",
+                                                                                                "funcId": "___function___1"
+                                                                                            },
+                                                                                            {
+                                                                                                "token": "STMTS",
+                                                                                                "type": "NON_TERM",
+                                                                                                "children": [
+                                                                                                    {
+                                                                                                        "token": "RETURN",
+                                                                                                        "type": "NON_TERM",
+                                                                                                        "children": [
+                                                                                                            {
+                                                                                                                "token": "return",
+                                                                                                                "type": "keyword",
+                                                                                                                "funcId": "___function___1"
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "token": "this",
+                                                                                                                "type": "id",
+                                                                                                                "funcId": "___function___1"
+                                                                                                            }
+                                                                                                        ],
+                                                                                                        "funcId": "___function___1"
+                                                                                                    },
+                                                                                                    {
+                                                                                                        "token": ";",
+                                                                                                        "type": "punctuation",
+                                                                                                        "funcId": "___function___1"
+                                                                                                    }
+                                                                                                ],
+                                                                                                "funcId": "___function___1"
+                                                                                            }
+                                                                                        ],
+                                                                                        "funcId": "___function___1"
+                                                                                    },
+                                                                                    {
+                                                                                        "token": "}",
+                                                                                        "type": "punctuation",
+                                                                                        "funcId": "___function___1"
+                                                                                    }
+                                                                                ],
+                                                                                "funcId": "___function___1"
+                                                                            }
+                                                                        ],
+                                                                        "funcId": "___function___1"
+                                                                    }
+                                                                ],
+                                                                "funcId": "a"
                                                             }
                                                         ],
-                                                        "funcId": "fib"
+                                                        "funcId": "a"
                                                     },
                                                     {
                                                         "token": "}",
                                                         "type": "punctuation",
-                                                        "funcId": "fib"
+                                                        "funcId": "a"
                                                     }
                                                 ],
-                                                "funcId": "fib"
+                                                "funcId": "a"
                                             }
                                         ],
-                                        "funcId": "fib"
+                                        "funcId": "a"
                                     }
                                 ],
-                                "funcId": "fib"
+                                "funcId": "a"
                             },
                             {
                                 "token": "}",
                                 "type": "punctuation",
-                                "funcId": "fib"
+                                "funcId": "a"
                             }
                         ],
-                        "funcId": "fib"
+                        "funcId": "a"
                     }
                 ],
-                "funcId": "fib"
+                "funcId": "a"
             },
             {
                 "token": "STMTS",
                 "type": "NON_TERM",
                 "children": [
                     {
-                        "token": "FUNCTION",
+                        "token": "VAR",
                         "type": "NON_TERM",
                         "children": [
                             {
-                                "token": "function",
-                                "type": "keyword",
-                                "funcId": "factorial"
+                                "token": "var",
+                                "type": "keyword"
                             },
                             {
-                                "token": "factorial",
-                                "type": "id",
-                                "funcId": "factorial"
-                            },
-                            {
-                                "token": "(",
-                                "type": "punctuation",
-                                "funcId": "factorial"
-                            },
-                            {
-                                "token": "n",
-                                "type": "id",
-                                "funcId": "factorial"
-                            },
-                            {
-                                "token": ")",
-                                "type": "punctuation",
-                                "funcId": "factorial"
-                            },
-                            {
-                                "token": "BLOCK",
+                                "token": "VAR_BODY",
                                 "type": "NON_TERM",
                                 "children": [
                                     {
-                                        "token": "{",
-                                        "type": "punctuation",
-                                        "funcId": "factorial"
+                                        "token": "inst",
+                                        "type": "id"
                                     },
                                     {
-                                        "token": "STMTS",
+                                        "token": "=",
+                                        "type": "assign"
+                                    },
+                                    {
+                                        "token": "ACCESS_CALL",
                                         "type": "NON_TERM",
                                         "children": [
                                             {
-                                                "token": "IF",
+                                                "token": "a",
+                                                "type": "id"
+                                            },
+                                            {
+                                                "token": "ACCESS_CAL_ARGS",
                                                 "type": "NON_TERM",
                                                 "children": [
                                                     {
-                                                        "token": "if",
-                                                        "type": "keyword",
-                                                        "funcId": "factorial"
-                                                    },
-                                                    {
                                                         "token": "(",
-                                                        "type": "punctuation",
-                                                        "funcId": "factorial"
-                                                    },
-                                                    {
-                                                        "token": "COMPARE",
-                                                        "type": "NON_TERM",
-                                                        "children": [
-                                                            {
-                                                                "token": "n",
-                                                                "type": "id",
-                                                                "funcId": "factorial"
-                                                            },
-                                                            {
-                                                                "token": "COMPARE_REST",
-                                                                "type": "NON_TERM",
-                                                                "children": [
-                                                                    {
-                                                                        "token": "===",
-                                                                        "type": "operator",
-                                                                        "funcId": "factorial"
-                                                                    },
-                                                                    {
-                                                                        "token": "1",
-                                                                        "type": "number",
-                                                                        "funcId": "factorial"
-                                                                    }
-                                                                ],
-                                                                "funcId": "factorial"
-                                                            }
-                                                        ],
-                                                        "funcId": "factorial"
+                                                        "type": "punctuation"
                                                     },
                                                     {
                                                         "token": ")",
-                                                        "type": "punctuation",
-                                                        "funcId": "factorial"
-                                                    },
-                                                    {
-                                                        "token": "BLOCK",
-                                                        "type": "NON_TERM",
-                                                        "children": [
-                                                            {
-                                                                "token": "{",
-                                                                "type": "punctuation",
-                                                                "funcId": "factorial"
-                                                            },
-                                                            {
-                                                                "token": "STMTS",
-                                                                "type": "NON_TERM",
-                                                                "children": [
-                                                                    {
-                                                                        "token": "RETURN",
-                                                                        "type": "NON_TERM",
-                                                                        "children": [
-                                                                            {
-                                                                                "token": "return",
-                                                                                "type": "keyword",
-                                                                                "funcId": "factorial"
-                                                                            },
-                                                                            {
-                                                                                "token": "0",
-                                                                                "type": "number",
-                                                                                "funcId": "factorial"
-                                                                            }
-                                                                        ],
-                                                                        "funcId": "factorial"
-                                                                    },
-                                                                    {
-                                                                        "token": ";",
-                                                                        "type": "punctuation",
-                                                                        "funcId": "factorial"
-                                                                    }
-                                                                ],
-                                                                "funcId": "factorial"
-                                                            },
-                                                            {
-                                                                "token": "}",
-                                                                "type": "punctuation",
-                                                                "funcId": "factorial"
-                                                            }
-                                                        ],
-                                                        "funcId": "factorial"
+                                                        "type": "punctuation"
                                                     }
-                                                ],
-                                                "funcId": "factorial"
-                                            },
-                                            {
-                                                "token": "STMTS",
-                                                "type": "NON_TERM",
-                                                "children": [
-                                                    {
-                                                        "token": "RETURN",
-                                                        "type": "NON_TERM",
-                                                        "children": [
-                                                            {
-                                                                "token": "return",
-                                                                "type": "keyword",
-                                                                "funcId": "factorial"
-                                                            },
-                                                            {
-                                                                "token": "MULTI_OR_DIV",
-                                                                "type": "NON_TERM",
-                                                                "children": [
-                                                                    {
-                                                                        "token": "n",
-                                                                        "type": "id",
-                                                                        "funcId": "factorial"
-                                                                    },
-                                                                    {
-                                                                        "token": "MULTI_OR_DIV_REST",
-                                                                        "type": "NON_TERM",
-                                                                        "children": [
-                                                                            {
-                                                                                "token": "*",
-                                                                                "type": "operator",
-                                                                                "funcId": "factorial"
-                                                                            },
-                                                                            {
-                                                                                "token": "ACCESS_CALL",
-                                                                                "type": "NON_TERM",
-                                                                                "children": [
-                                                                                    {
-                                                                                        "token": "factorial",
-                                                                                        "type": "id",
-                                                                                        "funcId": "factorial"
-                                                                                    },
-                                                                                    {
-                                                                                        "token": "ACCESS_CAL_ARGS",
-                                                                                        "type": "NON_TERM",
-                                                                                        "children": [
-                                                                                            {
-                                                                                                "token": "(",
-                                                                                                "type": "punctuation",
-                                                                                                "funcId": "factorial"
-                                                                                            },
-                                                                                            {
-                                                                                                "token": "PLUS_OR_MINUS",
-                                                                                                "type": "NON_TERM",
-                                                                                                "children": [
-                                                                                                    {
-                                                                                                        "token": "n",
-                                                                                                        "type": "id",
-                                                                                                        "funcId": "factorial"
-                                                                                                    },
-                                                                                                    {
-                                                                                                        "token": "PLUS_OR_MINUS_REST",
-                                                                                                        "type": "NON_TERM",
-                                                                                                        "children": [
-                                                                                                            {
-                                                                                                                "token": "-",
-                                                                                                                "type": "operator",
-                                                                                                                "funcId": "factorial"
-                                                                                                            },
-                                                                                                            {
-                                                                                                                "token": "1",
-                                                                                                                "type": "number",
-                                                                                                                "funcId": "factorial"
-                                                                                                            }
-                                                                                                        ],
-                                                                                                        "funcId": "factorial"
-                                                                                                    }
-                                                                                                ],
-                                                                                                "funcId": "factorial"
-                                                                                            },
-                                                                                            {
-                                                                                                "token": ")",
-                                                                                                "type": "punctuation",
-                                                                                                "funcId": "factorial"
-                                                                                            }
-                                                                                        ],
-                                                                                        "funcId": "factorial"
-                                                                                    }
-                                                                                ],
-                                                                                "funcId": "factorial"
-                                                                            }
-                                                                        ],
-                                                                        "funcId": "factorial"
-                                                                    }
-                                                                ],
-                                                                "funcId": "factorial"
-                                                            }
-                                                        ],
-                                                        "funcId": "factorial"
-                                                    },
-                                                    {
-                                                        "token": ";",
-                                                        "type": "punctuation",
-                                                        "funcId": "factorial"
-                                                    }
-                                                ],
-                                                "funcId": "factorial"
+                                                ]
                                             }
-                                        ],
-                                        "funcId": "factorial"
-                                    },
-                                    {
-                                        "token": "}",
-                                        "type": "punctuation",
-                                        "funcId": "factorial"
+                                        ]
                                     }
-                                ],
-                                "funcId": "factorial"
+                                ]
                             }
-                        ],
-                        "funcId": "factorial"
+                        ]
+                    },
+                    {
+                        "token": ";",
+                        "type": "punctuation"
                     },
                     {
                         "token": "STMTS",
                         "type": "NON_TERM",
                         "children": [
                             {
-                                "token": "VAR",
+                                "token": "ACCESS_CALL",
                                 "type": "NON_TERM",
                                 "children": [
                                     {
-                                        "token": "var",
-                                        "type": "keyword"
-                                    },
-                                    {
-                                        "token": "VAR_BODY",
+                                        "token": "LVAL",
                                         "type": "NON_TERM",
                                         "children": [
                                             {
-                                                "token": "fibRet",
+                                                "token": "inst",
                                                 "type": "id"
                                             },
                                             {
-                                                "token": "=",
-                                                "type": "assign"
+                                                "token": "LVAL_REST",
+                                                "type": "NON_TERM",
+                                                "children": [
+                                                    {
+                                                        "token": ".",
+                                                        "type": "punctuation"
+                                                    },
+                                                    {
+                                                        "token": "foo",
+                                                        "type": "id"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "token": "ACCESS_CAL_ARGS",
+                                        "type": "NON_TERM",
+                                        "children": [
+                                            {
+                                                "token": "(",
+                                                "type": "punctuation"
+                                            },
+                                            {
+                                                "token": ")",
+                                                "type": "punctuation"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "token": ".",
+                                        "type": "punctuation"
+                                    },
+                                    {
+                                        "token": "ACCESS_CALL",
+                                        "type": "NON_TERM",
+                                        "children": [
+                                            {
+                                                "token": "foo",
+                                                "type": "id"
+                                            },
+                                            {
+                                                "token": "ACCESS_CAL_ARGS",
+                                                "type": "NON_TERM",
+                                                "children": [
+                                                    {
+                                                        "token": "(",
+                                                        "type": "punctuation"
+                                                    },
+                                                    {
+                                                        "token": ")",
+                                                        "type": "punctuation"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "token": ".",
+                                                "type": "punctuation"
                                             },
                                             {
                                                 "token": "ACCESS_CALL",
                                                 "type": "NON_TERM",
                                                 "children": [
                                                     {
-                                                        "token": "fib",
+                                                        "token": "foo",
                                                         "type": "id"
                                                     },
                                                     {
@@ -689,12 +746,36 @@
                                                                 "type": "punctuation"
                                                             },
                                                             {
-                                                                "token": "10",
-                                                                "type": "number"
-                                                            },
-                                                            {
                                                                 "token": ")",
                                                                 "type": "punctuation"
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "token": ".",
+                                                        "type": "punctuation"
+                                                    },
+                                                    {
+                                                        "token": "ACCESS_CALL",
+                                                        "type": "NON_TERM",
+                                                        "children": [
+                                                            {
+                                                                "token": "log",
+                                                                "type": "id"
+                                                            },
+                                                            {
+                                                                "token": "ACCESS_CAL_ARGS",
+                                                                "type": "NON_TERM",
+                                                                "children": [
+                                                                    {
+                                                                        "token": "(",
+                                                                        "type": "punctuation"
+                                                                    },
+                                                                    {
+                                                                        "token": ")",
+                                                                        "type": "punctuation"
+                                                                    }
+                                                                ]
                                                             }
                                                         ]
                                                     }
@@ -725,7 +806,7 @@
                                                 "type": "NON_TERM",
                                                 "children": [
                                                     {
-                                                        "token": "facRet",
+                                                        "token": "inst2",
                                                         "type": "id"
                                                     },
                                                     {
@@ -737,7 +818,7 @@
                                                         "type": "NON_TERM",
                                                         "children": [
                                                             {
-                                                                "token": "factorial",
+                                                                "token": "a",
                                                                 "type": "id"
                                                             },
                                                             {
@@ -747,10 +828,6 @@
                                                                     {
                                                                         "token": "(",
                                                                         "type": "punctuation"
-                                                                    },
-                                                                    {
-                                                                        "token": "5",
-                                                                        "type": "number"
                                                                     },
                                                                     {
                                                                         "token": ")",
@@ -767,6 +844,88 @@
                                     {
                                         "token": ";",
                                         "type": "punctuation"
+                                    },
+                                    {
+                                        "token": "STMTS",
+                                        "type": "NON_TERM",
+                                        "children": [
+                                            {
+                                                "token": "ACCESS_CALL",
+                                                "type": "NON_TERM",
+                                                "children": [
+                                                    {
+                                                        "token": "LVAL",
+                                                        "type": "NON_TERM",
+                                                        "children": [
+                                                            {
+                                                                "token": "inst2",
+                                                                "type": "id"
+                                                            },
+                                                            {
+                                                                "token": "LVAL_REST",
+                                                                "type": "NON_TERM",
+                                                                "children": [
+                                                                    {
+                                                                        "token": ".",
+                                                                        "type": "punctuation"
+                                                                    },
+                                                                    {
+                                                                        "token": "foo",
+                                                                        "type": "id"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "token": "ACCESS_CAL_ARGS",
+                                                        "type": "NON_TERM",
+                                                        "children": [
+                                                            {
+                                                                "token": "(",
+                                                                "type": "punctuation"
+                                                            },
+                                                            {
+                                                                "token": ")",
+                                                                "type": "punctuation"
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        "token": ".",
+                                                        "type": "punctuation"
+                                                    },
+                                                    {
+                                                        "token": "ACCESS_CALL",
+                                                        "type": "NON_TERM",
+                                                        "children": [
+                                                            {
+                                                                "token": "log",
+                                                                "type": "id"
+                                                            },
+                                                            {
+                                                                "token": "ACCESS_CAL_ARGS",
+                                                                "type": "NON_TERM",
+                                                                "children": [
+                                                                    {
+                                                                        "token": "(",
+                                                                        "type": "punctuation"
+                                                                    },
+                                                                    {
+                                                                        "token": ")",
+                                                                        "type": "punctuation"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "token": ";",
+                                                "type": "punctuation"
+                                            }
+                                        ]
                                     }
                                 ]
                             }

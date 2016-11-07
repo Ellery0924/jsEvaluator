@@ -1,18 +1,26 @@
-function fib(n) {
-    if (n === 1 || n === 2) {
-        return 1;
-    }
-    else {
-        return fib(n - 1) + fib(n - 2);
+function a() {
+    var privateAttr = {
+        num: -1,
+        obj: {
+            num2: 1000
+        }
+    };
+
+    return {
+        foo: function () {
+            ++privateAttr.num;
+            --privateAttr.obj.num2;
+            return this;
+        },
+        log: function () {
+            console.log(privateAttr);
+            return this;
+        }
     }
 }
 
-function factorial(n) {
-    if (n === 1) {
-        return 0;
-    }
-    return n * factorial(n - 1);
-}
+var inst = a();
+inst.foo().foo().foo().log();
 
-var fibRet = fib(10);
-var facRet = factorial(5);
+var inst2 = a();
+inst2.foo().log();

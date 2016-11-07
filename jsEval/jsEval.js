@@ -4,11 +4,18 @@
  */
 'use strict';
 //全局作用域
-const global = { isGlobal: true };
+const global = {
+    isGlobal: true,
+    console: {
+        type: 'variable',
+        value: console
+    }
+};
 //函数调用栈
 const callStack = [];
 const callEnvironments = [];
 let guid = -1;
+let closureId = -1;
 
 function error(node) {
     throw new Error('syntax error:' + JSON.stringify(node));
@@ -206,6 +213,10 @@ function clearEnv(env) {
                 delete item.value.THIS;
                 clearEnv(item.value.scope);
             }
+
+            if (item.type === 'closure') {
+                delete env[key];
+            }
         }
     }
 }
@@ -269,13 +280,13 @@ function findRef(id, env, context) {
 }
 
 function lookupId(id, env) {
-    //获取当前调用函数的闭包
+    // 尝试获取当前调用函数的闭包
     const topCall = callStack[callStack.length - 1];
     const closureId = topCall ? topCall.callee.___closure___ : null;
     const closure = closureId ? global['closure_' + closureId] : null;
-    //如果存在闭包,取闭包作为环境,然后合并实参到当前环境
+    // 合并实参到当前环境
     if (callStack.length) {
-        env = Object.assign({}, topCall.appliedArgs, closure, env);
+        env = Object.assign({}, closure, topCall.appliedArgs, env);
     }
 
     if (id === 'this') {
@@ -414,7 +425,6 @@ function twoItemOperation(node, env) {
     let operatee = evaluate(next.children[1], env);
 
     while (operator && operatee) {
-        // console.log(operator, operatee, ret);
         switch (operator) {
             case '*':
                 ret = ret * operatee;
@@ -525,7 +535,10 @@ function accessRef(node, env) {
         return lVal(node, env);
     }
     else {
-        return { context: lookupId(node.token, env), lastRef: 'value' };
+        const context = lookupId(node.token, env);
+        const lastRef = 'value';
+        const value = context != null ? context[lastRef] : context;
+        return { context: context, lastRef: lastRef, value: value };
     }
 }
 
@@ -533,8 +546,11 @@ function accessValue(node, env) {
     if (node.token === 'LVAL') {
         return lVal(node, env).value;
     }
-    else {
-        return lookupId(node, env).value;
+    else if (node.type === 'id') {
+        return lookupId(node.token, env).value;
+    }
+    else if (node.token === 'FUNCTION') {
+        return lookupId(node.funcId, env).value;
     }
 }
 
@@ -607,14 +623,14 @@ function _if(node, env) {
 
 function accessFromContext(node, env, context) {
     if (node.type === 'id') {
-        return context[node.token];
+        return { value: context[node.token], context: context };
     }
     else if (node.token === 'LVAL') {
         const children = node.children;
         const first = children[0];
         const nextContext = context[first.token];
         const rest = findNodeInChildrenBy(node, 'LVAL_REST');
-        return lValRest(rest, env, context);
+        return lValRest(rest, env, context[first.token]);
     }
 }
 
@@ -655,33 +671,45 @@ function accessCall(node, env, context) {
     const children = node.children;
 
     let currentContext = context || null;
+    let applyContext = null;
     for (let i = 0; i < children.length; i++) {
         let currentNode = children[i];
         if (currentNode.token === 'LVAL') {
             if (!currentContext) {
-                currentContext = accessValue(currentNode, env);
+                const ref = accessRef(currentNode, env);
+                currentContext = ref.value;
+                applyContext = ref.context;
             }
             else {
-                currentContext = accessFromContext(currentNode, env, currentContext);
+                const ref = accessFromContext(currentNode, env, currentContext);
+                currentContext = ref.value;
+                applyContext = ref.context;
             }
         }
         else if (currentNode.type === 'id') {
             if (!currentContext) {
-                currentContext = accessValue(currentNode.token, env);
+                const ref = accessRef(currentNode, env);
+                currentContext = ref.value;
+                applyContext = global;
             }
             else {
-                currentContext = accessFromContext(currentNode, env, currentContext);
+                const ref = accessFromContext(currentNode, env, currentContext);
+                currentContext = ref.value;
+                applyContext = ref.context;
             }
         }
         else if (currentNode.token === '.') {
             let next = children[i + 1];
-            //console.log(next)
             if (next.token !== 'ACCESS_CALL') {
                 if (!currentContext) {
-                    currentContext = accessValue(next.token, env);
+                    const ref = accessRef(next, env);
+                    currentContext = ref.value;
+                    applyContext = ref.context;
                 }
                 else {
-                    currentContext = accessFromContext(next, env, currentContext);
+                    const ref = accessFromContext(next, env, currentContext);
+                    currentContext = ref.value;
+                    applyContext = ref.context;
                 }
                 i++;
             }
@@ -694,39 +722,49 @@ function accessCall(node, env, context) {
         else if (currentNode.token === 'ACCESS_CAL_ARGS') {
             const argsNode = currentNode;
             const callee = currentContext;
-
-            const actualArgs = accessArgs(argsNode, env);
-            let appliedArgs;
-
-            if (Array.isArray(actualArgs)) {
-                appliedArgs = actualArgs.reduce((ret, arg, i)=> {
-                    ret[callee.args[i]] = { type: 'variable', value: arg };
-                    return ret;
-                }, {});
+            if (typeof callee === 'function') {
+                let actualArgs = accessArgs(argsNode, env);
+                if (!Array.isArray(actualArgs)) {
+                    actualArgs = [actualArgs];
+                }
+                return callee.apply(applyContext, actualArgs);
             }
             else {
-                if (callee.args[0] != null) {
-                    appliedArgs = {
-                        [callee.args[0]]: { type: 'variable', value: actualArgs }
-                    };
+
+                const actualArgs = accessArgs(argsNode, env);
+                let appliedArgs;
+
+                if (Array.isArray(actualArgs)) {
+                    appliedArgs = actualArgs.reduce((ret, arg, i)=> {
+                        ret[callee.args[i]] = { type: 'variable', value: arg };
+                        return ret;
+                    }, {});
                 }
-            }
+                else {
+                    if (callee.args[0] != null) {
+                        appliedArgs = {
+                            [callee.args[0]]: { type: 'variable', value: actualArgs }
+                        };
+                    }
+                }
 
-            callStack.push({
-                context: currentContext || global,
-                callee: callee,
-                appliedArgs: appliedArgs
-            });
+                callStack.push({
+                    context: currentContext || global,
+                    callee: callee,
+                    appliedArgs: appliedArgs
+                });
 
-            evaluate(callee.body, callee.scope);
-            const lastCall = callStack.pop();
-            currentContext = lastCall.RETURN;
-
-            // 如果返回值是对象或者函数, 尝试创建闭包
-            if (lastCall.RETURN &&
-                (lastCall.RETURN.type === 'function'
-                || typeof lastCall.RETURN === 'object')) {
-                makeClosure(lastCall, lastCall.RETURN, callee);
+                // 克隆作用域,并连接到外层作用域上
+                const scope = cloneScope(callee.scope);
+                evaluate(callee.body, scope);
+                const lastCall = callStack.pop();
+                currentContext = lastCall.RETURN;
+                // 如果返回值是对象或者函数, 尝试创建闭包
+                if (lastCall.RETURN &&
+                    (lastCall.RETURN.type === 'function'
+                    || typeof lastCall.RETURN === 'object')) {
+                    makeClosure(lastCall, lastCall.RETURN, callee, scope);
+                }
             }
         }
         else if (currentNode.token === 'ACCESS_CALL') {
@@ -737,11 +775,43 @@ function accessCall(node, env, context) {
     return currentContext;
 }
 
-let closureId = -1;
+function cloneScope(scope) {
+    const ret = {};
+    for (var vname in scope) {
+        if (scope.hasOwnProperty(vname)) {
+            if (vname === '___parent___') {
+                ret[vname] = scope[vname];
+            }
+            else {
+                const variable = scope[vname];
+                const value = variable.value;
+                const type = value ? value.type : null;
+                if (type === 'function') {
+                    const fret = {};
+                    for (var fattr in value) {
+                        if (value.hasOwnProperty(fattr)) {
+                            if (fattr !== 'scope') {
+                                fret[fattr] = JSON.parse(JSON.stringify(value[fattr]));
+                            }
+                            else {
+                                fret[fattr] = cloneScope(value[fattr]);
+                            }
+                        }
+                    }
+                    ret[vname] = { type: 'function', value: fret };
+                }
+                else {
+                    ret[vname] = JSON.parse(JSON.stringify(variable));
+                }
+            }
+        }
+    }
+    return ret;
+}
 
-function makeClosure(call, ret, callee) {
+function makeClosure(call, ret, callee, scope) {
     closureId++;
-    let scopeCopy = Object.assign({}, call.callee.scope);
+    let scopeCopy = scope;
     const appliedArgs = call.appliedArgs;
     if (appliedArgs) {
         Object.keys(appliedArgs).forEach(key=> {
@@ -753,7 +823,11 @@ function makeClosure(call, ret, callee) {
     }
     // 合并外层函数的闭包
     const parentClosure = global['closure_' + callee.___closure___];
-    let closure = Object.assign({}, parentClosure);
+    let closure = Object.assign({}, parentClosure, {
+        madeBy: callee.name,
+        type: 'closure',
+        closureId: closureId
+    });
     // 最内层的变量应该取当前环境的, 其余的父级作用域应该取外层函数的闭包的
     let lvl = 0;
     while (scopeCopy) {
@@ -769,13 +843,15 @@ function makeClosure(call, ret, callee) {
         lvl++;
         scopeCopy = scopeCopy.___parent___;
     }
+
     global['closure_' + closureId] = closure;
 
+    // 递归查找返回值是否是函数,或者是对象的一个属性是函数,如果是,绑定刚创建的闭包的id
     function bindClosure(target) {
-        if (target.type === 'function') {
+        if (target && target.type === 'function') {
             target.___closure___ = closureId;
         }
-        else {
+        else if (target) {
             Object.keys(target).forEach(key=> {
                 const val = target[key];
                 bindClosure(val);
@@ -790,7 +866,6 @@ function evaluate(node, env) {
     if (node) {
         const token = node.token;
         if (node.type === 'NON_TERM') {
-            console.log('evaluating:', token);
             switch (token) {
                 case 'BLOCK':
                     return block(node, env);
@@ -822,13 +897,14 @@ function evaluate(node, env) {
                 case 'ASSIGN':
                     return assign(node, env);
                 case 'FUNCTION':
-                    return accessValue(node.funcId, env);
+                    return accessValue(node, env);
                 case 'COMMA':
                     return comma(node, env);
                 case 'IF':
                     return _if(node, env);
                 case 'ACCESS_CALL':
                     return accessCall(node, env);
+                    break;
                 case 'RETURN':
                     return _return(node, env);
             }
@@ -847,7 +923,7 @@ function evaluate(node, env) {
                 case 'undefined':
                     return undefined;
                 case 'id':
-                    return accessValue(node.token, env);
+                    return accessValue(node, env);
             }
         }
     }

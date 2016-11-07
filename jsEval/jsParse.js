@@ -87,7 +87,7 @@ class JSParser extends Parser {
             const node = new Node('IF');
             matchToken(/if/, node);
             matchToken(/\(/, node);
-            expression(node);
+            expression(node, ')');
             matchToken(/\)/, node);
             block(node);
             _ifRest(node);

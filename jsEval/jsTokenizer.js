@@ -48,6 +48,7 @@ function throwSyntaxError(currentCode, line, index) {
 module.exports = function tokenizer(testCode) {
     console.log('tokenizer analyzing...');
     const codeLen = testCode.length;
+    let isTrackingString = false;
     //使用lastIndex和lookahead维护一个缓冲区
     //缓冲区的初始大小为1,即只保存一个字符
     //但是会有很多情况需要追加字符再进行匹配
@@ -73,23 +74,24 @@ module.exports = function tokenizer(testCode) {
                 line++;
             }
 
-            //如果是空格或者换行,直接跳到下一个字符
-            if (mspace) {
+            //如果是空格或者换行,直接跳到下一个字符(除非是正在匹配字符串)
+            if (mspace && !isTrackingString) {
                 lastIndex++;
                 lookahead++;
                 break;
             }
 
-            //优先处理字符串匹配,因为字符串和标识符的匹配是冲突的
-            //读到'或者"时,不断地向缓冲区加入新字符直至匹配到结尾的'或者"
-            //如果结尾和开头不同为'或者",则报语法错误
+            // 优先处理字符串匹配,因为字符串和标识符的匹配是冲突的
+            // 读到'或者"时,不断地向缓冲区加入新字符直至匹配到结尾的'或者"
+            // 如果结尾和开头不同为'或者",则报语法错误
+            // 这个字符串匹配还是有bug!
             if (currentFirstLetter.match(rquotation)) {
                 if (currentCode.length === 1
                     || currentCode.length > 1 && currentLastLetter !== currentFirstLetter
                     || currentLastLetter === currentFirstLetter && currentCode[currentCode.length - 2] === '\\') {
-                    //如果匹配到空白符,则可以认定为非法字符串
+                    // 如果匹配到空白符,lastIndex不能++
                     if (nextLetter.match(rspace)) {
-                        throwSyntaxError(currentCode, line, lastIndex);
+                        isTrackingString = true;
                     }
                     lookahead++;
                     break;
@@ -100,7 +102,7 @@ module.exports = function tokenizer(testCode) {
             }
             //匹配字符串
             if (mstring) {
-                console.log(mstring)
+                isTrackingString = false;
                 parsed.push(getToken(mstring, 'string'));
                 break;
             }

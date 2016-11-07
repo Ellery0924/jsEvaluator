@@ -6,15 +6,17 @@
 //全局作用域
 const global = {
     isGlobal: true,
+    // 将原生的console注入
     console: {
         type: 'variable',
         value: console
     }
 };
-//函数调用栈
+// 函数调用栈
 const callStack = [];
-const callEnvironments = [];
+// 匿名函数id
 let guid = -1;
+// 闭包id
 let closureId = -1;
 
 function error(node) {
@@ -112,7 +114,8 @@ function extractFunctionDeclarationFromStmt(node, env) {
                 funcId: funcId,
                 type: 'function',
                 name: funcName || null,
-                length: args.length
+                length: args.length,
+                prototype: Object.prototype
             }
         };
 
@@ -227,12 +230,15 @@ function stmts(node, env) {
     const rest = findNodeInChildrenBy(node, 'STMTS');
 
     evaluate(stmt, env);
-    if (rest) {
-        stmts(rest, env);
-    }
-    else {
-        const lastStmt = children.find(child=>child !== stmt && child.token !== ';');
-        evaluate(lastStmt, env);
+    // return后面的语句都可以跳过
+    if (stmt.token !== 'RETURN') {
+        if (rest) {
+            stmts(rest, env);
+        }
+        else {
+            const lastStmt = children.find(child=>child !== stmt && child.token !== ';');
+            evaluate(lastStmt, env);
+        }
     }
 }
 
@@ -283,14 +289,15 @@ function lookupId(id, env) {
     // 尝试获取当前调用函数的闭包
     const topCall = callStack[callStack.length - 1];
     const closureId = topCall ? topCall.callee.___closure___ : null;
-    const closure = closureId ? global['closure_' + closureId] : null;
+    // closureId是从0开始的,坑爹啊!
+    const closure = closureId != null ? global['closure_' + closureId] : null;
     // 合并实参到当前环境
     if (callStack.length) {
         env = Object.assign({}, closure, topCall.appliedArgs, env);
     }
 
     if (id === 'this') {
-        return callStack[callStack.length - 1].context;
+        return { value: callStack[callStack.length - 1].context };
     }
     if (env[id]) {
         return env[id];
@@ -471,6 +478,26 @@ function twoItemOperation(node, env) {
             case '||':
                 ret = ret || operatee;
                 break;
+            case 'instanceof':
+                let instResult = false;
+                while (ret) {
+                    if (ret.___proto___ === operatee.prototype) {
+                        instResult = true;
+                        break;
+                    }
+                    ret = ret.___proto___;
+                }
+                return instResult;
+            case 'in':
+                let inResult = false;
+                while (operatee) {
+                    if (operatee.hasOwnProperty(ret)) {
+                        inResult = true;
+                        break;
+                    }
+                    operatee = operatee.___proto___;
+                }
+                return inResult;
         }
 
         next = next.children.find(child=>child.token.match(/_REST/));
@@ -523,10 +550,23 @@ function lValRest(node, env, context) {
     }
 
     if (rest) {
-        return lValRest(rest, env, context[id]);
+        return lValRest(rest, env, lookupAttrOnProtoChain(id, context));
     }
     else {
-        return { context: context, lastRef: id, value: context[id] };
+        return { context: context, lastRef: id, value: lookupAttrOnProtoChain(id, context) };
+    }
+}
+
+// 沿着原型链向上查找
+function lookupAttrOnProtoChain(attrName, target) {
+    if (target[attrName]) {
+        return target[attrName];
+    }
+    else if (target.___proto___) {
+        return lookupAttrOnProtoChain(attrName, target.___proto___);
+    }
+    else {
+        return undefined;
     }
 }
 
@@ -667,7 +707,13 @@ function accessArgs(node, env) {
     }
 }
 
-function accessCall(node, env, context) {
+function _new(node, env) {
+    const children = node.children;
+    const calleeNode = children[1];
+    return accessCall(calleeNode, env, null, true);
+}
+
+function accessCall(node, env, context, isNew) {
     const children = node.children;
 
     let currentContext = context || null;
@@ -730,7 +776,6 @@ function accessCall(node, env, context) {
                 return callee.apply(applyContext, actualArgs);
             }
             else {
-
                 const actualArgs = accessArgs(argsNode, env);
                 let appliedArgs;
 
@@ -749,7 +794,8 @@ function accessCall(node, env, context) {
                 }
 
                 callStack.push({
-                    context: currentContext || global,
+                    // 如果是new调用的, 那么context是一个链接到prototype上的空对象
+                    context: !isNew ? applyContext || global : { ___proto___: callee.prototype },
                     callee: callee,
                     appliedArgs: appliedArgs
                 });
@@ -759,6 +805,10 @@ function accessCall(node, env, context) {
                 evaluate(callee.body, scope);
                 const lastCall = callStack.pop();
                 currentContext = lastCall.RETURN;
+                // new的返回值是return的值或者this
+                if (!currentContext && isNew) {
+                    currentContext = lastCall.context;
+                }
                 // 如果返回值是对象或者函数, 尝试创建闭包
                 if (lastCall.RETURN &&
                     (lastCall.RETURN.type === 'function'
@@ -768,7 +818,7 @@ function accessCall(node, env, context) {
             }
         }
         else if (currentNode.token === 'ACCESS_CALL') {
-            currentContext = accessCall(currentNode, env, currentContext);
+            currentContext = accessCall(currentNode, env, currentContext, isNew);
         }
     }
 
@@ -885,6 +935,7 @@ function evaluate(node, env) {
                 case 'INSTANCE_OF_OR_IN':
                 case 'AND':
                 case 'OR':
+                case 'INSTANCE_OF_OR_IN':
                     return twoItemOperation(node, env);
                 case 'THREE_ITEM_OPERATION':
                     return threeItemOperation(node, env);
@@ -907,6 +958,8 @@ function evaluate(node, env) {
                     break;
                 case 'RETURN':
                     return _return(node, env);
+                case 'NEW':
+                    return _new(node, env);
             }
         }
         else {

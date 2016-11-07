@@ -230,8 +230,9 @@ function stmts(node, env) {
     const rest = findNodeInChildrenBy(node, 'STMTS');
 
     evaluate(stmt, env);
-    // return后面的语句都可以跳过
-    if (stmt.token !== 'RETURN') {
+    // return后面的语句都可以跳过, 如果stms是一个正在调用的函数体, 那么需要检测该函数是否已经return
+    const currentCall = callStack[callStack.length - 1];
+    if (currentCall && !currentCall.hasReturned || !currentCall) {
         if (rest) {
             stmts(rest, env);
         }
@@ -678,6 +679,7 @@ function _return(node, env) {
     const children = node.children;
     const val = children[1];
     callStack[callStack.length - 1].RETURN = evaluate(val, env);
+    callStack[callStack.length - 1].hasReturned = true;
 }
 
 function callArgs(node, env, ret) {

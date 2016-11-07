@@ -7,4 +7,12 @@ function fib(n) {
     }
 }
 
+function factorial(n) {
+    if (n === 1) {
+        return 0;
+    }
+    return n * factorial(n - 1);
+}
+
 var fibRet = fib(10);
+var facRet = factorial(5);

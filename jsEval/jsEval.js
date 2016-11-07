@@ -912,6 +912,10 @@ function makeClosure(call, ret, callee, scope) {
     bindClosure(ret);
 }
 
+function _for(node, env) {
+
+}
+
 function evaluate(node, env) {
     if (node) {
         const token = node.token;
@@ -960,6 +964,8 @@ function evaluate(node, env) {
                     return _return(node, env);
                 case 'NEW':
                     return _new(node, env);
+                case 'FOR':
+                    return _for(node, env);
             }
         }
         else {

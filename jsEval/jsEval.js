@@ -14,8 +14,11 @@ const global = {
 };
 // 函数调用栈
 const callStack = [];
+// 当前正在执行的循环
+let loopStack = [];
 // 匿名函数id
 let guid = -1;
+let loopid = -1;
 // 闭包id
 let closureId = -1;
 
@@ -230,9 +233,14 @@ function stmts(node, env) {
     const rest = findNodeInChildrenBy(node, 'STMTS');
 
     evaluate(stmt, env);
+    if (stmt.token === 'break') {
+        _break();
+    }
     // return后面的语句都可以跳过, 如果stms是一个正在调用的函数体, 那么需要检测该函数是否已经return
     const currentCall = callStack[callStack.length - 1];
-    if (currentCall && !currentCall.hasReturned || !currentCall) {
+    const currentLoop = loopStack[loopStack.length - 1];
+    if ((currentCall && !currentCall.hasReturned || !currentCall)
+        && ( currentLoop && !currentLoop.hasBreak || !currentLoop)) {
         if (rest) {
             stmts(rest, env);
         }
@@ -539,6 +547,7 @@ function lVal(node, env) {
 
 function lValRest(node, env, context) {
     const children = node.children;
+    const isDirectlyAccess = children[0].token === '.';
     const idNode = children[1];
     const rest = findNodeInChildrenBy(node, 'LVAL_REST');
 
@@ -547,7 +556,7 @@ function lValRest(node, env, context) {
         id = evaluate(idNode, env);
     }
     else {
-        id = idNode.token;
+        id = isDirectlyAccess ? idNode.token : evaluate(idNode, env);
     }
 
     if (rest) {
@@ -705,7 +714,7 @@ function accessArgs(node, env) {
         return callArgs(evalArgs, env, []);
     }
     else {
-        return evaluate(evalArgs, env);
+        return [evaluate(evalArgs, env)];
     }
 }
 
@@ -772,28 +781,16 @@ function accessCall(node, env, context, isNew) {
             const callee = currentContext;
             if (typeof callee === 'function') {
                 let actualArgs = accessArgs(argsNode, env);
-                if (!Array.isArray(actualArgs)) {
-                    actualArgs = [actualArgs];
-                }
                 return callee.apply(applyContext, actualArgs);
             }
             else {
                 const actualArgs = accessArgs(argsNode, env);
                 let appliedArgs;
 
-                if (Array.isArray(actualArgs)) {
-                    appliedArgs = actualArgs.reduce((ret, arg, i)=> {
-                        ret[callee.args[i]] = { type: 'variable', value: arg };
-                        return ret;
-                    }, {});
-                }
-                else {
-                    if (callee.args[0] != null) {
-                        appliedArgs = {
-                            [callee.args[0]]: { type: 'variable', value: actualArgs }
-                        };
-                    }
-                }
+                appliedArgs = actualArgs.reduce((ret, arg, i)=> {
+                    ret[callee.args[i]] = { type: 'variable', value: arg };
+                    return ret;
+                }, {});
 
                 callStack.push({
                     // 如果是new调用的, 那么context是一个链接到prototype上的空对象
@@ -915,7 +912,32 @@ function makeClosure(call, ret, callee, scope) {
 }
 
 function _for(node, env) {
+    const children = node.children;
+    const controlHandleNode = findNodeInChildrenBy(node, 'CONTROL_HANDLE');
+    const initialNode = controlHandleNode.children[0];
+    const condNode = controlHandleNode.children[2];
+    const afterLoopNode = controlHandleNode.children[4];
+    const block = findNodeInChildrenBy(node, 'BLOCK');
 
+    evaluate(initialNode, env);
+    _loopBody(condNode, afterLoopNode, block, env, loopid);
+}
+
+function _loopBody(condNode, afterLoopNode, block, env, loopid) {
+    const cond = evaluate(condNode, env);
+    if (cond) {
+        evaluate(block, env);
+        evaluate(afterLoopNode, env);
+        _loopBody(condNode, afterLoopNode, block, env);
+    }
+}
+
+// TODO
+function _break() {
+    //const currentLoop = loopStack[loopStack.length - 1];
+    //if (currentLoop) {
+    //    currentLoop.hasBreak = true;
+    //}
 }
 
 function evaluate(node, env) {

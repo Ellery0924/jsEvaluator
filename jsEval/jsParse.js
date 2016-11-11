@@ -287,8 +287,6 @@ class JSParser extends Parser {
                     }
                 }
 
-                console.log('slice:', tokens.slice(self.current, end), self.current, end)
-
                 return tokens.slice(self.current, end).find(predicate) || { token: 'others' };
             }
             return self.getTokensUntil(regex).find(predicate) || { token: 'others' };

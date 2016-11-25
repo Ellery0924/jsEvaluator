@@ -313,7 +313,6 @@ class JSParser extends Parser {
         }
 
         function lVal(parent) {
-            console.log('lval')
             const node = new Node('LVAL');
             matchType(/id/, node);
             lValRest(node);

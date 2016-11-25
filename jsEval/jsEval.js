@@ -47,7 +47,7 @@ function hoistFunctionDeclaration(node, env) {
             hoistFunctionDeclaration(restStmts, env);
         }
         else {
-            const restStmt = node.children.find(child=>child !== stmt && child.token !== ';');
+            const restStmt = node.children.find(child => child !== stmt && child.token !== ';');
             if (restStmt) {
                 hoistFunctionDeclaration(restStmt, env);
             }
@@ -59,12 +59,12 @@ function hoistFunctionDeclaration(node, env) {
 }
 
 function flattenFuncArgs(args) {
-    return args.reduce((acc, arg)=> {
+    return args.reduce((acc, arg) => {
         if (arg.type === 'id') {
             acc = acc.concat(arg);
         }
         else {
-            acc = acc.concat(arg.children.filter(child=>child.type === 'id'));
+            acc = acc.concat(arg.children.filter(child => child.type === 'id'));
         }
         return acc;
     }, []).map(arg => arg.token).reverse();
@@ -73,7 +73,7 @@ function flattenFuncArgs(args) {
 function funcTag(node, funcId) {
     node.funcId = funcId;
     if (node.children) {
-        node.children.forEach(child=>funcTag(child, funcId));
+        node.children.forEach(child => funcTag(child, funcId));
     }
 }
 
@@ -84,8 +84,8 @@ function extractFunctionDeclarationFromStmt(node, env) {
         const funcName = children[1].type === 'id' ? children[1].token : null;
         const funcBodyNode = findNodeInChildrenBy(node, 'BLOCK');
         const argsNode = children.slice(
-            children.findIndex(child=>child.token === '(') + 1,
-            children.findIndex(child=>child.token === ')')
+            children.findIndex(child => child.token === '(') + 1,
+            children.findIndex(child => child.token === ')')
         )[0];
 
         function getArgs(node, ret) {
@@ -126,12 +126,12 @@ function extractFunctionDeclarationFromStmt(node, env) {
         hoistFunctionDeclaration(funcBodyNode, scope);
     }
     else if (children) {
-        children.forEach(child=>hoistFunctionDeclaration(child, env));
+        children.forEach(child => hoistFunctionDeclaration(child, env));
     }
 }
 
 function findNodeInChildrenBy(node, cond, by) {
-    return node && node.children ? node.children.find(child=>
+    return node && node.children ? node.children.find(child =>
         child[by !== 'type' ? 'token' : 'type'] === cond
     ) : null;
 }
@@ -148,7 +148,7 @@ function hoistVariable(node, env) {
             hoistVariable(nextStmts, env);
         }
         else {
-            const rest = children.find(child=>child !== stmt && child.token !== ';');
+            const rest = children.find(child => child !== stmt && child.token !== ';');
             if (rest) {
                 hoistVariableInStmt(rest, env);
             }
@@ -186,7 +186,7 @@ function hoistVariableInStmt(node, env) {
         if (varBodyRest) {
             hoistVariableInStmt(varBodyRest, env);
         }
-        children.forEach(child=> {
+        children.forEach(child => {
             if (child !== varBodyRest && child !== idNode && child.token !== '=') {
                 hoistVariableInStmt(child, env);
             }
@@ -202,7 +202,7 @@ function hoistVariableInStmt(node, env) {
         }
     }
     else if (children) {
-        children.forEach(child=> {
+        children.forEach(child => {
             hoistVariable(child, env);
         });
     }
@@ -245,7 +245,7 @@ function stmts(node, env) {
             stmts(rest, env);
         }
         else {
-            const lastStmt = children.find(child=>child !== stmt && child.token !== ';');
+            const lastStmt = children.find(child => child !== stmt && child.token !== ';');
             evaluate(lastStmt, env);
         }
     }
@@ -263,7 +263,7 @@ function _varBody(node, env) {
     const children = node.children;
     const idNode = children[0];
     const rest = findNodeInChildrenBy(node, 'VAR_BODY_REST');
-    const valueNode = children.find(child=>
+    const valueNode = children.find(child =>
         child !== idNode
         && child.token !== ','
         && child.token !== '='
@@ -348,7 +348,7 @@ function objContent(node, env, ret) {
 }
 
 function array(node, env) {
-    const content = node.children.find(child=>child.token !== ']' && child.token !== '[');
+    const content = node.children.find(child => child.token !== ']' && child.token !== '[');
     if (content) {
         if (content.token === 'COMMA') {
             return arrContent(content, env, []);
@@ -436,11 +436,11 @@ function selfPlusOrMinus(node, env, operator, isBackward) {
 function twoItemOperation(node, env) {
     const children = node.children;
     let ret = evaluate(children[0], env);
-    let next = children.find(child=>child.token.match(/_REST/));
+    let next = children.find(child => child.token.match(/_REST/));
     let operator = next.children[0].token;
     let operatee = evaluate(next.children[1], env);
 
-    while (operator && operatee) {
+    while (operator && operatee != null) {
         switch (operator) {
             case '*':
                 ret = ret * operatee;
@@ -509,7 +509,7 @@ function twoItemOperation(node, env) {
                 return inResult;
         }
 
-        next = next.children.find(child=>child.token.match(/_REST/));
+        next = next.children.find(child => child.token.match(/_REST/));
         if (next) {
             operator = next.children[0].token;
             operatee = evaluate(next.children[1], env);
@@ -569,13 +569,11 @@ function lValRest(node, env, context) {
 
 // 沿着原型链向上查找
 function lookupAttrOnProtoChain(attrName, target) {
-    if (target[attrName]) {
+    if (target[attrName] != null) {
         return target[attrName];
-    }
-    else if (target.___proto___) {
+    } else if (target.___proto___) {
         return lookupAttrOnProtoChain(attrName, target.___proto___);
-    }
-    else {
+    } else {
         return undefined;
     }
 }
@@ -638,7 +636,7 @@ function assign(node, env) {
 
 function comma(node, env) {
     const children = node.children;
-    const exprNode = children.find(child=>child.token !== ',' && child.token !== 'COMMA_REST');
+    const exprNode = children.find(child => child.token !== ',' && child.token !== 'COMMA_REST');
     const rest = findNodeInChildrenBy(node, 'COMMA_REST');
     const exprVal = evaluate(exprNode, env);
 
@@ -787,7 +785,7 @@ function accessCall(node, env, context, isNew) {
                 const actualArgs = accessArgs(argsNode, env);
                 let appliedArgs;
 
-                appliedArgs = actualArgs.reduce((ret, arg, i)=> {
+                appliedArgs = actualArgs.reduce((ret, arg, i) => {
                     ret[callee.args[i]] = { type: 'variable', value: arg };
                     return ret;
                 }, {});
@@ -863,7 +861,7 @@ function makeClosure(call, ret, callee, scope) {
     let scopeCopy = scope;
     const appliedArgs = call.appliedArgs;
     if (appliedArgs) {
-        Object.keys(appliedArgs).forEach(key=> {
+        Object.keys(appliedArgs).forEach(key => {
             const val = appliedArgs[key];
             if (scopeCopy[key] == null || scopeCopy[key].value == null) {
                 scopeCopy[key] = val;
@@ -880,7 +878,7 @@ function makeClosure(call, ret, callee, scope) {
     // 最内层的变量应该取当前环境的, 其余的父级作用域应该取外层函数的闭包的
     let lvl = 0;
     while (scopeCopy) {
-        Object.keys(scopeCopy).forEach(key=> {
+        Object.keys(scopeCopy).forEach(key => {
             const variable = scopeCopy[key];
             const value = variable.value;
             if (value &&
@@ -901,7 +899,7 @@ function makeClosure(call, ret, callee, scope) {
             target.___closure___ = closureId;
         }
         else if (target) {
-            Object.keys(target).forEach(key=> {
+            Object.keys(target).forEach(key => {
                 const val = target[key];
                 bindClosure(val);
             });
@@ -1013,7 +1011,7 @@ function evaluate(node, env) {
 }
 
 //js求值器,根据抽象语法树运行js代码
-module.exports = (ast)=> {
+module.exports = (ast) => {
     //提升函数声明
     hoistFunctionDeclaration(ast.root, global);
     //提升变量声明

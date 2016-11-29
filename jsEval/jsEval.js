@@ -33,8 +33,7 @@ function hoistFunctionDeclaration(node, env) {
 
         if (target.token === 'STMTS') {
             hoistFunctionDeclaration(target, env);
-        }
-        else if (target.token !== '}') {
+        } else if (target.token !== '}') {
             extractFunctionDeclarationFromStmt(target, env);
         }
     }
@@ -45,15 +44,13 @@ function hoistFunctionDeclaration(node, env) {
         extractFunctionDeclarationFromStmt(stmt, env);
         if (restStmts) {
             hoistFunctionDeclaration(restStmts, env);
-        }
-        else {
+        } else {
             const restStmt = node.children.find(child => child !== stmt && child.token !== ';');
             if (restStmt) {
                 hoistFunctionDeclaration(restStmt, env);
             }
         }
-    }
-    else {
+    } else {
         extractFunctionDeclarationFromStmt(node, env);
     }
 }
@@ -62,8 +59,7 @@ function flattenFuncArgs(args) {
     return args.reduce((acc, arg) => {
         if (arg.type === 'id') {
             acc = acc.concat(arg);
-        }
-        else {
+        } else {
             acc = acc.concat(arg.children.filter(child => child.type === 'id'));
         }
         return acc;
@@ -94,8 +90,7 @@ function extractFunctionDeclarationFromStmt(node, env) {
             }
             if (node.type === 'id') {
                 ret.push(node.token);
-            }
-            else {
+            } else {
                 const id = node.children[0].token;
                 ret.push(id);
                 getArgs(node.children[2], ret);
@@ -124,8 +119,7 @@ function extractFunctionDeclarationFromStmt(node, env) {
 
         funcTag(node, funcId);
         hoistFunctionDeclaration(funcBodyNode, scope);
-    }
-    else if (children) {
+    } else if (children) {
         children.forEach(child => hoistFunctionDeclaration(child, env));
     }
 }
@@ -146,8 +140,7 @@ function hoistVariable(node, env) {
 
         if (nextStmts) {
             hoistVariable(nextStmts, env);
-        }
-        else {
+        } else {
             const rest = children.find(child => child !== stmt && child.token !== ';');
             if (rest) {
                 hoistVariableInStmt(rest, env);
@@ -158,12 +151,10 @@ function hoistVariable(node, env) {
         const stmts = findNodeInChildrenBy(node, 'STMTS');
         if (stmts) {
             hoistVariable(stmts, env);
-        }
-        else if (children[1].token !== '}') {
+        } else if (children[1].token !== '}') {
             hoistVariableInStmt(children[1], env);
         }
-    }
-    else {
+    } else {
         hoistVariableInStmt(node, env);
     }
 }
@@ -200,8 +191,7 @@ function hoistVariableInStmt(node, env) {
             const scope = env[funcId].value.scope;
             hoistVariable(funcBody, scope);
         }
-    }
-    else if (children) {
+    } else if (children) {
         children.forEach(child => {
             hoistVariable(child, env);
         });
@@ -243,8 +233,7 @@ function stmts(node, env) {
         && ( currentLoop && !currentLoop.hasBreak || !currentLoop)) {
         if (rest) {
             stmts(rest, env);
-        }
-        else {
+        } else {
             const lastStmt = children.find(child => child !== stmt && child.token !== ';');
             evaluate(lastStmt, env);
         }
@@ -288,8 +277,7 @@ function _varBody(node, env) {
 function findRef(id, env, context) {
     if (context) {
         return context[id];
-    }
-    else {
+    } else {
         return lookupId(id, env);
     }
 }
@@ -308,13 +296,12 @@ function lookupId(id, env) {
     if (id === 'this') {
         return { value: callStack[callStack.length - 1].context };
     }
+
     if (env[id]) {
         return env[id];
-    }
-    else if (env.___parent___) {
+    } else if (env.___parent___) {
         return lookupId(id, env.___parent___);
-    }
-    else {
+    } else {
         throw new Error('Referrence error: ' + id + ' is not defined.');
     }
 }
@@ -324,8 +311,7 @@ function _object(node, env) {
 
     if (content) {
         return objContent(content, env, {});
-    }
-    else {
+    } else {
         return {};
     }
 }
@@ -341,8 +327,7 @@ function objContent(node, env, ret) {
 
     if (rest) {
         return objContent(rest, env, ret);
-    }
-    else {
+    } else {
         return ret;
     }
 }
@@ -352,12 +337,10 @@ function array(node, env) {
     if (content) {
         if (content.token === 'COMMA') {
             return arrContent(content, env, []);
-        }
-        else {
+        } else {
             return [evaluate(content, env)];
         }
-    }
-    else {
+    } else {
         return [];
     }
 }
@@ -368,8 +351,7 @@ function arrContent(node, env, ret) {
     const rest = findNodeInChildrenBy(node, 'COMMA_REST');
     if (rest) {
         return arrContent(rest, env, ret);
-    }
-    else {
+    } else {
         return ret;
     }
 }
@@ -415,18 +397,15 @@ function selfPlusOrMinus(node, env, operator, isBackward) {
         if (operator === '++') {
             context[lastRef] = currentVal + 1;
             return context[lastRef];
-        }
-        else {
+        } else {
             context[lastRef] = currentVal - 1;
             return context[lastRef];
         }
-    }
-    else {
+    } else {
         if (operator === '++') {
             context[lastRef] = currentVal + 1;
             return currentVal;
-        }
-        else {
+        } else {
             context[lastRef] = currentVal - 1;
             return currentVal;
         }
@@ -513,8 +492,7 @@ function twoItemOperation(node, env) {
         if (next) {
             operator = next.children[0].token;
             operatee = evaluate(next.children[1], env);
-        }
-        else {
+        } else {
             break;
         }
     }
@@ -530,8 +508,7 @@ function threeItemOperation(node, env) {
 
     if (evaluate(condNode, env)) {
         return evaluate(thenNode, env);
-    }
-    else {
+    } else {
         return evaluate(elseNode, env);
     }
 }
@@ -554,15 +531,13 @@ function lValRest(node, env, context) {
     let id;
     if (idNode.type !== 'id') {
         id = evaluate(idNode, env);
-    }
-    else {
+    } else {
         id = isDirectlyAccess ? idNode.token : evaluate(idNode, env);
     }
 
     if (rest) {
         return lValRest(rest, env, lookupAttrOnProtoChain(id, context));
-    }
-    else {
+    } else {
         return { context: context, lastRef: id, value: lookupAttrOnProtoChain(id, context) };
     }
 }
@@ -581,8 +556,7 @@ function lookupAttrOnProtoChain(attrName, target) {
 function accessRef(node, env) {
     if (node.token === 'LVAL') {
         return lVal(node, env);
-    }
-    else {
+    } else {
         const context = lookupId(node.token, env);
         const lastRef = 'value';
         const value = context != null ? context[lastRef] : context;
@@ -593,11 +567,9 @@ function accessRef(node, env) {
 function accessValue(node, env) {
     if (node.token === 'LVAL') {
         return lVal(node, env).value;
-    }
-    else if (node.type === 'id') {
+    } else if (node.type === 'id') {
         return lookupId(node.token, env).value;
-    }
-    else if (node.token === 'FUNCTION') {
+    } else if (node.token === 'FUNCTION') {
         return lookupId(node.funcId, env).value;
     }
 }
@@ -642,8 +614,7 @@ function comma(node, env) {
 
     if (rest) {
         return comma(rest, env);
-    }
-    else {
+    } else {
         return exprVal;
     }
 }
@@ -663,8 +634,7 @@ function _if(node, env) {
 
     if (condRet) {
         evaluate(thenBlock, env);
-    }
-    else {
+    } else {
         evaluate(elseBlock, env);
     }
 }
@@ -699,8 +669,7 @@ function callArgs(node, env, ret) {
     if (rest.token !== 'CALL_ARGS') {
         ret.push(evaluate(rest, env));
         return ret;
-    }
-    else {
+    } else {
         return callArgs(rest, env, ret);
     }
 }
@@ -734,8 +703,7 @@ function accessCall(node, env, context, isNew) {
                 const ref = accessRef(currentNode, env);
                 currentContext = ref.value;
                 applyContext = ref.context;
-            }
-            else {
+            } else {
                 const ref = accessFromContext(currentNode, env, currentContext);
                 currentContext = ref.value;
                 applyContext = ref.context;
@@ -746,8 +714,7 @@ function accessCall(node, env, context, isNew) {
                 const ref = accessRef(currentNode, env);
                 currentContext = ref.value;
                 applyContext = global;
-            }
-            else {
+            } else {
                 const ref = accessFromContext(currentNode, env, currentContext);
                 currentContext = ref.value;
                 applyContext = ref.context;
@@ -760,8 +727,7 @@ function accessCall(node, env, context, isNew) {
                     const ref = accessRef(next, env);
                     currentContext = ref.value;
                     applyContext = ref.context;
-                }
-                else {
+                } else {
                     const ref = accessFromContext(next, env, currentContext);
                     currentContext = ref.value;
                     applyContext = ref.context;
@@ -780,8 +746,7 @@ function accessCall(node, env, context, isNew) {
             if (typeof callee === 'function') {
                 let actualArgs = accessArgs(argsNode, env);
                 return callee.apply(applyContext, actualArgs);
-            }
-            else {
+            } else {
                 const actualArgs = accessArgs(argsNode, env);
                 let appliedArgs;
 
@@ -846,8 +811,7 @@ function cloneScope(scope) {
                         }
                     }
                     ret[vname] = { type: 'function', value: fret };
-                }
-                else {
+                } else {
                     ret[vname] = JSON.parse(JSON.stringify(variable));
                 }
             }
@@ -897,8 +861,7 @@ function makeClosure(call, ret, callee, scope) {
     function bindClosure(target) {
         if (target && target.type === 'function') {
             target.___closure___ = closureId;
-        }
-        else if (target) {
+        } else if (target) {
             Object.keys(target).forEach(key => {
                 const val = target[key];
                 bindClosure(val);
@@ -989,8 +952,7 @@ function evaluate(node, env) {
                 case 'FOR':
                     return _for(node, env);
             }
-        }
-        else {
+        } else {
             const type = node.type;
             switch (type) {
                 case 'number':

@@ -11,7 +11,7 @@ function bubbleSort(arr) {
 }
 
 function quickSort(arr) {
-    if (!arr.length) {
+    if (arr.length===0) {
         return [];
     }
 
@@ -33,7 +33,7 @@ function quickSort(arr) {
     return ret;
 }
 
-var a = [5, 4, 3, 2, 1, 6, 7, 8, 9];
+var a = [5, 4, 3, 2, 1, 6, 7, 8, 9,77770];
 var b = quickSort(a);
 bubbleSort(a);
 console.log('bubblesort', a);

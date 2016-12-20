@@ -5,6 +5,7 @@ for (var i = 0; i < 10; i++) {
         if (j >= 3) {
             console.log('j break at', j);
             break;
+            console.log('impossible');
         }
     }
 
@@ -107,3 +108,11 @@ var hoftest = hof(function (a, b) {
 
 var ret = hoftest({ value: 200 }, { value: 10 });
 console.log(ret);
+
+var testOb = {
+    foo: function () {
+        return 1000;
+    }
+}
+
+console.log(typeof 'nani');

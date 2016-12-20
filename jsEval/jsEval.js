@@ -15,7 +15,7 @@ const global = {
 // 函数调用栈
 const callStack = [];
 // 循环堆栈
-let loopStack = [];
+const loopStack = [];
 // 匿名函数id
 let guid = -1;
 // 循环id
@@ -37,8 +37,7 @@ function hoistFunctionDeclaration(node, env) {
         } else if (target.token !== '}') {
             extractFunctionDeclarationFromStmt(target, env);
         }
-    }
-    else if (node.token === 'STMTS') {
+    } else if (node.token === 'STMTS') {
         const stmt = node.children[0];
         const restStmts = findNodeInChildrenBy(node, 'STMTS');
 
@@ -147,8 +146,7 @@ function hoistVariable(node, env) {
                 hoistVariableInStmt(rest, env);
             }
         }
-    }
-    else if (node.token === 'BLOCK') {
+    } else if (node.token === 'BLOCK') {
         const stmts = findNodeInChildrenBy(node, 'STMTS');
         if (stmts) {
             hoistVariable(stmts, env);
@@ -183,8 +181,7 @@ function hoistVariableInStmt(node, env) {
                 hoistVariableInStmt(child, env);
             }
         });
-    }
-    else if (node.token === 'FUNCTION') {
+    } else if (node.token === 'FUNCTION') {
         const funcBody = findNodeInChildrenBy(node, 'BLOCK');
         const funcId = node.funcId;
 
@@ -224,10 +221,8 @@ function stmts(node, env) {
     const rest = findNodeInChildrenBy(node, 'STMTS');
 
     evaluate(stmt, env);
-    // if (stmt.token === 'break') {
-    //     _break();
-    // }
     // return后面的语句都可以跳过, 如果stms是一个正在调用的函数体, 那么需要检测该函数是否已经return
+    // break同理
     const currentCall = callStack[callStack.length - 1];
     const currentLoop = loopStack[loopStack.length - 1];
     if ((currentCall && !currentCall.hasReturned || !currentCall)
@@ -373,6 +368,10 @@ function factor(node, env) {
         case '(':
             return evaluate(rest, env);
         case 'typeof':
+            var rightValue = evaluate(rest, env);
+            if (typeof rightValue === 'object' && rightValue.type === 'function') {
+                return 'function';
+            }
             return typeof evaluate(rest, env);
         case 'void':
             evaluate(rest, env);
@@ -804,8 +803,7 @@ function cloneScope(scope) {
                         if (value.hasOwnProperty(fattr)) {
                             if (fattr !== 'scope') {
                                 fret[fattr] = JSON.parse(JSON.stringify(value[fattr]));
-                            }
-                            else {
+                            } else {
                                 fret[fattr] = cloneScope(value[fattr]);
                             }
                         }

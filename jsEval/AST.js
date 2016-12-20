@@ -22,7 +22,9 @@ module.exports = {
             if (!node) {
                 node = this.root;
             }
-            if (node.children.length === 1 && node.token.match(/BREAK|CONTINUE|RETURN/) === null) {
+            if (node.children.length === 1
+                // 单节点语句不清理
+                && node.token.match(/BREAK|CONTINUE|RETURN/) === null) {
                 const onlyChild = node.children[0];
                 if (!node.parent) {
                     this.root = onlyChild;

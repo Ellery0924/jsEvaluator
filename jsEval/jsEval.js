@@ -907,6 +907,48 @@ function _break() {
     currentLoop._break = true;
 }
 
+function _while(node, env) {
+    const children = node.children;
+    const condNode = children[2];
+    const blockNode = children[4];
+
+    loopStack.push({
+        id: ++loopid,
+        _break: false
+    });
+    _whileBody(condNode, blockNode, env, loopid);
+    loopStack.pop();
+}
+
+function _do(node, env) {
+    const children = node.children;
+    const blockNode = children[1];
+    const condNode = children[4];
+
+    loopStack.push({
+        id: ++loopid,
+        _break: false
+    });
+    evaluate(blockNode, env);
+    _whileBody(condNode, blockNode, env, loopid);
+    loopStack.pop();
+}
+
+function _whileBody(condNode, blockNode, env, loopid) {
+    const cond = evaluate(condNode, env);
+    const currentLoop = loopStack[loopStack.length - 1];
+
+    if (currentLoop
+        && currentLoop.id === loopid
+        && !currentLoop._break) {
+
+        if (cond) {
+            evaluate(blockNode, env);
+            _whileBody(condNode, blockNode, env, loopid);
+        }
+    }
+}
+
 function evaluate(node, env) {
     if (node) {
         const token = node.token;
@@ -959,6 +1001,10 @@ function evaluate(node, env) {
                     return _new(node, env);
                 case 'FOR':
                     return _for(node, env);
+                case 'WHILE':
+                    return _while(node, env);
+                case 'DO':
+                    return _do(node, env);
             }
         } else {
             const type = node.type;

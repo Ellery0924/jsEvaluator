@@ -115,4 +115,4 @@ var testOb = {
     }
 }
 
-console.log(typeof 'nani');
+console.log(typeof testOb.foo);

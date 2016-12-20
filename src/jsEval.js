@@ -1027,18 +1027,18 @@ function evaluate(node, env) {
 }
 
 //js求值器,根据抽象语法树运行js代码
-module.exports = (ast) => {
+module.exports = (ptree) => {
     //提升函数声明
-    hoistFunctionDeclaration(ast.root, global);
+    hoistFunctionDeclaration(ptree.root, global);
     //提升变量声明
-    hoistVariable(ast.root, global);
+    hoistVariable(ptree.root, global);
     //求值
-    evaluate(ast.root, global);
+    evaluate(ptree.root, global);
     //清理循环引用以输出JSON
     clearEnv(global);
 
     return {
-        ast: ast,
+        parseTree: ptree,
         env: global
     };
 };

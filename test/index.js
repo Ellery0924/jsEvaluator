@@ -8,4 +8,4 @@ const jsEval = require('../index');
 
 const ret = jsEval(testCode);
 fs.writeFileSync('./env.json', JSON.stringify(ret.env, null, 4));
-fs.writeFileSync('./evalret.json', JSON.stringify(ret.ast, null, 4));
+fs.writeFileSync('./parseTree.json', JSON.stringify(ret.parseTree, null, 4));

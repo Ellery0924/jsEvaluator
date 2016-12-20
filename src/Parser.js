@@ -1,5 +1,5 @@
 'use strict';
-const Node = require('./AST').Node;
+const Node = require('./ParseTree').Node;
 
 module.exports = class {
     constructor(ast, tokens) {

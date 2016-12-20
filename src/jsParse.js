@@ -1,7 +1,7 @@
 'use strict';
 const Parser = require('./Parser');
-const AST = require('./AST').AST;
-const Node = require('./AST').Node;
+const ParseTree = require('./ParseTree').ParseTree;
+const Node = require('./ParseTree').Node;
 
 class JSParser extends Parser {
     constructor(ast, tokens) {
@@ -636,7 +636,7 @@ class JSParser extends Parser {
 }
 
 module.exports = function (tokens) {
-    const ast = new JSParser(new AST(new Node('PROGRAM', 'NON_TERM')), tokens).parse();
+    const ast = new JSParser(new ParseTree(new Node('PROGRAM', 'NON_TERM')), tokens).parse();
     ast.flatten();
     ast.clear();
     return ast;

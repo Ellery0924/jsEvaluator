@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-    AST: class {
+    ParseTree: class {
         constructor(parent) {
             this.root = null;
             this.parent = parent || null;

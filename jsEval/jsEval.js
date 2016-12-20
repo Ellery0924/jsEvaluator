@@ -14,10 +14,11 @@ const global = {
 };
 // 函数调用栈
 const callStack = [];
-// 当前正在执行的循环
+// 循环堆栈
 let loopStack = [];
 // 匿名函数id
 let guid = -1;
+// 循环id
 let loopid = -1;
 // 闭包id
 let closureId = -1;
@@ -126,8 +127,8 @@ function extractFunctionDeclarationFromStmt(node, env) {
 
 function findNodeInChildrenBy(node, cond, by) {
     return node && node.children ? node.children.find(child =>
-        child[by !== 'type' ? 'token' : 'type'] === cond
-    ) : null;
+            child[by !== 'type' ? 'token' : 'type'] === cond
+        ) : null;
 }
 
 function hoistVariable(node, env) {
@@ -223,14 +224,14 @@ function stmts(node, env) {
     const rest = findNodeInChildrenBy(node, 'STMTS');
 
     evaluate(stmt, env);
-    if (stmt.token === 'break') {
-        _break();
-    }
+    // if (stmt.token === 'break') {
+    //     _break();
+    // }
     // return后面的语句都可以跳过, 如果stms是一个正在调用的函数体, 那么需要检测该函数是否已经return
     const currentCall = callStack[callStack.length - 1];
     const currentLoop = loopStack[loopStack.length - 1];
     if ((currentCall && !currentCall.hasReturned || !currentCall)
-        && ( currentLoop && !currentLoop.hasBreak || !currentLoop)) {
+        && ( currentLoop && !currentLoop._break || !currentLoop)) {
         if (rest) {
             stmts(rest, env);
         } else {
@@ -719,8 +720,7 @@ function accessCall(node, env, context, isNew) {
                 currentContext = ref.value;
                 applyContext = ref.context;
             }
-        }
-        else if (currentNode.token === '.') {
+        } else if (currentNode.token === '.') {
             let next = children[i + 1];
             if (next.token !== 'ACCESS_CALL') {
                 if (!currentContext) {
@@ -879,26 +879,34 @@ function _for(node, env) {
     const condNode = controlHandleNode.children[2];
     const afterLoopNode = controlHandleNode.children[4];
     const block = findNodeInChildrenBy(node, 'BLOCK');
+    loopStack.push({
+        id: ++loopid,
+        _break: false
+    });
 
     evaluate(initialNode, env);
     _loopBody(condNode, afterLoopNode, block, env, loopid);
+    loopStack.pop();
 }
 
 function _loopBody(condNode, afterLoopNode, block, env, loopid) {
     const cond = evaluate(condNode, env);
-    if (cond) {
-        evaluate(block, env);
-        evaluate(afterLoopNode, env);
-        _loopBody(condNode, afterLoopNode, block, env);
+    const currentLoop = loopStack[loopStack.length - 1];
+
+    if (currentLoop
+        && currentLoop.id === loopid
+        && !currentLoop._break) {
+        if (cond) {
+            evaluate(block, env);
+            evaluate(afterLoopNode, env);
+            _loopBody(condNode, afterLoopNode, block, env, loopid);
+        }
     }
 }
 
-// TODO
 function _break() {
-    //const currentLoop = loopStack[loopStack.length - 1];
-    //if (currentLoop) {
-    //    currentLoop.hasBreak = true;
-    //}
+    const currentLoop = loopStack[loopStack.length - 1];
+    currentLoop._break = true;
 }
 
 function evaluate(node, env) {
@@ -947,6 +955,8 @@ function evaluate(node, env) {
                     break;
                 case 'RETURN':
                     return _return(node, env);
+                case 'BREAK':
+                    return _break();
                 case 'NEW':
                     return _new(node, env);
                 case 'FOR':

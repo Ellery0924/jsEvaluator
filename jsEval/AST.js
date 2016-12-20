@@ -22,14 +22,13 @@ module.exports = {
             if (!node) {
                 node = this.root;
             }
-            if (node.children.length === 1) {
+            if (node.children.length === 1 && node.token.match(/BREAK|CONTINUE|RETURN/) === null) {
                 const onlyChild = node.children[0];
                 if (!node.parent) {
                     this.root = onlyChild;
                     onlyChild.parent = null;
                     this.flatten(onlyChild);
-                }
-                else {
+                } else {
                     const indexInParent = node.parent.children.indexOf(node);
                     node.parent.children.splice(indexInParent, 1, onlyChild);
                     onlyChild.parent = node.parent;
@@ -37,7 +36,7 @@ module.exports = {
                 }
             }
             else {
-                node.children.forEach(child=>this.flatten(child));
+                node.children.forEach(child => this.flatten(child));
             }
         }
 
@@ -52,7 +51,7 @@ module.exports = {
                 }
             }
             else {
-                node.children.forEach(child=> {
+                node.children.forEach(child => {
                     this.clear(child)
                 });
             }

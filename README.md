@@ -21,7 +21,7 @@ eval(code);
 
 ## 运行test
 测试用的js代码位于./test/evalTestCode.js，运行后会输出全局作用域和语法分析树到test
-下面的env.json和evalret.json文件中。
+下面的env.json和parseTree.json文件中。
 
 ```
 cd test

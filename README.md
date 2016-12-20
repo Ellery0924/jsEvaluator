@@ -6,6 +6,10 @@
 模拟实现了js的作用域链、闭包、原型链，以及函数调用栈等等。
 可以调用部分数组和对象方法，也可以调用console的方法。
 
+## 文法
+
+我总结的js文法位于src目录下的stmt.md
+
 ## API
 ```
 const eval = require('jsEvaluator');

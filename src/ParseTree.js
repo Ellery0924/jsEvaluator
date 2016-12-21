@@ -44,6 +44,7 @@ module.exports = {
             if (!node) {
                 node = this.root;
             }
+
             if (node.children.length === 0) {
                 delete node.children;
                 if (node.type === 'NON_TERM') {
@@ -54,9 +55,11 @@ module.exports = {
                     this.clear(child)
                 });
             }
+
             if (node.parent !== undefined) {
                 delete node.parent;
             }
+
             delete node.nextSibling;
         }
     },

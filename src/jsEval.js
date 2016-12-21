@@ -10,6 +10,10 @@ const global = {
     console: {
         type: 'variable',
         value: console
+    },
+    Math: {
+        type: 'variable',
+        value: Math
     }
 };
 // 函数调用栈

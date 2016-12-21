@@ -45,12 +45,10 @@ module.exports = class {
                 this.ast.append(new Node(currentToken.token, currentToken.type), parent);
                 console.log('JSParser: token matched \'' + currentToken.token + '\'');
                 return true;
-            }
-            else {
+            } else {
                 if (optional) {
                     return false;
-                }
-                else {
+                } else {
                     this.error(token);
                 }
             }
@@ -66,8 +64,7 @@ module.exports = class {
                 this.ast.append(new Node(currentToken.token, currentToken.type), parent);
                 console.log('JSParser: token matched \'' + currentToken.token + '\'');
                 return true;
-            }
-            else {
+            } else {
                 if (optional) {
                     return false;
                 }
@@ -82,8 +79,7 @@ module.exports = class {
             const t = this.tokens[i];
             if (!t.token.match(new RegExp(token))) {
                 ret.push(t);
-            }
-            else {
+            } else {
                 break;
             }
         }

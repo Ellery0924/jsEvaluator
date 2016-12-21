@@ -10,8 +10,7 @@ module.exports = {
         append(node, target) {
             if (this.root === null) {
                 this.root = node;
-            }
-            else {
+            } else {
                 target.children.push(node);
                 node.parent = target;
             }
@@ -36,8 +35,7 @@ module.exports = {
                     onlyChild.parent = node.parent;
                     this.flatten(onlyChild);
                 }
-            }
-            else {
+            } else {
                 node.children.forEach(child => this.flatten(child));
             }
         }
@@ -51,8 +49,7 @@ module.exports = {
                 if (node.type === 'NON_TERM') {
                     node.parent.children.splice(node.parent.children.indexOf(node), 1);
                 }
-            }
-            else {
+            } else {
                 node.children.forEach(child => {
                     this.clear(child)
                 });

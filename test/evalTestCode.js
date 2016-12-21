@@ -51,7 +51,7 @@ function countingSort(arr, largest) {
     return ret;
 }
 
-var arr = [5, 4, 3, 2, 3];
-console.log(countingSort(arr, 5));
+var arr = [100, 5, 4, 3, 2, 3];
+console.log(countingSort(arr, 100));
 quickSort(arr, 0, arr.length - 1);
 console.log(arr);

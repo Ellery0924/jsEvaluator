@@ -95,8 +95,7 @@ module.exports = function tokenizer(testCode) {
                     }
                     lookahead++;
                     break;
-                }
-                else if (currentLastLetter !== currentFirstLetter) {
+                } else if (currentLastLetter !== currentFirstLetter) {
                     throwSyntaxError(currentCode, line, lastIndex);
                 }
             }
@@ -105,19 +104,14 @@ module.exports = function tokenizer(testCode) {
                 isTrackingString = false;
                 parsed.push(getToken(mstring, 'string'));
                 break;
-            }
-            //匹配关键字
-            //由于字符串的匹配优先进行,因此这里可以放心的匹配
-            else if (mkeyword) {
+            } else if (mkeyword) {
                 if (nextLetter.match(/\w/)) {
                     lookahead++;
                     break;
                 }
                 parsed.push(getToken(mkeyword, 'keyword'));
                 break;
-            }
-            //匹配布尔值
-            else if (mbool) {
+            } else if (mbool) {
                 //如果后一个字符还是字母或者数字,说明不是true/false而是变量
                 if (nextLetter.match(/\w/)) {
                     lookahead++;
@@ -125,18 +119,14 @@ module.exports = function tokenizer(testCode) {
                 }
                 parsed.push(getToken(mbool, 'bool'));
                 break;
-            }
-            //匹配标识符
-            else if (mid) {
+            } else if (mid) {
                 if (nextLetter.match(/[\w\d_$]/)) {
                     lookahead++;
                     break;
                 }
                 parsed.push(getToken(mid, 'id'));
                 break;
-            }
-            //匹配数字(浮点数和整数)
-            else if (mnum) {
+            } else if (mnum) {
                 if (nextLetter.match(/[\.\d]/)) {
                     lookahead++;
                     break;
@@ -146,14 +136,10 @@ module.exports = function tokenizer(testCode) {
                 }
                 parsed.push(getToken(mnum, 'number'));
                 break;
-            }
-            //匹配标点符号
-            else if (mpunctuation) {
+            } else if (mpunctuation) {
                 parsed.push(getToken(mpunctuation, 'punctuation'));
                 break;
-            }
-            //匹配操作符
-            else if (moperator) {
+            } else if (moperator) {
                 const currentLetter = moperator[0];
                 //以下操作符可能是某个更长的操作符的一部分
                 //因此遇到以下操作符直接向缓冲区追加一个字符进行匹配
@@ -161,18 +147,15 @@ module.exports = function tokenizer(testCode) {
                     currentLetter === '&' && nextLetter === '&') {
                     lookahead++;
                     break;
-                }
-                else if (currentLetter === '<' && (nextLetter === '<' || nextLetter === '=')
+                } else if (currentLetter === '<' && (nextLetter === '<' || nextLetter === '=')
                     || currentLetter === '>' && (nextLetter === '>' || nextLetter === '=')) {
                     lookahead++;
                     break;
-                }
-                else if (currentLetter === '+' && nextLetter === '+'
+                } else if (currentLetter === '+' && nextLetter === '+'
                     || currentLetter === '-' && nextLetter === '-') {
                     lookahead++;
                     break;
-                }
-                else if (currentLetter === '+'
+                } else if (currentLetter === '+'
                     || currentLetter === '-'
                     || currentLetter === '*'
                     || currentLetter === '/'
@@ -181,9 +164,7 @@ module.exports = function tokenizer(testCode) {
                         lookahead++;
                         break;
                     }
-                }
-                //处理!
-                else if (currentLetter === '!') {
+                } else if (currentLetter === '!') {
                     //匹配!==
                     if (nextLetter === '=') {
                         lookahead++;
@@ -195,9 +176,7 @@ module.exports = function tokenizer(testCode) {
                 }
                 parsed.push(getToken(moperator, 'operator'));
                 break;
-            }
-            //匹配赋值(=)
-            else if (massign) {
+            } else if (massign) {
                 //=可能是===的一部分,因此直接追加一个字符
                 const extended = testCode.slice(lastIndex, lookahead + 1);
                 if (nextLetter === '=') {

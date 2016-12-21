@@ -20,8 +20,7 @@ class JSParser extends Parser {
                 const t = self.currentToken();
                 if (t.token === '{') {
                     block(node);
-                }
-                else {
+                } else {
                     stmt(node);
                     matchToken(/;/, node, true);
                     stmts(node);
@@ -100,8 +99,7 @@ class JSParser extends Parser {
                 const t = self.currentTokenStr();
                 if (t === 'if') {
                     _if(node);
-                }
-                else {
+                } else {
                     block(node);
                 }
                 append(node, parent);
@@ -277,8 +275,7 @@ class JSParser extends Parser {
                     }
                     if (t.token === leftMatch) {
                         leftMatchCount++;
-                    }
-                    else if (t.token === until) {
+                    } else if (t.token === until) {
                         leftMatchCount--;
                         if (leftMatchCount === 0) {
                             end = i;
@@ -302,11 +299,9 @@ class JSParser extends Parser {
                 lVal(node);
                 matchToken(assignTerm, node);
                 assign(node);
-            }
-            else if (firstKeyTerm.token.match(/\?/)) {
+            } else if (firstKeyTerm.token.match(/\?/)) {
                 threeItemOperation(node);
-            }
-            else {
+            } else {
                 or(node);
             }
             append(node, parent);
@@ -325,8 +320,7 @@ class JSParser extends Parser {
                 matchType(/id/, node);
                 lValRest(node);
                 append(node, parent);
-            }
-            else if (matchToken(/\[/, node, true)) {
+            } else if (matchToken(/\[/, node, true)) {
                 expression(node, ']');
                 matchToken(/\]/, node);
                 lValRest(node);
@@ -456,47 +450,36 @@ class JSParser extends Parser {
             if (type.match(/string|number|bool|undefined|null/)) {
                 matchType(/string|number|bool|undefined|null/, node);
                 node.token = 'BASIC_TYPE';
-            }
-            else if (token === '(') {
+            } else if (token === '(') {
                 matchToken(/\(/, node);
                 expression(node, ')');
                 matchToken(/\)/, node);
-            }
-            else if (matchToken(/^(\-|\+|\~|\!)$/, node, true)) {
+            } else if (matchToken(/^(\-|\+|\~|\!)$/, node, true)) {
                 factor(node);
-            }
-            else if (matchToken(/typeof/, node, true)) {
+            } else if (matchToken(/typeof/, node, true)) {
                 factor(node);
-            }
-            else if (matchToken(/void/, node, true)) {
+            } else if (matchToken(/void/, node, true)) {
                 factor(node);
-            }
-            else if (matchToken(/\+\+|\-\-/, node, true)) {
+            } else if (matchToken(/\+\+|\-\-/, node, true)) {
                 lVal(node);
-            }
-            else if (matchToken(/delete/, node, true)) {
+            } else if (matchToken(/delete/, node, true)) {
                 lVal(node);
-            }
-            else if (token === 'new') {
+            } else if (token === 'new') {
                 _new(node);
-            }
-            else if (type.match(/id/)) {
+            } else if (type.match(/id/)) {
                 access(node);
                 if (matchToken(/\+\+|\-\-/, node, true)) {
                     node.token = 'SELF_PLUS_OR_MINUS_BACKWARD';
                 }
-            }
-            else if (token === 'function') {
+            } else if (token === 'function') {
                 _function(node);
                 if (matchToken(/\(/, node, true)) {
                     callArgs(node);
                     matchToken(/\)/, node);
                 }
-            }
-            else if (token === '{') {
+            } else if (token === '{') {
                 object(node);
-            }
-            else if (token === '[') {
+            } else if (token === '[') {
                 array(node);
             }
 
@@ -522,8 +505,7 @@ class JSParser extends Parser {
             accessCall(node);
             if (matchToken(/\./, node, true)) {
                 access(node);
-            }
-            else if (matchToken(/\[/, node, true)) {
+            } else if (matchToken(/\[/, node, true)) {
                 expression(node);
                 matchToken(/]/, node);
                 if (matchToken(/\./, node, true)) {

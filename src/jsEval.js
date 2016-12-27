@@ -646,8 +646,7 @@ function _if(node, env) {
 function accessFromContext(node, env, context) {
     if (node.type === 'id') {
         return { value: context[node.token], context: context };
-    }
-    else if (node.token === 'LVAL') {
+    } else if (node.token === 'LVAL') {
         const children = node.children;
         const first = children[0];
         const nextContext = context[first.token];
@@ -683,8 +682,7 @@ function accessArgs(node, env) {
     const evalArgs = children[1];
     if (evalArgs.token === 'CALL_ARGS') {
         return callArgs(evalArgs, env, []);
-    }
-    else {
+    } else {
         return [evaluate(evalArgs, env)];
     }
 }

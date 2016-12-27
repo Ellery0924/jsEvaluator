@@ -697,9 +697,9 @@ function _new(node, env) {
 
 function accessCall(node, env, context, isNew) {
     const children = node.children;
-
     let currentContext = context || null;
     let applyContext = null;
+
     for (let i = 0; i < children.length; i++) {
         let currentNode = children[i];
         if (currentNode.token === 'LVAL') {
@@ -712,8 +712,7 @@ function accessCall(node, env, context, isNew) {
                 currentContext = ref.value;
                 applyContext = ref.context;
             }
-        }
-        else if (currentNode.type === 'id') {
+        } else if (currentNode.type === 'id') {
             if (!currentContext) {
                 const ref = accessRef(currentNode, env);
                 currentContext = ref.value;
@@ -737,15 +736,14 @@ function accessCall(node, env, context, isNew) {
                 }
                 i++;
             }
-        }
-        else if (currentNode.token === '[') {
+        } else if (currentNode.token === '[') {
             let expr = children[i + 1];
             currentContext = currentContext[evaluate(expr, env)];
             i = i + 2;
-        }
-        else if (currentNode.token === 'ACCESS_CAL_ARGS') {
+        } else if (currentNode.token === 'ACCESS_CAL_ARGS') {
             const argsNode = currentNode;
             const callee = currentContext;
+
             if (typeof callee === 'function') {
                 let actualArgs = accessArgs(argsNode, env);
                 return callee.apply(applyContext, actualArgs);
@@ -781,8 +779,7 @@ function accessCall(node, env, context, isNew) {
                     makeClosure(lastCall, lastCall.RETURN, callee, scope);
                 }
             }
-        }
-        else if (currentNode.token === 'ACCESS_CALL') {
+        } else if (currentNode.token === 'ACCESS_CALL') {
             currentContext = accessCall(currentNode, env, currentContext, isNew);
         }
     }
@@ -796,8 +793,7 @@ function cloneScope(scope) {
         if (scope.hasOwnProperty(vname)) {
             if (vname === '___parent___') {
                 ret[vname] = scope[vname];
-            }
-            else {
+            } else {
                 const variable = scope[vname];
                 const value = variable.value;
                 const type = value ? value.type : null;

@@ -286,7 +286,6 @@ function lookupId(id, env) {
     // 尝试获取当前调用函数的闭包
     const topCall = callStack[callStack.length - 1];
     const closureId = topCall ? topCall.callee.___closure___ : null;
-    // closureId是从0开始的,坑爹啊!
     const closure = closureId != null ? global['closure_' + closureId] : null;
     // 合并实参到当前环境
     if (callStack.length) {

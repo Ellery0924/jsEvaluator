@@ -799,7 +799,6 @@ function cloneScope(scope) {
                     for (var fattr in value) {
                         if (value.hasOwnProperty(fattr)) {
                             if (fattr !== 'scope') {
-                                // fret[fattr] = JSON.parse(JSON.stringify(value[fattr]));
                                 fret[fattr] = value[fattr];
                             } else {
                                 fret[fattr] = cloneScope(value[fattr]);
@@ -808,7 +807,6 @@ function cloneScope(scope) {
                     }
                     ret[vname] = { type: 'function', value: fret };
                 } else {
-                    // ret[vname] = JSON.parse(JSON.stringify(variable));
                     ret[vname] = { type, value };
                 }
             }

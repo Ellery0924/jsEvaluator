@@ -360,33 +360,33 @@ function factor(node, env) {
     const car = children[0].token;
     const rest = children[1];
     switch (car) {
-        case '!':
-            return !evaluate(rest, env);
-        case '-':
-            return -evaluate(rest, env);
-        case '+':
-            return +evaluate(rest, env);
-        case '~':
-            return ~evaluate(rest, env);
-        case '(':
-            return evaluate(rest, env);
-        case 'typeof':
-            var rightValue = evaluate(rest, env);
-            if (typeof rightValue === 'object' && rightValue.type === 'function') {
-                return 'function';
-            }
-            return typeof evaluate(rest, env);
-        case 'void':
-            evaluate(rest, env);
-            return;
-        case '++':
-        case '--':
-            return selfPlusOrMinus(rest, env, car);
-        case 'delete':
-            const ref = accessRef(rest, env);
-            const context = ref.context;
-            const lastRef = ref.lastRef;
-            return delete context[lastRef];
+    case '!':
+        return !evaluate(rest, env);
+    case '-':
+        return -evaluate(rest, env);
+    case '+':
+        return +evaluate(rest, env);
+    case '~':
+        return ~evaluate(rest, env);
+    case '(':
+        return evaluate(rest, env);
+    case 'typeof':
+        var rightValue = evaluate(rest, env);
+        if (typeof rightValue === 'object' && rightValue.type === 'function') {
+            return 'function';
+        }
+        return typeof evaluate(rest, env);
+    case 'void':
+        evaluate(rest, env);
+        return;
+    case '++':
+    case '--':
+        return selfPlusOrMinus(rest, env, car);
+    case 'delete':
+        const ref = accessRef(rest, env);
+        const context = ref.context;
+        const lastRef = ref.lastRef;
+        return delete context[lastRef];
     }
 }
 
@@ -424,71 +424,71 @@ function twoItemOperation(node, env) {
 
     while (operator && operatee != null) {
         switch (operator) {
-            case '*':
-                ret = ret * operatee;
-                break;
-            case '/':
-                ret = ret / operatee;
-                break;
-            case '%':
-                ret = ret % operatee;
-                break;
-            case '+':
-                ret = ret + operatee;
-                break;
-            case '-':
-                ret = ret - operatee;
-                break;
-            case '>':
-                ret = ret > operatee;
-                break;
-            case '<':
-                ret = ret < operatee;
-                break;
-            case '>=':
-                ret = ret >= operatee;
-                break;
-            case '<=':
-                ret = ret <= operatee;
-                break;
-            case '===':
-                ret = ret === operatee;
-                break;
-            case '!==':
-                ret = ret !== operatee;
-                break;
-            case '==':
-                ret = ret == operatee;
-                break;
-            case '!=':
-                ret = ret != operatee;
-                break;
-            case '&&':
-                ret = ret && operatee;
-                break;
-            case '||':
-                ret = ret || operatee;
-                break;
-            case 'instanceof':
-                let instResult = false;
-                while (ret) {
-                    if (ret.___proto___ === operatee.prototype) {
-                        instResult = true;
-                        break;
-                    }
-                    ret = ret.___proto___;
+        case '*':
+            ret = ret * operatee;
+            break;
+        case '/':
+            ret = ret / operatee;
+            break;
+        case '%':
+            ret = ret % operatee;
+            break;
+        case '+':
+            ret = ret + operatee;
+            break;
+        case '-':
+            ret = ret - operatee;
+            break;
+        case '>':
+            ret = ret > operatee;
+            break;
+        case '<':
+            ret = ret < operatee;
+            break;
+        case '>=':
+            ret = ret >= operatee;
+            break;
+        case '<=':
+            ret = ret <= operatee;
+            break;
+        case '===':
+            ret = ret === operatee;
+            break;
+        case '!==':
+            ret = ret !== operatee;
+            break;
+        case '==':
+            ret = ret == operatee;
+            break;
+        case '!=':
+            ret = ret != operatee;
+            break;
+        case '&&':
+            ret = ret && operatee;
+            break;
+        case '||':
+            ret = ret || operatee;
+            break;
+        case 'instanceof':
+            let instResult = false;
+            while (ret) {
+                if (ret.___proto___ === operatee.prototype) {
+                    instResult = true;
+                    break;
                 }
-                return instResult;
-            case 'in':
-                let inResult = false;
-                while (operatee) {
-                    if (operatee.hasOwnProperty(ret)) {
-                        inResult = true;
-                        break;
-                    }
-                    operatee = operatee.___proto___;
+                ret = ret.___proto___;
+            }
+            return instResult;
+        case 'in':
+            let inResult = false;
+            while (operatee) {
+                if (operatee.hasOwnProperty(ret)) {
+                    inResult = true;
+                    break;
                 }
-                return inResult;
+                operatee = operatee.___proto___;
+            }
+            return inResult;
         }
 
         next = next.children.find(child => child.token.match(/_REST/));
@@ -588,24 +588,24 @@ function assign(node, env) {
     const rightValue = evaluate(rightNode, env);
 
     switch (operator) {
-        case '=':
-            context[lastRef] = rightValue;
-            return rightValue;
-        case '+=':
-            context[lastRef] = context[lastRef] + rightValue;
-            return rightValue;
-        case '-=':
-            context[lastRef] = context[lastRef] - rightValue;
-            return rightValue;
-        case '*=':
-            context[lastRef] = context[lastRef] * rightValue;
-            return rightValue;
-        case '/=':
-            context[lastRef] = context[lastRef] / rightValue;
-            return rightValue;
-        case '%=':
-            context[lastRef] = context[lastRef] % rightValue;
-            return rightValue;
+    case '=':
+        context[lastRef] = rightValue;
+        return rightValue;
+    case '+=':
+        context[lastRef] = context[lastRef] + rightValue;
+        return rightValue;
+    case '-=':
+        context[lastRef] = context[lastRef] - rightValue;
+        return rightValue;
+    case '*=':
+        context[lastRef] = context[lastRef] * rightValue;
+        return rightValue;
+    case '/=':
+        context[lastRef] = context[lastRef] / rightValue;
+        return rightValue;
+    case '%=':
+        context[lastRef] = context[lastRef] % rightValue;
+        return rightValue;
     }
 }
 
@@ -799,7 +799,8 @@ function cloneScope(scope) {
                     for (var fattr in value) {
                         if (value.hasOwnProperty(fattr)) {
                             if (fattr !== 'scope') {
-                                fret[fattr] = JSON.parse(JSON.stringify(value[fattr]));
+                                // fret[fattr] = JSON.parse(JSON.stringify(value[fattr]));
+                                fret[fattr] = value[fattr];
                             } else {
                                 fret[fattr] = cloneScope(value[fattr]);
                             }
@@ -807,7 +808,8 @@ function cloneScope(scope) {
                     }
                     ret[vname] = { type: 'function', value: fret };
                 } else {
-                    ret[vname] = JSON.parse(JSON.stringify(variable));
+                    // ret[vname] = JSON.parse(JSON.stringify(variable));
+                    ret[vname] = { type, value };
                 }
             }
         }
@@ -951,73 +953,73 @@ function evaluate(node, env) {
         const token = node.token;
         if (node.type === 'NON_TERM') {
             switch (token) {
-                case 'BLOCK':
-                    return block(node, env);
-                case 'STMTS':
-                    return stmts(node, env);
-                case 'VAR':
-                    return _var(node, env);
-                case 'OBJECT':
-                    return _object(node, env);
-                case 'ARRAY':
-                    return array(node, env);
-                case 'FACTOR':
-                    return factor(node, env);
-                case 'MULTI_OR_DIV':
-                case 'PLUS_OR_MINUS':
-                case 'COMPARE':
-                case 'INSTANCE_OF_OR_IN':
-                case 'AND':
-                case 'OR':
-                case 'INSTANCE_OF_OR_IN':
-                    return twoItemOperation(node, env);
-                case 'THREE_ITEM_OPERATION':
-                    return threeItemOperation(node, env);
-                case 'LVAL':
-                    return accessValue(node, env);
-                case 'SELF_PLUS_OR_MINUS_BACKWARD':
-                    const operator = node.children[1].token;
-                    const operatee = node.children[0];
-                    return selfPlusOrMinus(operatee, env, operator, true);
-                case 'ASSIGN':
-                    return assign(node, env);
-                case 'FUNCTION':
-                    return accessValue(node, env);
-                case 'COMMA':
-                    return comma(node, env);
-                case 'IF':
-                    return _if(node, env);
-                case 'ACCESS_CALL':
-                    return accessCall(node, env);
-                    break;
-                case 'RETURN':
-                    return _return(node, env);
-                case 'BREAK':
-                    return _break();
-                case 'NEW':
-                    return _new(node, env);
-                case 'FOR':
-                    return _for(node, env);
-                case 'WHILE':
-                    return _while(node, env);
-                case 'DO':
-                    return _do(node, env);
+            case 'BLOCK':
+                return block(node, env);
+            case 'STMTS':
+                return stmts(node, env);
+            case 'VAR':
+                return _var(node, env);
+            case 'OBJECT':
+                return _object(node, env);
+            case 'ARRAY':
+                return array(node, env);
+            case 'FACTOR':
+                return factor(node, env);
+            case 'MULTI_OR_DIV':
+            case 'PLUS_OR_MINUS':
+            case 'COMPARE':
+            case 'INSTANCE_OF_OR_IN':
+            case 'AND':
+            case 'OR':
+            case 'INSTANCE_OF_OR_IN':
+                return twoItemOperation(node, env);
+            case 'THREE_ITEM_OPERATION':
+                return threeItemOperation(node, env);
+            case 'LVAL':
+                return accessValue(node, env);
+            case 'SELF_PLUS_OR_MINUS_BACKWARD':
+                const operator = node.children[1].token;
+                const operatee = node.children[0];
+                return selfPlusOrMinus(operatee, env, operator, true);
+            case 'ASSIGN':
+                return assign(node, env);
+            case 'FUNCTION':
+                return accessValue(node, env);
+            case 'COMMA':
+                return comma(node, env);
+            case 'IF':
+                return _if(node, env);
+            case 'ACCESS_CALL':
+                return accessCall(node, env);
+                break;
+            case 'RETURN':
+                return _return(node, env);
+            case 'BREAK':
+                return _break();
+            case 'NEW':
+                return _new(node, env);
+            case 'FOR':
+                return _for(node, env);
+            case 'WHILE':
+                return _while(node, env);
+            case 'DO':
+                return _do(node, env);
             }
         } else {
             const type = node.type;
             switch (type) {
-                case 'number':
-                    return Number(token);
-                case 'string':
-                    return String(token);
-                case 'bool':
-                    return token === 'true' ? true : false;
-                case 'null':
-                    return null;
-                case 'undefined':
-                    return undefined;
-                case 'id':
-                    return accessValue(node, env);
+            case 'number':
+                return Number(token);
+            case 'string':
+                return String(token);
+            case 'bool':
+                return token === 'true' ? true : false;
+            case 'null':
+                return null;
+            case 'undefined':
+                return undefined;
+            case 'id':
+                return accessValue(node, env);
             }
         }
     }

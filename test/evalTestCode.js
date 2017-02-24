@@ -1,3 +1,74 @@
+function wrapper() {
+    var id = { value: -1 };
+    return {
+        closureA: function () {
+            ++id.value;
+            console.log('id added by a ', id);
+            return id;
+        },
+        closureB: function () {
+            ++id.value;
+            console.log('id added by b ', id);
+            return id;
+        }
+    };
+}
+
+var ret = wrapper();
+
+console.log('=== Closure ===');
+var obj1 = ret.closureA();
+var obj2 = ret.closureB();
+var obj3 = ret.closureA();
+var obj4 = ret.closureB();
+console.log(obj1 === obj2, obj2 === obj3, obj3 === obj4);
+
+console.log('=== Recursive, Callstack ===');
+function fib(n) {
+    if (n === 0 || n === 1) {
+        return 1;
+    } else {
+        return fib(n - 1) + fib(n - 2);
+    }
+}
+
+function factorial(n) {
+    if (n === 1) {
+        return 1;
+    } else {
+        return n * factorial(n - 1);
+    }
+}
+console.log('fib 10:', fib(10));
+console.log('fact 5:', factorial(5));
+
+console.log('=== Prototype chain ====');
+function Animal() {
+}
+
+Animal.prototype = {
+    sayMyName: function () {
+        console.log('My name is', this.name);
+    }
+};
+
+function Cat(name) {
+    this.name = name;
+}
+
+Cat.prototype = new Animal();
+Cat.prototype.meow = function () {
+    console.log('Meow!');
+    this.sayMyName();
+};
+
+var jerry = new Cat('Jerry');
+jerry.meow();
+console.log('Is Jerry a cat? ', jerry instanceof Cat);
+console.log('Is Jerry an animal? ', jerry instanceof Animal);
+
+console.log('=== Quicksort and Countingsort ===');
+
 function quickSort(arr, start, end) {
     if (start >= end) {
         return;
@@ -51,7 +122,9 @@ function countingSort(arr, largest) {
     return ret;
 }
 
-var arr = [100, 5, 4, 3, 2, 3];
-console.log(countingSort(arr, 100));
-quickSort(arr, 0, arr.length - 1);
+var arr = [5, 2, 7, 8, 1000, -1];
+quickSort(arr, 0, 5);
 console.log(arr);
+
+arr = [6, 5, 2, 9, 1000, 2];
+console.log(countingSort(arr, 1000));

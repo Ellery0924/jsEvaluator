@@ -67,64 +67,73 @@ jerry.meow();
 console.log('Is Jerry a cat? ', jerry instanceof Cat);
 console.log('Is Jerry an animal? ', jerry instanceof Animal);
 
-console.log('=== Quicksort and Countingsort ===');
-
-function quickSort(arr, start, end) {
-    if (start >= end) {
-        return;
-    }
-    var q = partition(arr, start, end);
-    quickSort(arr, start, q - 1);
-    quickSort(arr, q + 1, end);
-}
+console.log('=== sort ===');
 
 function swap(arr, i, j) {
-    var tmp = arr[j];
-    arr[j] = arr[i];
-    arr[i] = tmp;
+    var tmp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = tmp;
 }
 
 function partition(arr, start, end) {
-    var r = arr[end], j, i;
-    j = start;
-    for (i = start; i < end; i++) {
-        if (arr[i] < r) {
+    var p = arr[end];
+    var i = start, j = start;
+    while (j < end) {
+        var current = arr[j];
+        if (current < p) {
             swap(arr, i, j);
-            j++;
+            i++;
+        }
+        j++;
+    }
+    swap(arr, i, end);
+    return i;
+}
+
+function _quicksort(arr, start, end) {
+    if (start >= end) {
+        return [];
+    }
+
+    var p = partition(arr, start, end);
+    _quicksort(arr, start, p - 1);
+    _quicksort(arr, p + 1, end);
+}
+
+function quicksort(arr) {
+    _quicksort(arr, 0, arr.length - 1);
+}
+
+function insertionsort(arr) {
+    for (var i = 1; i < arr.length; i++) {
+        var cur = arr[i];
+        var j = i;
+        while (cur < arr[j - 1] && j > 0) {
+            arr[j] = arr[j - 1];
+            j--;
+        }
+        arr[j] = cur;
+    }
+}
+
+function bubblesort(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+        for (var j = 0; j < i; j++) {
+            if (arr[j] > arr[i]) {
+                swap(arr, i, j);
+            }
         }
     }
-    swap(arr, end, j);
-    return j;
 }
 
-function count(arr, largest) {
-    var counts = [];
-    for (var i = 0; i <= largest; i++) {
-        counts[i] = 0;
-    }
-    for (var j = 0; j < arr.length; j++) {
-        counts[arr[j]]++;
-    }
-    for (var k = 1; k < counts.length; k++) {
-        counts[k] += counts[k - 1];
-    }
-    return counts;
-}
+var arr1 = [5, 2, 7, 8, 6, 3, 10000, 200];
+bubblesort(arr1);
+console.log('result of bubblesort: ', arr1);
 
-function countingSort(arr, largest) {
-    var counts = count(arr, largest),
-        ret = [];
-    for (var i = 0; i < arr.length; i++) {
-        var ele = arr[i];
-        ret[counts[ele] - 1] = ele;
-        counts[ele]--;
-    }
-    return ret;
-}
+var arr2 = [2100, 2000, 3, 6, 7, 1, 131, 232];
+quicksort(arr2);
+console.log('result of quicksort: ', arr2);
 
-var arr = [5, 2, 7, 8, 1000, -1];
-quickSort(arr, 0, 5);
-console.log(arr);
-
-arr = [6, 5, 2, 9, 1000, 2];
-console.log(countingSort(arr, 1000));
+var arr3 = [2, 2121, 222, 55, 33, 21];
+insertionsort(arr3);
+console.log('result of insertionsort: ', arr3);

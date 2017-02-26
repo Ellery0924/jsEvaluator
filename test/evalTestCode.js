@@ -68,7 +68,6 @@ console.log('Is Jerry a cat? ', jerry instanceof Cat);
 console.log('Is Jerry an animal? ', jerry instanceof Animal);
 
 console.log('=== sort ===');
-
 function swap(arr, i, j) {
     var tmp = arr[i];
     arr[i] = arr[j];

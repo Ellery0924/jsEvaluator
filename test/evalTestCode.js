@@ -133,6 +133,6 @@ var arr2 = [2100, 2000, 3, 6, 7, 1, 131, 232];
 quicksort(arr2);
 console.log('result of quicksort: ', arr2);
 
-var arr3 = [2, 2121, 222, 55, 33, 21];
+var arr3 = [2, 2121, 222, 55, 33.333, 21];
 insertionsort(arr3);
 console.log('result of insertionsort: ', arr3);

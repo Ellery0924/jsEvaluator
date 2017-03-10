@@ -116,10 +116,10 @@ function insertionsort(arr) {
 }
 
 function bubblesort(arr) {
-    for (var i = 0; i < arr.length - 1; i++) {
-        for (var j = 0; j < arr.length - i - 1; j++) {
-            if (arr[j] > arr[j + 1]) {
-                swap(arr, j, j + 1);
+    for (var i = 0; i < arr.length; i++) {
+        for (var j = 1; j < arr.length - i; j++) {
+            if (arr[j - 1] > arr[j]) {
+                swap(arr, j, j - 1);
             }
         }
     }

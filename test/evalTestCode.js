@@ -1,10 +1,11 @@
-var closureCreator = function () {
-  var n = 0;
-  return function add1() {
-    n++;
-    return n;
-  };
-};
+var value = 1;
+function a() {
+  console.log(value);
+}
 
-var add = closureCreator();
-var result = add();
+function b() {
+  var value = 2;
+  a();
+}
+
+b()

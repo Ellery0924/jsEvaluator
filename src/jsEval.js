@@ -9,12 +9,12 @@ const global = {
   // 将原生的console注入
   console: {
     type: 'variable',
-    value: console
+    value: console,
   },
   Math: {
     type: 'variable',
-    value: Math
-  }
+    value: Math,
+  },
 };
 // 函数调用栈
 const callStack = [];
@@ -85,7 +85,7 @@ function extractFunctionDeclarationFromStmt(node, env) {
     const funcBodyNode = findNodeInChildrenBy(node, 'BLOCK');
     const argsNode = children.slice(
       children.findIndex(child => child.token === '(') + 1,
-      children.findIndex(child => child.token === ')')
+      children.findIndex(child => child.token === ')'),
     )[0];
 
     function getArgs(node, ret) {
@@ -117,8 +117,8 @@ function extractFunctionDeclarationFromStmt(node, env) {
         type: 'function',
         name: funcName || null,
         length: args.length,
-        prototype: Object.prototype
-      }
+        prototype: Object.prototype,
+      },
     };
 
     funcTag(node, funcId);
@@ -130,7 +130,7 @@ function extractFunctionDeclarationFromStmt(node, env) {
 
 function findNodeInChildrenBy(node, cond, by) {
   return node && node.children ? node.children.find(child =>
-    child[by !== 'type' ? 'token' : 'type'] === cond
+    child[by !== 'type' ? 'token' : 'type'] === cond,
   ) : null;
 }
 
@@ -242,6 +242,7 @@ function stmts(node, env) {
 
 function _var(node, env) {
   const varBody = findNodeInChildrenBy(node, 'VAR_BODY');
+  // console.log(varBody);
   //没有varBody是没有赋值的var语句
   if (varBody) {
     return _varBody(varBody, env);
@@ -256,14 +257,16 @@ function _varBody(node, env) {
     child !== idNode
     && child.token !== ','
     && child.token !== '='
-    && child !== rest
+    && child !== rest,
   );
   const id = idNode.token;
   const value = valueNode ? evaluate(valueNode, env) : undefined;
-
+  // if (value === 2) {
+  //   console.log(env);
+  // }
   env[id] = {
     type: 'variable',
-    value: value
+    value: value,
   };
 
   if (rest) {
@@ -293,7 +296,7 @@ function lookupId(id, env) {
   }
 
   if (id === 'this') {
-    return { value: callStack[callStack.length - 1].context };
+    return { value: callStack[callStack.length - 1].callee.context };
   }
 
   if (env[id]) {
@@ -679,6 +682,7 @@ function callArgs(node, env, ret) {
 function accessArgs(node, env) {
   const children = node.children;
   const evalArgs = children[1];
+  // console.log(evalArgs.token, evalArgs, { ...env, ___parent___: null });
   if (evalArgs.token === 'CALL_ARGS') {
     return callArgs(evalArgs, env, []);
   } else {
@@ -697,7 +701,7 @@ function accessCall(node, env, context, isNew) {
   let currentContext = context || null;
   let applyContext = null;
 
-  for (let i = 0 ; i < children.length ; i++) {
+  for (let i = 0; i < children.length; i++) {
     let currentNode = children[i];
     if (currentNode.token === 'LVAL') {
       if (!currentContext) {
@@ -713,6 +717,7 @@ function accessCall(node, env, context, isNew) {
       if (!currentContext) {
         const ref = accessRef(currentNode, env);
         currentContext = ref.value;
+        console.log(ref.value.name, 'excuting');
         applyContext = global;
       } else {
         const ref = accessFromContext(currentNode, env, currentContext);
@@ -757,11 +762,11 @@ function accessCall(node, env, context, isNew) {
           // 如果是new调用的, 那么context是一个链接到prototype上的空对象
           context: !isNew ? applyContext || global : { ___proto___: callee.prototype },
           callee: callee,
-          appliedArgs: appliedArgs
+          appliedArgs: appliedArgs,
         });
 
         // 克隆作用域,并连接到外层作用域上
-        const scope = cloneScope(callee.scope);
+        const scope = callee.scope;
         evaluate(callee.body, scope);
         const lastCall = callStack.pop();
         currentContext = lastCall.RETURN;
@@ -783,37 +788,38 @@ function accessCall(node, env, context, isNew) {
 
   return currentContext;
 }
-
-function cloneScope(scope) {
-  const ret = {};
-  for (var vname in scope) {
-    if (scope.hasOwnProperty(vname)) {
-      if (vname === '___parent___') {
-        ret[vname] = scope[vname];
-      } else {
-        const variable = scope[vname];
-        const value = variable.value;
-        const type = value ? value.type : null;
-        if (type === 'function') {
-          const fret = {};
-          for (var fattr in value) {
-            if (value.hasOwnProperty(fattr)) {
-              if (fattr !== 'scope') {
-                fret[fattr] = value[fattr];
-              } else {
-                fret[fattr] = cloneScope(value[fattr]);
-              }
-            }
-          }
-          ret[vname] = { type: 'function', value: fret };
-        } else {
-          ret[vname] = { type, value };
-        }
-      }
-    }
-  }
-  return ret;
-}
+//
+// function cloneScope(scope) {
+//   console.log('scope to clone', scope);
+//   const ret = {};
+//   for (var vname in scope) {
+//     if (scope.hasOwnProperty(vname)) {
+//       if (vname === '___parent___') {
+//         ret[vname] = scope[vname];
+//       } else {
+//         const variable = scope[vname];
+//         const value = variable.value;
+//         const type = value ? value.type : null;
+//         if (type === 'function') {
+//           const fret = {};
+//           for (var fattr in value) {
+//             if (value.hasOwnProperty(fattr)) {
+//               if (fattr !== 'scope') {
+//                 fret[fattr] = value[fattr];
+//               } else {
+//                 fret[fattr] = cloneScope(value[fattr]);
+//               }
+//             }
+//           }
+//           ret[vname] = { type: 'function', value: fret };
+//         } else {
+//           ret[vname] = { type, value };
+//         }
+//       }
+//     }
+//   }
+//   return ret;
+// }
 
 function makeClosure(call, ret, callee, scope) {
   closureId++;
@@ -832,7 +838,7 @@ function makeClosure(call, ret, callee, scope) {
   let closure = Object.assign({}, parentClosure, {
     madeBy: callee.name,
     type: 'closure',
-    closureId: closureId
+    closureId: closureId,
   });
   // 最内层的变量应该取当前环境的, 其余的父级作用域应该取外层函数的闭包的
   let lvl = 0;
@@ -876,7 +882,7 @@ function _for(node, env) {
   const block = findNodeInChildrenBy(node, 'BLOCK');
   loopStack.push({
     id: ++loopid,
-    _break: false
+    _break: false,
   });
 
   evaluate(initialNode, env);
@@ -911,7 +917,7 @@ function _while(node, env) {
 
   loopStack.push({
     id: ++loopid,
-    _break: false
+    _break: false,
   });
   _whileBody(condNode, blockNode, env, loopid);
   loopStack.pop();
@@ -924,7 +930,7 @@ function _do(node, env) {
 
   loopStack.push({
     id: ++loopid,
-    _break: false
+    _break: false,
   });
   evaluate(blockNode, env);
   _whileBody(condNode, blockNode, env, loopid);
@@ -1036,6 +1042,6 @@ module.exports = (ptree) => {
 
   return {
     parseTree: ptree,
-    env: global
+    env: global,
   };
 };

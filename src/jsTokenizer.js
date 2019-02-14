@@ -46,7 +46,6 @@ function throwSyntaxError(currentCode, line, index) {
 }
 
 module.exports = function tokenizer(testCode) {
-  console.log('tokenizer analyzing...');
   const codeLen = testCode.length;
   let isTrackingString = false;
   //使用lastIndex和lookahead维护一个缓冲区

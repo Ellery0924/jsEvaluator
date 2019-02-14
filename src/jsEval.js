@@ -717,7 +717,6 @@ function accessCall(node, env, context, isNew) {
       if (!currentContext) {
         const ref = accessRef(currentNode, env);
         currentContext = ref.value;
-        console.log(ref.value.name, 'excuting');
         applyContext = global;
       } else {
         const ref = accessFromContext(currentNode, env, currentContext);
@@ -754,7 +753,10 @@ function accessCall(node, env, context, isNew) {
         let appliedArgs;
 
         appliedArgs = actualArgs.reduce((ret, arg, i) => {
-          ret[callee.args[i]] = { type: 'variable', value: arg };
+          const argKey = callee.args[i];
+          if (argKey != null) {
+            ret[callee.args[i]] = { type: 'variable', value: arg };
+          }
           return ret;
         }, {});
 
@@ -766,7 +768,7 @@ function accessCall(node, env, context, isNew) {
         });
 
         // 克隆作用域,并连接到外层作用域上
-        const scope = callee.scope;
+        const { scope } = callee;
         evaluate(callee.body, scope);
         const lastCall = callStack.pop();
         currentContext = lastCall.RETURN;
@@ -788,6 +790,18 @@ function accessCall(node, env, context, isNew) {
 
   return currentContext;
 }
+
+function clearScope(scope) {
+  Object.keys(scope).forEach((k) => {
+    const variable = scope[k];
+    const { value: variableInfo } = variable;
+    const type = variableInfo ? variableInfo.type : null;
+    if (type === 'variable') {
+      variableInfo.value = undefined;
+    }
+  });
+}
+
 //
 // function cloneScope(scope) {
 //   console.log('scope to clone', scope);

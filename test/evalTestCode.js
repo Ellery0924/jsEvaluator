@@ -1,11 +1,11 @@
 var value = 1;
-function a() {
+
+function b() {
+  value++;
   console.log(value);
 }
 
-function b() {
-  var value = 2;
-  a();
+for (var i = 0; i < 3; i++) {
+  b();
 }
 
-b()
